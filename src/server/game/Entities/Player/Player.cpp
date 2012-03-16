@@ -4254,6 +4254,27 @@ bool Player::Has310Flyer(bool checkAllSpells, uint32 excludeSpellId)
     return false;
 }
 
+void Player::ReduceSpellCooldown(uint32 spell_id, uint32 seconds)
+{
+    if (HasSpellCooldown(spell_id))
+    {
+        uint32 newCooldownDelay = GetSpellCooldownDelay(spell_id);
+
+        if (newCooldownDelay < seconds/1000 + 1)
+            newCooldownDelay = 0;
+        else
+            newCooldownDelay -= seconds/1000;
+
+        this->AddSpellCooldown(spell_id, 0, uint32(time(NULL) + newCooldownDelay));
+
+        WorldPacket data(SMSG_MODIFY_COOLDOWN, 4 + 8 + 4);
+        data << uint32(spell_id); // Spell ID
+        data << uint64(GetGUID()); // Player GUID
+        data << int32(-seconds); // Cooldown mod in milliseconds
+        GetSession()->SendPacket(&data);
+    }
+}
+
 void Player::RemoveSpellCooldown(uint32 spell_id, bool update /* = false */)
 {
     _spellCooldowns.erase(spell_id);

@@ -7770,7 +7770,7 @@ void Spell::EffectRemoveAura(SpellEffIndex effIndex)
     unitTarget->RemoveAurasDueToSpell(m_spellInfo->Effects[effIndex].TriggerSpell);
 }
 
-void Spell:EffectRewardCurrency(SpellEffIndex effIndex)
+void Spell::EffectRewardCurrency(SpellEffIndex effIndex)
 {
     if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT_TARGET)
         return;
@@ -7778,7 +7778,7 @@ void Spell:EffectRewardCurrency(SpellEffIndex effIndex)
     if (unitTarget->GetTypeId() != TYPEID_PLAYER)
         return;
 
-    unitTarget->ModifyCurrency(m_spellInfo->Effects[effIndex].MiscValue, damage);
+    unitTarget->ToPlayer()->ModifyCurrency(m_spellInfo->Effects[effIndex].MiscValue, damage);
 }
 
 void Spell::EffectDestroyItem(SpellEffIndex effIndex)
@@ -7789,7 +7789,7 @@ void Spell::EffectDestroyItem(SpellEffIndex effIndex)
     if (unitTarget->GetTypeId() != TYPEID_PLAYER)
         return;
 
-    unitTarget->DestroyItemCount(m_spellInfo->Effects[effIndex].ItemType, 9999, true, true);
+    unitTarget->ToPlayer()->DestroyItemCount(m_spellInfo->Effects[effIndex].ItemType, 9999, true, true);
 }
 
 void Spell::EffectMassResurrect(SpellEffIndex effIndex)
@@ -7820,7 +7820,7 @@ void Spell::EffectMassResurrect(SpellEffIndex effIndex)
         if (!target->IsInWorld())
             continue;
 
-        if (target->isRessurectRequested())
+        if (target->ToPlayer()->isRessurectRequested())
             continue;
 
         if (target->HasAura(95223))
@@ -7834,8 +7834,8 @@ void Spell::EffectMassResurrect(SpellEffIndex effIndex)
 
         ExecuteLogEffectResurrect(effIndex, target);
 
-        target->setResurrectRequestData(m_caster->GetGUID(), m_caster->GetMapId(), m_caster->GetPositionX(), m_caster->GetPositionY(), m_caster->GetPositionZ(), health, mana);
-        SendResurrectRequest(target);
+        target->ToPlayer()->setResurrectRequestData(m_caster->GetGUID(), m_caster->GetMapId(), m_caster->GetPositionX(), m_caster->GetPositionY(), m_caster->GetPositionZ(), health, mana);
+        SendResurrectRequest(target->ToPlayer());
     }
 }
 

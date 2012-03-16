@@ -2886,6 +2886,16 @@ void SpellMgr::LoadSpellInfoStore()
     sLog->outString();
 }
 
+ActionBarSpellOverride const* SpellMgr::GetActionBarSpellOverride(uint32 overrideSpell) const
+{
+        ActionBarSpellOverrideMap::const_iterator itr = mActionBarSpellOverrideMap.find(overrideSpell);
+
+        if(itr == mActionBarSpellOverrideMap.end())
+                return NULL;
+        else
+                return &itr->second;
+}
+
 void SpellMgr::UnloadSpellInfoStore()
 {
     for (uint32 i = 0; i < mSpellInfoMap.size(); ++i)

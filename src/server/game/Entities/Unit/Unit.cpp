@@ -10921,7 +10921,7 @@ bool Unit::isSpellCrit(Unit* victim, SpellInfo const* spellProto, SpellSchoolMas
                         // Improved Searing Pain
                         if (spellProto->SpellFamilyFlags[0] & 0x100 && spellProto->SpellIconID == 816)
                                 if (AuraEffect const* aurEff = GetDummyAuraEffect(SPELLFAMILY_WARLOCK, 816, 0))
-                                    if (pVictim->HealthBelowPct(25))
+                                    if (victim->HealthBelowPct(25))
                                         crit_chance += aurEff->GetAmount();
                         break;
                     case SPELLFAMILY_MAGE:
