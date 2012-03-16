@@ -5788,9 +5788,26 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
             }
             break;
         }
+        case SPELLFAMILY_PRIEST:
+        {
+            if (m_spellInfo->Id == 89490) // Strength of Soul
+            {
+                if (unitTarget->HasAura(6788))
+                {
+                    uint32 newCooldownDelay = unitTarget->GetAura(6788)->GetDuration();
+                    if (newCooldownDelay <= uint32(damage*1000))
+                        newCooldownDelay = 0;
+                    else
+                        newCooldownDelay -= uint32(damage*1000);
+
+                    unitTarget->GetAura(6788)->SetDuration(newCooldownDelay, true);
+                }
+            }
+            break;
+        }
         case SPELLFAMILY_MAGE:
         {
-            if (m_spellInfo->Id == 11129) //Combustion
+            if (m_spellInfo->Id == 11129) // Combustion
             {
                 //I assume initial periodic damage is 0 if no Dots on target
                 int32 bp = 0;
