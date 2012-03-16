@@ -474,8 +474,8 @@ enum WorldStates
     WS_WEEKLY_QUEST_RESET_TIME          = 20002,                      // Next weekly reset time
     WS_BG_DAILY_RESET_TIME              = 20003,                      // Next daily BG reset time
     WS_CURRENCY_RESET_TIME              = 20004,                      // Next currency week cap reset time
-    WS_GUILD_AD_HOURLY_RESET_TIME       = 20005                       // Next daily Guild Advancement XP reset time
-    WS_WEEKLY_GUILD_ACTIVITY_RESET_TIME = 20006                       // Next guild activity week reset time
+    WS_GUILD_AD_HOURLY_RESET_TIME       = 20005,                       // Next daily Guild Advancement XP reset time
+    WS_WEEKLY_GUILD_ACTIVITY_RESET_TIME = 20006,                       // Next guild activity week reset time
     WS_WEEKLY_REP_RESET_TIME            = 20007                       // Next guild reputation week reset time
 };
 
