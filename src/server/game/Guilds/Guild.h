@@ -338,6 +338,7 @@ private:
         uint64 GetGUID() const { return m_guid; }
         std::string GetName() const { return m_name; }
         uint32 GetAccountId() const { return m_accountId; }
+        uint32 GetGuildId() const { return m_guildId; }
         uint8 GetRankId() const { return m_rankId; }
         uint64 GetLogoutTime() { return m_logoutTime; }
         std::string GetPublicNote() { return m_publicNote; }
@@ -773,13 +774,29 @@ public:
     uint64 GetGuildMoney() { return m_bankMoney; }
     uint64 SetGuildMoney(uint64 add) { return m_bankMoney += add; }
 
-    void GainXP(uint64 xp);
+    void GainXP(uint64 xp,uint32 guildid,uint32 guid);
     void LevelUp();
     void ResetTodayXP() { m_today_xp = 0; }
     void GenerateXPCap();
     void AddGuildNews(uint32 type, uint64 source_guild, int value1, int value2, int flags = 0);
     GuildAchievementMgr& GetAchievementMgr() { return _achievementMgr; }
     GuildAchievementMgr const& GetAchievementMgr() const { return _achievementMgr; }
+
+    // Player Guild Exp
+    uint64 GetWeeklyExp(uint32 guildid,uint32 guid);
+    uint64 GetTotalExp(uint32 guildid,uint32 guid);
+    void SetPlayerGuildExp(uint32 guildid,uint32 guid, uint64 weekly_xp, uint64 total_xp);
+
+    // Player Guild Reputation
+    uint32 GetCharacterReputationGuild(uint32 guid);
+    uint32 GetCharacterReputationGuildRep(uint32 guid);
+    time_t GetCharacterReputationGuildTime(uint32 guid);
+    void GainReputation(uint64 guidid, uint32 rep);
+    void InsertCharacterReputationGuild(uint32 guid, uint32 guildid);
+    void UpdateCharacterReputationGuild(uint32 guildid, uint32 guid);
+    void UpdateDisbandCharacterReputationGuild(uint32 guid);
+    void ResetDisbandCharacterReputationGuild(uint32 guid);
+    void UpdateCharacterReputationGuildRep(uint32 wk_rep, uint32 guid);
 
 protected:
     uint32 m_id;

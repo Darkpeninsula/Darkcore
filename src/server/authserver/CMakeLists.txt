@@ -105,10 +105,14 @@ endif()
 
 if( UNIX )
   install(TARGETS authserver DESTINATION bin)
-  install(FILES  authserver.conf.dist DESTINATION etc)
+  if( WITH_CONF )
+    install(FILES  authserver.conf.dist DESTINATION etc)
+  endif()
 elseif( WIN32 )
   install(TARGETS authserver DESTINATION "${CMAKE_INSTALL_PREFIX}")
-  install(FILES authserver.conf.dist DESTINATION "${CMAKE_INSTALL_PREFIX}")
+  if( WITH_CONF )
+    install(FILES authserver.conf.dist DESTINATION "${CMAKE_INSTALL_PREFIX}")
+  endif()
 endif()
 
 # Generate precompiled header

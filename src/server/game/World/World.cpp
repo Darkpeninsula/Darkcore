@@ -107,6 +107,8 @@ World::World()
     m_MaxPlayerCount = 0;
     m_NextDailyQuestReset = 0;
     m_NextWeeklyQuestReset = 0;
+    m_NextWeeklyGuildActivityReset = 0;
+    m_NextWeeklyGuildReputationReset = 0;
 
     m_defaultDbcLocale = LOCALE_enUS;
     m_availableDbcLocaleMask = 0;
@@ -1786,11 +1788,17 @@ void World::SetInitialWorldSettings()
     sLog->outString("Calculate next weekly quest reset time..." );
     InitWeeklyQuestResetTime();
 
+    sLog->outString("Calculate next weekly guild activity reset time..." );
+    InitWeeklyGuildActivityResetTime();
+
+    sLog->outString("Calculate next weekly guild reputation reset time..." );
+    InitWeeklyGuildReputationResetTime();
+
     sLog->outString("Calculate random battleground reset time..." );
     InitRandomBGResetTime();
 
-    //sLog->outString("Calculate guild Advancement XP daily reset time..." );
-    //InitGuildAdvancementDailyResetTime();
+    sLog->outString("Calculate guild Advancement XP daily reset time..." );
+    InitGuildAdvancementDailyResetTime();
 
     LoadCharacterNameData();
 
@@ -1953,8 +1961,14 @@ void World::Update(uint32 diff)
     if (m_gameTime > m_NextWeeklyQuestReset)
         ResetWeeklyQuests();
 
-    // if (m_gameTime > m_NextDailyXPReset)
-        // ResetGuildAdvancementDailyXP();
+    if (m_gameTime > m_NextWeeklyGuildActivityReset)
+        ResetWeeklyGuildActivity();
+
+    if (m_gameTime > m_NextWeeklyGuildReputationReset)
+        ResetWeeklyGuildReputation();
+
+    if (m_gameTime > m_NextDailyXPReset)
+        ResetGuildAdvancementDailyXP();
 
     if (m_gameTime > m_NextRandomBGReset)
         ResetRandomBG();
@@ -2707,6 +2721,20 @@ void World::InitWeeklyQuestResetTime()
     m_NextWeeklyQuestReset = wstime < curtime ? curtime : time_t(wstime);
 }
 
+void World::InitWeeklyGuildActivityResetTime()
+{
+    time_t guild_activity_time = uint64(sWorld->getWorldState(WS_WEEKLY_GUILD_ACTIVITY_RESET_TIME));
+    time_t current_time = time(NULL);
+    m_NextWeeklyGuildActivityReset = guild_activity_time < current_time ? current_time : time_t(guild_activity_time);
+}
+
+void World::InitWeeklyGuildReputationResetTime()
+{
+    time_t ws_rep_time = uint64(sWorld->getWorldState(WS_WEEKLY_REP_RESET_TIME));
+    time_t cur_rep_time = time(NULL);
+    m_NextWeeklyGuildReputationReset = ws_rep_time < cur_rep_time ? cur_rep_time : time_t(ws_rep_time);
+}
+
 void World::InitDailyQuestResetTime()
 {
     time_t mostRecentQuestTime;
@@ -2783,7 +2811,7 @@ void World::ResetDailyQuests()
     sPoolMgr->ChangeDailyQuests();
 }
 
-/*void World::InitGuildAdvancementDailyResetTime()
+void World::InitGuildAdvancementDailyResetTime()
 {
     time_t Hourlyxptime = uint64(sWorld->getWorldState(WS_GUILD_AD_HOURLY_RESET_TIME));
     if (!Hourlyxptime)
@@ -2844,7 +2872,7 @@ void World::ResetGuildAdvancementDailyXP()
 
     m_NextHourlyXPReset = time_t(m_NextHourlyXPReset + HOUR);
     sWorld->setWorldState(WS_GUILD_AD_HOURLY_RESET_TIME, uint64(m_NextHourlyXPReset));
-}*/
+}
 
 void World::LoadDBAllowedSecurityLevel()
 {
@@ -2887,6 +2915,20 @@ void World::ResetEventSeasonalQuests(uint16 event_id)
     for (SessionMap::const_iterator itr = m_sessions.begin(); itr != m_sessions.end(); ++itr)
         if (itr->second->GetPlayer())
             itr->second->GetPlayer()->ResetSeasonalQuestStatus(event_id);
+}
+
+void World::ResetWeeklyGuildActivity()
+{
+    CharacterDatabase.Execute("UPDATE guild_member SET weekly_xp = '0'");
+    m_NextWeeklyGuildActivityReset = time_t(m_NextWeeklyGuildActivityReset + WEEK);
+    sWorld->setWorldState(WS_WEEKLY_GUILD_ACTIVITY_RESET_TIME, uint64(m_NextWeeklyGuildActivityReset));
+}
+
+void World::ResetWeeklyGuildReputation()
+{
+    CharacterDatabase.Execute("UPDATE character_guild_reputation SET weekly_rep = '0'");
+    m_NextWeeklyGuildReputationReset = time_t(m_NextWeeklyGuildReputationReset + WEEK);
+    sWorld->setWorldState(WS_WEEKLY_REP_RESET_TIME, uint64(m_NextWeeklyGuildReputationReset));
 }
 
 void World::ResetRandomBG()

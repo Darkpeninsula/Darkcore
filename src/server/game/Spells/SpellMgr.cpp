@@ -3126,9 +3126,6 @@ void SpellMgr::LoadSpellCustomAttr()
             case 90355:  // Ancient Hysteria
                 spellInfo->Effects[0].TriggerSpell = 95809; // Insanity
                 break;
-            case 20335: // Heart of the Crusader
-            case 20336:
-            case 20337:
             case 26573: // Consecration
                 spellInfo->Effects[1].TriggerSpell = 82366;
                 spellInfo->Effects[2].TriggerSpell = 36946;

@@ -1337,8 +1337,19 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
             case SPELLFAMILY_PALADIN:
                 // Sanctfied Wrath Cataclysm proc
                 if (GetId() == 31884)
+                {
                     if (caster->GetAuraEffect(SPELL_AURA_ADD_FLAT_MODIFIER, SPELLFAMILY_PALADIN, 3029, 0))
                         caster->CastSpell(caster, 57318, true);
+                }
+                // Speed of Light
+                else if (GetId() == 82327)
+                {
+                    if (AuraEffect * aurEff = caster->GetDummyAuraEffect(SPELLFAMILY_PALADIN, 5062, EFFECT_1))
+                    {
+                        int32 basepoints0 = aurEff->GetAmount();
+                        caster->CastCustomSpell(caster, 85497, &basepoints0, NULL, NULL, true);
+                    }
+                }
                 break;
             case SPELLFAMILY_DEATHKNIGHT:
                 if (!caster)

@@ -30,6 +30,7 @@
 
 #define MAX_GUILD_BANK_TAB_TEXT_LEN 500
 #define EMBLEM_PRICE 10 * GOLD
+#define GUILD_REP_FACTION 1168
 
 inline uint32 _GetGuildBankTabPrice(uint8 tabId)
 {
@@ -1176,7 +1177,44 @@ bool Guild::Create(Player* pLeader, const std::string& name)
 
     CharacterDatabase.CommitTransaction(trans);
     // Add reputation to leader
-    pLeader->SetReputation(1168, 1);
+    uint32 char_rep_guildid = GetCharacterReputationGuild(GUID_LOPART(pLeader->GetGUID()));
+
+    if(char_rep_guildid == 0)
+    {
+        InsertCharacterReputationGuild(GUID_LOPART(pLeader->GetGUID()), m_id);
+        GainReputation(pLeader->GetGUID(),1);
+    }
+    else
+    {
+        if(char_rep_guildid == m_id)
+        {
+            // if player has left the guild for more than 30 days, the reputation will be reset
+            time_t now = time(NULL);
+            if( now < (GetCharacterReputationGuildTime(GUID_LOPART(pLeader->GetGUID()))+MONTH) )
+                GainReputation(pLeader->GetGUID(),1);
+            else
+            {
+                // Reset Reputation
+                int32 reputation = pLeader->GetReputationMgr().GetReputation(GUILD_REP_FACTION);
+                GainReputation(pLeader->GetGUID(),-reputation);
+            }
+
+            // Reset Disband Time
+            ResetDisbandCharacterReputationGuild(GUID_LOPART(pLeader->GetGUID()));
+        }
+        else
+        {
+            UpdateCharacterReputationGuild(m_id,GUID_LOPART(pLeader->GetGUID()));
+
+            // Reset Reputation
+            int32 reputation = pLeader->GetReputationMgr().GetReputation(GUILD_REP_FACTION);
+            GainReputation(pLeader->GetGUID(),-reputation);
+
+            // Reset Disband Time
+            ResetDisbandCharacterReputationGuild(GUID_LOPART(pLeader->GetGUID()));
+        }
+    }
+
     // Create default ranks
     _CreateDefaultGuildRanks(pLeaderSession->GetSessionDbLocaleIndex());
     // Add guildmaster
@@ -1339,8 +1377,10 @@ void Guild::HandleRoster(WorldSession* session /*= NULL*/)
 
     for (Members::const_iterator itr = m_members.begin(); itr != m_members.end(); ++itr)
         data << itr->second->GetPublicNote();
+
+    // Guild Activity (Weekly)
     for (Members::const_iterator itr = m_members.begin(); itr != m_members.end(); ++itr)
-        data << uint64(0); // week activity
+        data << uint64(GetWeeklyExp(itr->second->GetGuildId(),GUID_LOPART(itr->second->GetGUID())));
 
     data << m_info;
 
@@ -1356,9 +1396,9 @@ void Guild::HandleRoster(WorldSession* session /*= NULL*/)
     for (Members::const_iterator itr = m_members.begin(); itr != m_members.end(); ++itr)
         data << itr->second->GetOfficerNote();
 
+    // Guild Activity (Total)
     for (Members::const_iterator itr = m_members.begin(); itr != m_members.end(); ++itr)
-        //data << uint64(itr->second->GetGUID()); // unk uint64
-        data << uint64(0); // total activity
+        data << uint64(GetTotalExp(itr->second->GetGuildId(),GUID_LOPART(itr->second->GetGUID())));
 
     for (Members::const_iterator itr = m_members.begin(); itr != m_members.end(); ++itr)
         data << uint8(0); // unk
@@ -1400,8 +1440,16 @@ void Guild::HandleRoster(WorldSession* session /*= NULL*/)
         }
     }
 
+    // Guild Reputation Weekly Cap
     for (Members::const_iterator itr = m_members.begin(); itr != m_members.end(); ++itr)
-        data << uint32(0); // remaining guild rep
+    {
+        //if(GUID_LOPART(itr->second->GetGUID()) == guid)
+            //total_weekly_rep = 3500 - GetCharacterReputationGuildRep(GUID_LOPART(itr->second->GetGUID())) - weekly_reputation;
+        //else
+            total_weekly_rep = 3500 - GetCharacterReputationGuildRep(GUID_LOPART(itr->second->GetGUID()));
+
+        data << uint32(total_weekly_rep);
+   }
 
     for (Members::const_iterator itr = m_members.begin(); itr != m_members.end(); ++itr)
     {
@@ -1764,6 +1812,44 @@ void Guild::HandleAcceptMember(WorldSession* session)
 
         _LogEvent(GUILD_EVENT_LOG_JOIN_GUILD, player->GetGUIDLow());
         _BroadcastEvent(GE_JOINED, player->GetGUID(), player->GetName());
+
+        uint32 char_rep_guildid = GetCharacterReputationGuild(GUID_LOPART(player->GetGUID()));
+
+        if(char_rep_guildid == 0)
+        {
+            InsertCharacterReputationGuild(GUID_LOPART(player->GetGUID()), player->GetGuildId());
+            GainReputation(player->GetGUID(),1);
+        }
+        else
+        {
+            if(char_rep_guildid == player->GetGuildId())
+            {
+                // if player has left the guild for more than 30 days, the reputation will be reset
+                time_t now = time(NULL);
+                if( now < (GetCharacterReputationGuildTime(GUID_LOPART(player->GetGUID()))+MONTH) )
+                    GainReputation(player->GetGUID(),1);
+                else
+                {
+                    // Reset Reputation
+                    int32 reputation = player->GetReputationMgr().GetReputation(GUILD_REP_FACTION);
+                    GainReputation(player->GetGUID(),-reputation);
+                }
+
+                // Reset Disband Time
+                ResetDisbandCharacterReputationGuild(GUID_LOPART(player->GetGUID()));
+            }
+            else
+            {
+                UpdateCharacterReputationGuild(player->GetGuildId(),GUID_LOPART(player->GetGUID()));
+
+                // Reset Reputation
+                int32 reputation = player->GetReputationMgr().GetReputation(GUILD_REP_FACTION);
+                GainReputation(player->GetGUID(),-reputation);
+
+                // Reset Disband Time
+                ResetDisbandCharacterReputationGuild(GUID_LOPART(player->GetGUID()));
+            }
+        }
     }
     HandleRoster();
 }
@@ -1778,8 +1864,13 @@ void Guild::HandleLeaveMember(WorldSession* session)
             // Leader cannot leave if he is not the last member
             SendCommandResult(session, GUILD_QUIT_S, ERR_GUILD_LEADER_LEAVE);
         else
+        {
+            // Guild Reputation Disband Time
+            UpdateDisbandCharacterReputationGuild(GUID_LOPART(player->GetGUID()));
+
             // Guild is disbanded if leader leaves.
             Disband();
+        }
     }
     else
     {
@@ -1787,6 +1878,9 @@ void Guild::HandleLeaveMember(WorldSession* session)
 
         _LogEvent(GUILD_EVENT_LOG_LEAVE_GUILD, player->GetGUIDLow());
         _BroadcastEvent(GE_LEFT, player->GetGUID(), player->GetName());
+
+        // Guild Reputation Disband Time
+        UpdateDisbandCharacterReputationGuild(GUID_LOPART(player->GetGUID()));
 
         SendCommandResult(session, GUILD_QUIT_S, ERR_PLAYER_NO_MORE_IN_GUILD, m_name);
     }
@@ -1816,6 +1910,9 @@ void Guild::HandleRemoveMember(WorldSession* session, uint64 guid)
             DeleteMember(guid, false, true);
             _LogEvent(GUILD_EVENT_LOG_UNINVITE_PLAYER, player->GetGUIDLow(), GUID_LOPART(guid));
             _BroadcastEvent(GE_REMOVED, 0, name.c_str(), player->GetName());
+
+            // Guild Reputation Disband Time
+            UpdateDisbandCharacterReputationGuild(GUID_LOPART(guid));
         }
     }
     HandleRoster();
@@ -3155,8 +3252,29 @@ void Guild::_BroadcastEvent(GuildEvents guildEvent, uint64 guid, const char* par
     sLog->outDebug(LOG_FILTER_GUILD, "WORLD: Sent SMSG_GUILD_EVENT");
 }
 
+// Guild Reputation
+void Guild::GainReputation(uint64 guidid, uint32 rep)
+{
+    if (!rep)
+       return;
+
+    Player* player = sObjectMgr->GetPlayer(guidid);
+
+    if(player)
+    {
+        uint32 cur_rep = GetCharacterReputationGuildRep(guidid);
+
+        // Max Weekly Reputation
+        if(cur_rep <= 3500)
+        {
+            player->GetReputationMgr().ModifyReputation(sFactionStore.LookupEntry(GUILD_REP_FACTION), rep);
+            UpdateCharacterReputationGuildRep(cur_rep+rep, guidid);
+        }
+   }
+}
+
 // Guild Advancement
-void Guild::GainXP(uint64 xp)
+void Guild::GainXP(uint64 xp,uint32 guildid,uint32 guid)
 {
     if (!xp)
         return;
@@ -3169,6 +3287,8 @@ void Guild::GainXP(uint64 xp)
     uint64 new_xp = m_xp + xp;
     uint64 nextLvlXP = GetNextLevelXP();
     uint8 level = GetLevel();
+    uint64 weekly_xp = GetWeeklyExp(guildid,guid);
+    uint64 total_xp = GetTotalExp(guildid,guid);
 
     if (new_xp > m_xp_cap)
         return;
@@ -3201,6 +3321,11 @@ void Guild::GainXP(uint64 xp)
     for (Members::const_iterator itr = m_members.begin(); itr != m_members.end(); ++itr)
         if (Player* player = itr->second->FindPlayer())
             player->GetSession()->SendPacket(&data);
+
+    // Set Player Guild XP
+    weekly_xp = weekly_xp + xp;
+    total_xp = total_xp + xp;
+    SetPlayerGuildExp(guildid,guid,weekly_xp,total_xp);
 }
 
 void Guild::LevelUp()
@@ -3294,4 +3419,134 @@ void Guild::AddGuildNews(uint32 type, uint64 source_guild, int value1, int value
             player->GetSession()->SendPacket(&data);
 
     m_guild_news.push_back(guildNews);
+}
+
+uint64 Guild::GetWeeklyExp(uint32 guildid,uint32 guid)
+{
+    PreparedStatement *stmt = CharacterDatabase.GetPreparedStatement(CHAR_GUILD_GET_PLAYER_WEEKLY_XP_EXP);
+    stmt->setUInt32(0, guildid);
+    stmt->setUInt32(1, guid);
+    PreparedQueryResult result = CharacterDatabase.Query(stmt);
+
+    if (result) //load
+    {
+        Field *fields = result->Fetch();
+        uint64 m_weekly_xp = fields[0].GetUInt32();
+        return m_weekly_xp;
+    }
+    else
+        return 0;
+}
+
+uint64 Guild::GetTotalExp(uint32 guildid,uint32 guid)
+{
+    PreparedStatement *stmt = CharacterDatabase.GetPreparedStatement(CHAR_GUILD_GET_PLAYER_WEEKLY_XP_EXP);
+    stmt->setUInt32(0, guildid);
+    stmt->setUInt32(1, guid);
+    PreparedQueryResult result = CharacterDatabase.Query(stmt);
+
+    if (result) //load
+    {
+        Field *fields = result->Fetch();
+        uint64 m_weekly_xp = fields[0].GetUInt32();
+        return m_weekly_xp;
+    }
+    else
+        return 0;
+}
+
+void Guild::SetPlayerGuildExp(uint32 guildid,uint32 guid, uint64 weekly_xp, uint64 total_xp)
+{
+    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_GUILD_SAVE_XP);
+    stmt->setUInt64(0, weekly_xp);
+    stmt->setUInt64(1, total_xp);
+    stmt->setUInt32(2, guildid);
+    stmt->setUInt32(3, guid);
+    CharacterDatabase.Execute(stmt);
+}
+
+uint32 Guild::GetCharacterReputationGuild(uint32 guid)
+{
+    PreparedStatement *stmt = CharacterDatabase.GetPreparedStatement(CHAR_GET_GUILD_REP);
+    stmt->setUInt32(0, guid);
+    PreparedQueryResult result = CharacterDatabase.Query(stmt);
+
+    if (result) //load
+    {
+        Field *fields = result->Fetch();
+        uint32 guildid = fields[0].GetUInt32();
+        return guildid;
+    }
+    else
+        return 0;
+}
+
+void Guild::InsertCharacterReputationGuild(uint32 guid, uint32 guildid)
+{
+    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_ADD_GUILD_REP);
+    stmt->setUInt32(0, guid);
+    stmt->setUInt32(1, guildid);
+    CharacterDatabase.Execute(stmt);
+}
+
+void Guild::UpdateCharacterReputationGuild(uint32 guildid, uint32 guid)
+{
+    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SET_GUILD_REP);
+    stmt->setUInt32(0, guildid);
+    stmt->setUInt32(1, guid);
+    CharacterDatabase.Execute(stmt);
+}
+
+void Guild::UpdateDisbandCharacterReputationGuild(uint32 guid)
+{
+    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SET_GUILD_REP_TIME);
+    stmt->setUInt32(0, guid);
+    CharacterDatabase.Execute(stmt);
+}
+
+void Guild::ResetDisbandCharacterReputationGuild(uint32 guid)
+{
+    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SET_GUILD_REP_RESET_TIME);
+    stmt->setUInt32(0, guid);
+    CharacterDatabase.Execute(stmt);
+}
+
+time_t Guild::GetCharacterReputationGuildTime(uint32 guid)
+{
+    PreparedStatement *stmt = CharacterDatabase.GetPreparedStatement(CHAR_GET_GUILD_REP_TIME);
+    stmt->setUInt32(0, guid);
+    PreparedQueryResult result = CharacterDatabase.Query(stmt);
+
+    if (result) //load
+    {
+        Field *fields = result->Fetch();
+        time_t disband_time = fields[0].GetUInt32();
+        return disband_time;
+    }
+    else
+        return 0;
+}
+
+uint32 Guild::GetCharacterReputationGuildRep(uint32 guid)
+{
+    PreparedStatement *stmt = CharacterDatabase.GetPreparedStatement(CHAR_GET_GUILD_REP_VAL);
+    stmt->setUInt32(0, guid);
+    PreparedQueryResult result = CharacterDatabase.Query(stmt);
+
+    if (result) //load
+    {
+        Field *fields = result->Fetch();
+        uint32 weekly_rep_val = fields[0].GetUInt32();
+        return weekly_rep_val;
+    }
+    else
+        return 0;
+}
+
+void Guild::UpdateCharacterReputationGuildRep(uint32 wk_rep, uint32 guid)
+{
+    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SET_GUILD_REP_VAL);
+    stmt->setUInt32(0, wk_rep);
+    stmt->setUInt32(1, guid);
+    CharacterDatabase.Execute(stmt);
 }

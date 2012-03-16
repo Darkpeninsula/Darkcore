@@ -471,10 +471,12 @@ enum RealmZone
 
 enum WorldStates
 {
-    WS_WEEKLY_QUEST_RESET_TIME    = 20002,                      // Next weekly reset time
-    WS_BG_DAILY_RESET_TIME        = 20003,                      // Next daily BG reset time
-    WS_CURRENCY_RESET_TIME        = 20004,                      // Next currency week cap reset time
-    WS_GUILD_AD_HOURLY_RESET_TIME  = 20005                       // Next daily Guild Advancement XP reset time
+    WS_WEEKLY_QUEST_RESET_TIME          = 20002,                      // Next weekly reset time
+    WS_BG_DAILY_RESET_TIME              = 20003,                      // Next daily BG reset time
+    WS_CURRENCY_RESET_TIME              = 20004,                      // Next currency week cap reset time
+    WS_GUILD_AD_HOURLY_RESET_TIME       = 20005                       // Next daily Guild Advancement XP reset time
+    WS_WEEKLY_GUILD_ACTIVITY_RESET_TIME = 20006                       // Next guild activity week reset time
+    WS_WEEKLY_REP_RESET_TIME            = 20007                       // Next guild reputation week reset time
 };
 
 // DB scripting commands
@@ -635,6 +637,8 @@ class World
         /// Next daily quests and random bg reset time
         time_t GetNextDailyQuestsResetTime() const { return m_NextDailyQuestReset; }
         time_t GetNextWeeklyQuestsResetTime() const { return m_NextWeeklyQuestReset; }
+        time_t GetNextWeeklyGuildActivityResetTime() const { return m_NextWeeklyGuildActivityReset; }
+        time_t GetNextWeeklyGuildReputationResetTime() const { return m_NextWeeklyGuildReputationReset; }
         time_t GetNextRandomBGResetTime() const { return m_NextRandomBGReset; }
         time_t GetGuildAdvancementDailyXPResetTime() const { return m_NextHourlyXPReset; }
 
@@ -778,11 +782,15 @@ class World
 
         void InitDailyQuestResetTime();
         void InitWeeklyQuestResetTime();
+        void InitWeeklyGuildActivityResetTime();
+        void InitWeeklyGuildReputationResetTime();
         void InitRandomBGResetTime();
-        //void InitGuildAdvancementDailyResetTime();
+        void InitGuildAdvancementDailyResetTime();
         void ResetDailyQuests();
         void ResetWeeklyQuests();
-        //void ResetGuildAdvancementDailyXP();
+        void ResetWeeklyGuildActivity();
+        void ResetWeeklyGuildReputation();
+        void ResetGuildAdvancementDailyXP();
         void ResetRandomBG();
     private:
         static volatile bool m_stopEvent;
@@ -846,6 +854,8 @@ class World
         time_t m_NextRandomBGReset;
         time_t m_NextDailyXPReset;
         time_t m_NextHourlyXPReset;
+        time_t m_NextWeeklyGuildActivityReset;
+        time_t m_NextWeeklyGuildReputationReset;
 
         //Player Queue
         Queue m_QueuedPlayer;

@@ -2436,6 +2436,58 @@ class spell_gen_tournament_pennant : public SpellScriptLoader
         }
 };
 
+// 67682 Kablooey Bombs
+class spell_kablooey_bombs : public SpellScriptLoader
+{
+    public:
+        spell_kablooey_bombs() : SpellScriptLoader("spell_kablooey_bombs") { }
+
+        class spell_kablooey_bombs_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_kablooey_bombs_SpellScript);
+
+            bool Load()
+            {
+                _handled = false;
+                return true;
+            }
+
+            void ActivateChunk()
+            {
+                if (_handled)
+                    return;
+
+                _handled = true;
+
+                if (GetCaster()->GetTypeId() == TYPEID_PLAYER)
+                {
+                    if(GetCaster()->ToPlayer()->GetQuestStatus(14124) == QUEST_STATUS_INCOMPLETE)
+                    {
+                        GameObject* Deposit = GetCaster()->ToPlayer()->FindNearestGameObject(202593, 5.0f);
+
+                        if(Deposit)
+                        {
+                            Deposit->Delete();
+                            GetCaster()->ToPlayer()->AddItem(48766,1);
+                        }
+                    }
+                }
+            }
+
+            void Register()
+            {
+                AfterHit += SpellHitFn(spell_kablooey_bombs_SpellScript::ActivateChunk);
+            }
+
+            bool _handled;
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_kablooey_bombs_SpellScript();
+        }
+};
+
 void AddSC_generic_spell_scripts()
 {
     new spell_gen_absorb0_hitlimit1();
@@ -2482,4 +2534,5 @@ void AddSC_generic_spell_scripts()
     new spell_gen_summon_tournament_mount();
     new spell_gen_on_tournament_mount();
     new spell_gen_tournament_pennant();
+    new spell_kablooey_bombs();
 }
