@@ -7213,6 +7213,25 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
         {
             switch (dummySpell->Id)
             {
+                // Lava Surge (Rank 1, 2)
+                case 77755:
+                case 77756:
+                {
+                    // procSpell Exist
+                    if (!procSpell)
+                        return false;
+
+                    // Chance as basepoints for dummy aura
+                    if (!roll_chance_i(triggerAmount))
+                        return false;
+
+                    // Lava Burst Has Cooldown
+                    if (!ToPlayer()->HasSpellCooldown(51505))
+                        return false;
+
+                    ToPlayer()->RemoveSpellCooldown(51505, true);
+                    return true;
+                }
                 // Earthen Power (Rank 1, 2)
                 case 51523:
                 case 51524:
