@@ -1441,6 +1441,7 @@ void Guild::HandleRoster(WorldSession* session /*= NULL*/)
     }
 
     // Guild Reputation Weekly Cap
+    uint32 total_weekly_rep = 0;
     for (Members::const_iterator itr = m_members.begin(); itr != m_members.end(); ++itr)
     {
         //if(GUID_LOPART(itr->second->GetGUID()) == guid)
@@ -3258,8 +3259,7 @@ void Guild::GainReputation(uint64 guidid, uint32 rep)
     if (!rep)
        return;
 
-    Player* player = sObjectMgr->GetPlayer(guidid);
-
+    Player* player = sObjectMgr->GetPlayerByLowGUID(GUID_LOPART(guidid));
     if(player)
     {
         uint32 cur_rep = GetCharacterReputationGuildRep(guidid);
@@ -3457,7 +3457,7 @@ uint64 Guild::GetTotalExp(uint32 guildid,uint32 guid)
 
 void Guild::SetPlayerGuildExp(uint32 guildid,uint32 guid, uint64 weekly_xp, uint64 total_xp)
 {
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_GUILD_SAVE_XP);
+    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_GUILD_SAVE_PLAYER_XP_EXP);
     stmt->setUInt64(0, weekly_xp);
     stmt->setUInt64(1, total_xp);
     stmt->setUInt32(2, guildid);
