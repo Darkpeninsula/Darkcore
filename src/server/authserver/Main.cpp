@@ -101,20 +101,23 @@ extern int main(int argc, char **argv)
     }
     sLog->Initialize();
 
-    sLog->outString( "%s (authserver)", _FULLVERSION);
-    sLog->outString( "<Ctrl-C> to stop.\n");
-    sLog->outString( "Using configuration file %s.", cfg_file);
-
-    sLog->outString(" ");
-    sLog->outString("   ______  __  __  __  __  ______ __  ______  ______ ");
-    sLog->outString("  /\\  ___\\/\\ \\/ / /\\ \\_\\ \\/\\  ___/\\ \\/\\  == \\/\\  ___\\ ");
-    sLog->outString("  \\ \\___  \\ \\  _'-\\ \\____ \\ \\  __\\ \\ \\ \\  __<\\ \\  __\\ ");
-    sLog->outString("   \\/\\_____\\ \\_\\ \\_\\/\\_____\\ \\_\\  \\ \\_\\ \\_\\ \\_\\ \\_____\\ ");
-    sLog->outString("    \\/_____/\\/_/\\/_/\\/_____/\\/_/   \\/_/\\/_/ /_/\\/_____/ ");
-    sLog->outString("  Project SkyFireEmu 2012(c) Open-sourced Game Emulation ");
-    sLog->outString("           <http://www.projectskyfire.org/> ");
+    sLog->outString("%s (Authentication Server)", _FULLVERSION);
     sLog->outString("<Ctrl-C> to stop.\n");
-
+    sLog->outString(" ");
+    sLog->outString(" ");
+    sLog->outString("######                     ####      ######                            ");
+    sLog->outString("#    ##   ######  #######  #  #     ##    ##  ######  #######   ###### ");
+    sLog->outString("#  #  ##  #    ## #     ## #  ####  #  ##  # ##    ## #     ## ##    ##");
+    sLog->outString("#  ##  #  ####  # #  ##  # #  #  #  #  ##### #  ##  # #  ##  # #  ##  #");
+    sLog->outString("#  ##  # ##     # #  ##### #    ##  #  ##### #  ##  # #  ##### #      #");
+    sLog->outString("#  #  ## #  ##  # #  #     #  #  ## #  ##  # #  ##  # #  #     #  #####");
+    sLog->outString("#    ##  ##     # #  #     #  ##  # ##    ## ##    ## #  #     ##    # ");
+    sLog->outString("######    ####### ####     ########  ######   ######  ####      ###### ");
+    sLog->outString(" ");
+    sLog->outString("    Dark Peninsula Massive Game Object Server, Ver. 0.6 (Pre-Alpha)    ");
+    sLog->outString("                    <http://www.darkpeninsula.eu/>                     ");
+    sLog->outString(" ");
+    sLog->outString(" ");
     sLog->outDetail("%s (Library: %s)", OPENSSL_VERSION_TEXT, SSLeay_version(SSLEAY_VERSION));
 
 #if defined (ACE_HAS_EVENT_POLL) || defined (ACE_HAS_DEV_POLL)
