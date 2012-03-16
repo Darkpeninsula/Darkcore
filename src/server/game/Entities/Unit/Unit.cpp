@@ -6652,6 +6652,33 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
         {
             switch (dummySpell->SpellIconID)
             {
+                case 5094: // Posthaste
+                {
+                    triggered_spell_id = 83559;
+                    basepoints0 = triggerAmount;
+                    target = this;
+                    break;
+                }
+                case 4752: // Crouching Tiger, Hidden Chimera
+                {
+                    if (!procSpell)
+                        return false;
+
+                    if (procFlag & PROC_FLAG_TAKEN_MELEE_AUTO_ATTACK || procFlag & PROC_FLAG_TAKEN_SPELL_MELEE_DMG_CLASS)
+                    {
+                        uint32 seconds = dummySpell->EffectBasePoints[0];
+                        ToPlayer()->ReduceSpellCooldown(781, seconds);
+                        return false;
+                    }
+
+                    if (procFlag & PROC_FLAG_TAKEN_RANGED_AUTO_ATTACK || procFlag & PROC_FLAG_TAKEN_SPELL_RANGED_DMG_CLASS || procFlag & PROC_FLAG_TAKEN_SPELL_MAGIC_DMG_CLASS_NEG)
+                    {
+                        uint32 seconds = dummySpell->EffectBasePoints[1];
+                        ToPlayer()->ReduceSpellCooldown(19263, seconds);
+                        return false;
+                    }
+                    return false;
+                }
                 case 3524: // Marked for Death
                 {
                     if(!roll_chance_i(triggerAmount))

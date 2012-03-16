@@ -319,7 +319,7 @@ class spell_pal_judgements_of_the_bold : public SpellScriptLoader
                 {
                     canBeRecalculated = true;
                     int32 basemana = caster->ToPlayer()->GetCreateMana();
-                    amount = (3 * basemana) / 100; // 3% of base mana
+                    amount = (amount * basemana) / 1000;
                 }
             }
 

@@ -602,10 +602,9 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
         case SPELL_AURA_PERIODIC_ENERGIZE:
             if (GetSpellInfo()->SpellFamilyName == SPELLFAMILY_GENERIC)
             {
-                // Replenishment (0.25% from max)
-                // Infinite Replenishment
+                // Replenishment
                 if (m_spellInfo->SpellIconID == 3184 && m_spellInfo->SpellVisual[0] == 12495)
-                    amount = GetBase()->GetUnitOwner()->GetMaxPower(POWER_MANA) * 25 / 10000;
+                    amount = GetBase()->GetUnitOwner()->GetMaxPower(POWER_MANA) * amount / 1000;
             }
             // Innervate
             else if (m_spellInfo->Id == 29166)
