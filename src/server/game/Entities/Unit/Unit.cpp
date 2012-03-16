@@ -10917,6 +10917,13 @@ bool Unit::isSpellCrit(Unit* victim, SpellInfo const* spellProto, SpellSchoolMas
                 // Custom crit by class
                 switch (spellProto->SpellFamilyName)
                 {
+                    case SPELLFAMILY_WARLOCK:
+                        // Improved Searing Pain
+                        if (spellProto->SpellFamilyFlags[0] & 0x100 && spellProto->SpellIconID == 816)
+                                if (AuraEffect const* aurEff = GetDummyAuraEffect(SPELLFAMILY_WARLOCK, 816, 0))
+                                    if (pVictim->HealthBelowPct(25))
+                                        crit_chance += aurEff->GetAmount();
+                        break;
                     case SPELLFAMILY_MAGE:
                         // Glyph of Fire Blast
                         if (spellProto->SpellFamilyFlags[0] == 0x2 && spellProto->SpellIconID == 12)
