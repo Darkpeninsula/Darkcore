@@ -237,10 +237,10 @@ pEffect SpellEffects[TOTAL_SPELL_EFFECTS]=
     &Spell::EffectRewardCurrency,                           // 166 SPELL_EFFECT_REWARD_CURRENCY
     &Spell::EffectNULL,                                     // 167
     &Spell::EffectNULL,                                     // 168
-    &Spell::EffectNULL,                                     // 169
+    &Spell::EffectDestroyItem,                              // 169 SPELL_EFFECT_DESTROY_ITEM
     &Spell::EffectNULL,                                     // 170
     &Spell::EffectNULL,                                     // 171
-    &Spell::EffectNULL,                                     // 172
+    &Spell::EffectMassResurrect,                            // 172 SPELL_EFFECT_RESURRECT_RAID_PARTY
     &Spell::EffectNULL,                                     // 173
     &Spell::EffectNULL,                                     // 174
 };
@@ -7757,13 +7757,71 @@ void Spell::EffectRemoveAura(SpellEffIndex effIndex)
 
 void Spell:EffectRewardCurrency(SpellEffIndex effIndex)
 {
-    if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT)
+    if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT_TARGET)
+        return;
+
+    if (unitTarget->GetTypeId() != TYPEID_PLAYER)
+        return;
+
+    unitTarget->ModifyCurrency(m_spellInfo->Effects[effIndex].MiscValue, damage);
+}
+
+void Spell::EffectDestroyItem(SpellEffIndex effIndex)
+{
+    if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT_TARGET)
+        return;
+
+    if (unitTarget->GetTypeId() != TYPEID_PLAYER)
+        return;
+
+    unitTarget->DestroyItemCount(m_spellInfo->Effects[effIndex].ItemType, 9999, true, true);
+}
+
+void Spell::EffectMassResurrect(SpellEffIndex effIndex)
+{
+    if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT_TARGET)
         return;
 
     if (m_caster->GetTypeId() != TYPEID_PLAYER)
         return;
 
-    unitTarget->ModifyCurrency(m_spellInfo->Effects[effIndex].MiscValue, damage);
+    float radius = m_spellInfo->Effects[effIndex].CalcRadius(m_caster);
+
+    std::list<Unit*> RaidMembers;
+    m_caster->GetRaidMember(RaidMembers,radius);
+
+    for (std::list<Unit*>::iterator itr = RaidMembers.begin(); itr != RaidMembers.end(); ++itr)
+    {
+        Unit* target = (*itr);
+        if (!target)
+            continue;
+
+        if (target->GetTypeId() != TYPEID_PLAYER)
+            continue;
+
+        if (target->isAlive())
+            continue;
+
+        if (!target->IsInWorld())
+            continue;
+
+        if (target->isRessurectRequested())
+            continue;
+
+        if (target->HasAura(95223))
+            continue;
+
+        uint32 health = target->CountPctFromMaxHealth(damage);
+        uint32 mana   = CalculatePctN(target->GetMaxPower(POWER_MANA), damage);
+
+        target->CastSpell(m_caster, 58854, true, 0); // Ressurection Visual
+        target->CastSpell(m_caster, 95223, true, 0); // Mass Ressurection Debuff
+
+        ExecuteLogEffectResurrect(effIndex, target);
+
+        target->setResurrectRequestData(m_caster->GetGUID(), m_caster->GetMapId(), m_caster->GetPositionX(), m_caster->GetPositionY(), m_caster->GetPositionZ(), health, mana);
+        SendResurrectRequest(target);
+    }
 }
 
 void Spell::EffectCastButtons(SpellEffIndex effIndex)
