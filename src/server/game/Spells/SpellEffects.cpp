@@ -234,7 +234,7 @@ pEffect SpellEffects[TOTAL_SPELL_EFFECTS]=
     &Spell::EffectNULL,                                     // 163 unused
     &Spell::EffectRemoveAura,                               // 164 SPELL_EFFECT_REMOVE_AURA
     &Spell::EffectNULL,                                     // 165
-    &Spell::EffectNULL,                                     // 166
+    &Spell::EffectRewardCurrency,                           // 166 SPELL_EFFECT_REWARD_CURRENCY
     &Spell::EffectNULL,                                     // 167
     &Spell::EffectNULL,                                     // 168
     &Spell::EffectNULL,                                     // 169
@@ -7753,6 +7753,17 @@ void Spell::EffectRemoveAura(SpellEffIndex effIndex)
         return;
     // there may be need of specifying casterguid of removed auras
     unitTarget->RemoveAurasDueToSpell(m_spellInfo->Effects[effIndex].TriggerSpell);
+}
+
+void Spell:EffectRewardCurrency(SpellEffIndex effIndex)
+{
+    if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT)
+        return;
+
+    if (m_caster->GetTypeId() != TYPEID_PLAYER)
+        return;
+
+    unitTarget->ModifyCurrency(m_spellInfo->Effects[effIndex].MiscValue, damage);
 }
 
 void Spell::EffectCastButtons(SpellEffIndex effIndex)
