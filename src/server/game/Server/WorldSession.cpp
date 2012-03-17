@@ -1113,7 +1113,7 @@ void WorldSession::ProcessQueryCallbacks()
     //- HandleStableSwapPet
     if (_stableSwapCallback.IsReady())
     {
-        uint32 param = _stableSwapCallback.GetParam();
+        uint8 param = _stableSwapCallback.GetParam();
         _stableSwapCallback.GetResult(result);
         HandleStableSwapPetCallback(result, param);
         _stableSwapCallback.FreeResult();
