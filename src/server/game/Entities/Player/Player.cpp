@@ -581,10 +581,14 @@ void KillRewarder::_RewardPlayer(Player* player, bool isDungeon)
             // Reward Guild reputation
             if (player->GetGuildId() != 0 && _victim->GetTypeId() == TYPEID_UNIT && _victim->ToCreature()->IsDungeonBoss() && player->GetGroup() && player->GetGroup()->IsGuildGroup(player->GetGuildId()))
             {
-                uint32 guildRep = uint32(_xp / 450);
-                if (guildRep < 1)
-                    guildRep = 1;
-                player->GetReputationMgr().ModifyReputation(sFactionStore.LookupEntry(1168), guildRep);
+                if (Guild* guild = sGuildMgr->GetGuildById(player->GetGuildId()))
+                {
+                    uint32 guildRep = uint32(_xp / 450);
+                    if (guildRep < 1)
+                        guildRep = 1;
+
+                    guild->GainReputation(player->GetGUID(),guildRep);
+                }
             }
         }
     }

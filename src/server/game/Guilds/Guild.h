@@ -681,7 +681,7 @@ public:
     uint32 GetMembersCount() { return m_members.size(); }
 
     // Handle client commands
-    void HandleRoster(WorldSession* session = NULL);          // NULL = broadcast
+    void HandleRoster(WorldSession *session = NULL, uint32 guid = 0, uint32 weekly_reputation = 0);          // NULL = broadcast
     void HandleQuery(WorldSession* session);
     void HandleSetMOTD(WorldSession* session, const std::string& motd);
     void HandleSetInfo(WorldSession* session, const std::string& info);
