@@ -126,9 +126,9 @@ set(scripts_STAT_SRCS
   EasternKingdoms/ThroneOfTheTides/boss_commander_ulthok.cpp
   EasternKingdoms/ThroneOfTheTides/boss_erunak_stonespeaker.cpp
   EasternKingdoms/ThroneOfTheTides/boss_lady_nazjar.cpp
-  EasternKingdoms/ThroneOfTheTides/boss_mindbender_ghursha.cpp
   EasternKingdoms/ThroneOfTheTides/boss_ozumat.cpp
-  EasternKingdoms/ThroneOfTheTides/instance_throne_of_the_tides.cpp  
+  EasternKingdoms/ThroneOfTheTides/instance_throne_of_the_tides.cpp
+  EasternKingdoms/ThroneOfTheTides/throne_of_the_tides.cpp
   
   EasternKingdoms/SunkenTemple/sunken_temple.cpp
   EasternKingdoms/SunkenTemple/sunken_temple.h
