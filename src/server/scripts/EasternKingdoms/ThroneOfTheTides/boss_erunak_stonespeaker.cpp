@@ -239,7 +239,7 @@ public:
                 default:
                     break;
                 }
-            }		
+            }        
 
             DoMeleeAttackIfReady();
         }

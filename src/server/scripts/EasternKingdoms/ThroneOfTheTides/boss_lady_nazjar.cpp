@@ -259,7 +259,7 @@ public:
         }
 
         inline void LeaveClearDreamesPhase()
-        {	
+        {    
             me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_INTERRUPT, false);
             Phase++;
             Phased = false;

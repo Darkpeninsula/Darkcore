@@ -48,10 +48,8 @@ Position const OzumatPosition[2] =
 enum Spells
 {
     SPELL_GROUND_EFFECT = 83607,
-
     SPELL_ENTANGLING_GRASP = 83463,
     SPELL_NEPTULON_BEAM_VISUAL = 79511,
-
     SPELL_TIDAL_SURGE = 76133,
     SPELL_BLIGHT_OF_OZUMAT_VISUAL = 83672,
     SPELL_BLIGHT_OF_OZUMAT_VISUAL_GROUND_EFFECT = 83525,
@@ -115,7 +113,7 @@ public:
                 return;
 
             if (playerAliveChecker <= diff)
-            {	
+            {    
                 if(!isPlayerAlive())
                     Reset();
 
@@ -123,7 +121,7 @@ public:
             } else playerAliveChecker -= diff;
 
             if (generalTimer <= diff)
-            {	
+            {    
                 HandleWave();
 
                 generalTimer = 10000;
@@ -313,7 +311,7 @@ public:
                 EndEncounter();
 
             if (abilityTimer <= diff)
-            {	
+            {    
                 if(phase == 1)
                 {
                     if(Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 200, true))
