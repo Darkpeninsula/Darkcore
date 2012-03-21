@@ -2392,6 +2392,24 @@ GameObject* WorldObject::FindNearestGameObject(uint32 entry, float range) const
     return go;
 }
 
+Player* WorldObject::FindNearestPlayer(float range, bool alive) {
+	Player* player = NULL;
+	Darkcore::AnyPlayerInObjectRangeCheck check(this, GetVisibilityRange());
+	Darkcore::PlayerSearcher<Darkcore::AnyPlayerInObjectRangeCheck> searcher(this,
+			player, check);
+	VisitNearbyWorldObject(range, searcher);
+	return player;
+}
+
+std::list<Player*> WorldObject::GetNearestPlayersList(float range, bool alive) {
+	std::list<Player*> players;
+	Darkcore::AnyPlayerInObjectRangeCheck checker(this, range, alive);
+	Darkcore::PlayerListSearcher<Darkcore::AnyPlayerInObjectRangeCheck> searcher(
+			this, players, checker);
+	VisitNearbyWorldObject(range, searcher);
+	return players;
+}
+
 void WorldObject::GetGameObjectListWithEntryInGrid(std::list<GameObject*>& gameobjectList, uint32 entry, float maxSearchRange) const
 {
     CellCoord pair(Darkcore::ComputeCellCoord(this->GetPositionX(), this->GetPositionY()));

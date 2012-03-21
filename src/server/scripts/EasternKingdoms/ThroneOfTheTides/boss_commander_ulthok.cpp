@@ -160,7 +160,7 @@ public:
     }
 };
 
-void AddSC_boss_commander_ulthok()
+void AddSC_boss_ulthok()
 {
     new boss_commander_ulthok();
 }

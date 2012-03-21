@@ -290,7 +290,7 @@ public:
 
 };
 
-void AddSC_boss_umbriss() 
+void AddSC_boss_general_umbriss() 
 {
     new boss_umbriss();
 	new npc_dweller();

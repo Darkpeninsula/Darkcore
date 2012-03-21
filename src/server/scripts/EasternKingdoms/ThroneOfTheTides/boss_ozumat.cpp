@@ -389,7 +389,7 @@ public:
     };
 };
 
-void AddSC_ozumat()
+void AddSC_boss_ozumat()
 {
     new mob_neptulon();
     new boss_ozumat();

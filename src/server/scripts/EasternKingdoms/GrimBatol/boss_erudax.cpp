@@ -124,7 +124,7 @@ public:
 
 		void UpdateAI(const uint32 diff)
 		{
-			if (!UpdateVictim() || me->HasUnitState(UNIT_STAT_CASTING))
+			if (!UpdateVictim() || me->HasUnitState(UNIT_STATE_CASTING))
 				return;
 
 			if(ShouldSummonAdds)
@@ -325,7 +325,7 @@ public:
 
 		void UpdateAI(const uint32 diff)
 		{	
-			if (pTarget == NULL || !isAtAnEgg || me->HasUnitState(UNIT_STAT_CASTING))
+			if (pTarget == NULL || !isAtAnEgg || me->HasUnitState(UNIT_STATE_CASTING))
 				return;
 
 			events.Update(diff);
@@ -520,7 +520,7 @@ public:
 				}
 			}
 
-			if (me->HasUnitState(UNIT_STAT_CASTING))
+			if (me->HasUnitState(UNIT_STATE_CASTING))
 				return;
 
 			if(!VisualEffectCasted)
