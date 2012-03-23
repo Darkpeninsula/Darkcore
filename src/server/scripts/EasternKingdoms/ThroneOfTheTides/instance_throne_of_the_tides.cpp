@@ -152,7 +152,6 @@ public:
                 uiCorales = go->GetGUID();
                 if(encounter[0] == DONE)
                     go->SetPhaseMask(2,true);
-
                 break;
             case GO_LADY_NAZJAR_DOOR:
                 uiLadyNazjarDoor = go->GetGUID();
@@ -208,7 +207,7 @@ public:
                     if(GameObject* corales = instance->GetGameObject(uiCorales))
                         corales->SetPhaseMask(2,true);
 
-	                }else if (data == IN_PROGRESS)
+                    }else if (data == IN_PROGRESS)
                 {
                     HandleGameObject(uiLadyNazjarDoor, false);
                 }else

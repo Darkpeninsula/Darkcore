@@ -222,7 +222,7 @@ public:
 
 		void UpdateAI(const uint32 diff)
 		{
-			if (!UpdateVictim() || me->HasUnitState(UNIT_STAT_CASTING))
+			if (!UpdateVictim() || me->HasUnitState(UNIT_STATE_CASTING))
 				return;
 
 			if(phase == PHASE_CASTER_PHASE && !HealthAbovePct(30))
@@ -264,7 +264,7 @@ public:
 				{
 				case EVENT_BURNING_SHADOWBOLT:
 
-					if (Unit *pTarget = SelectUnit(SELECT_TARGET_RANDOM, 0))
+					if (Unit *pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0))
 						DoCast(pTarget, RAID_MODE(SPELL_BURNING_SHADOWBOLT,SPELL_BURNING_SHADOWBOLT_H));
 
 					events.ScheduleEvent(EVENT_BURNING_SHADOWBOLT,4000);
@@ -379,7 +379,7 @@ public:
 
 		void UpdateAI(const uint32 diff)
 		{
-			if (!UpdateVictim() || me-> HasUnitState(UNIT_STAT_CASTING))
+			if (!UpdateVictim() || me-> HasUnitState(UNIT_STATE_CASTING))
 				return;
 
 			events.Update(diff);
@@ -389,7 +389,7 @@ public:
 				switch (eventId)
 				{
 				case EVENT_VALIONAS_FLAME:
-					if (Unit* pTarget = SelectUnit(SELECT_TARGET_RANDOM, 0))
+					if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0))
 						DoCast(pTarget, SPELL_VALIONAS_FLAME);
 					events.RepeatEvent(urand(15000,25000));
 					break;
@@ -403,7 +403,7 @@ public:
 					break;
 
 				case EVENT_DEVOURING_FLAMES:
-					DoCast(SelectUnit(SELECT_TARGET_RANDOM, 0), SPELL_DEVOURING_FLAMES_H);
+					DoCast(SelectTarget(SELECT_TARGET_RANDOM, 0), SPELL_DEVOURING_FLAMES_H);
 					events.RepeatEvent(urand(30000,35000));
 					break;
 

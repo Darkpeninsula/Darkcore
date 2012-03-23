@@ -142,16 +142,16 @@ public:
 
     private:
         void DespawnDarkFissures()
-		{
-			std::list<Creature*> creatures;
-			GetCreatureListWithEntryInGrid(creatures, me, NPC_DARK_FISSURE, 150.0f);
+        {
+            std::list<Creature*> creatures;
+            GetCreatureListWithEntryInGrid(creatures, me, NPC_DARK_FISSURE, 150.0f);
 
-			if (creatures.empty())
-				return;
+            if (creatures.empty())
+                return;
 
-			for (std::list<Creature*>::iterator iter = creatures.begin(); iter != creatures.end(); ++iter)
-				(*iter)->DespawnOrUnsummon();
-		}
+            for (std::list<Creature*>::iterator iter = creatures.begin(); iter != creatures.end(); ++iter)
+                (*iter)->DespawnOrUnsummon();
+        }
     };
 
     CreatureAI* GetAI(Creature *pCreature) const
@@ -160,7 +160,7 @@ public:
     }
 };
 
-void AddSC_boss_commander_ulthok()
+void AddSC_boss_ulthok()
 {
     new boss_commander_ulthok();
 }

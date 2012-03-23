@@ -197,7 +197,7 @@ public:
                 EnterClearDreamesPhase();
             }
 
-            if (me->HasUnitState(UNIT_STAT_CASTING))
+            if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
             if(!Phased)
@@ -259,7 +259,7 @@ public:
         }
 
         inline void LeaveClearDreamesPhase()
-        {	
+        {    
             me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_INTERRUPT, false);
             Phase++;
             Phased = false;
@@ -350,7 +350,7 @@ public:
     }
 };
 
-void AddSC_boss_lady_nazjar()
+void AddSC_boss_nazjar()
 {
     new boss_lady_nazjar();
     new mob_waterspout();
