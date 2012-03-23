@@ -10,5 +10,7 @@ UPDATE `creature_template` SET `ScriptName` = 'boss_mindbender_ghursha' WHERE `e
 UPDATE `creature_template` SET `ScriptName` = 'mob_waterspout' WHERE `entry` = 48571;
 UPDATE `creature_template` SET `ScriptName` = 'mob_neptulon' WHERE `entry` = 40792;
 UPDATE `creature_template` SET `ScriptName` = 'mob_lady_nazjar_event' WHERE `entry` = 40586;
+UPDATE `creature_template` SET `ScriptName` = 'boss_lady_nazjar' WHERE `entry`= 40586;
+UPDATE `creature_template` SET `ScriptName` = 'boss_umbriss' WHERE  `entry` = 39625;
 
 UPDATE `gameobject_template` SET `ScriptName` = 'go_totd_defense_system' WHERE `entry` = 203199;
