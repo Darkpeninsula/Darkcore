@@ -128,7 +128,7 @@ public:
 
 			if(ShouldSummonAdds)
 			{
-				DespawnCreatures(NPC_SHADOW_GALE_STALKER);
+				Summons.DespawnEntry(NPC_SHADOW_GALE_STALKER);
 				RemoveShadowGaleDebuffFromPlayers();
 
 				me->SetReactState(REACT_AGGRESSIVE);
@@ -467,8 +467,8 @@ public:
 					switch (eventId)
 					{
 						case EVENT_TRIGGER_GALE_CHECK_PLAYERS:
-							Map::PlayerList const &PlayerList =  me->GetMap()->GetPlayers();
-
+                        {
+							Map::PlayerList const &PlayerList = me->GetMap()->GetPlayers();
 							if (!PlayerList.isEmpty())
 							{
 								for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
@@ -484,6 +484,7 @@ public:
 							}
 							events.ScheduleEvent(EVENT_TRIGGER_GALE_CHECK_PLAYERS, 1000);
 							break;
+                        }
 						default:
                             break;
 					}
