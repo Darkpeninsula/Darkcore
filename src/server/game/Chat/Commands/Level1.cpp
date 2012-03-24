@@ -44,7 +44,6 @@
 
 bool ChatHandler::HandleNameAnnounceCommand(const char* args)
 {
-    WorldPacket data;
     if (!*args)
         return false;
 
@@ -58,7 +57,6 @@ bool ChatHandler::HandleNameAnnounceCommand(const char* args)
 
 bool ChatHandler::HandleGMNameAnnounceCommand(const char* args)
 {
-    WorldPacket data;
     if (!*args)
         return false;
 
@@ -425,12 +423,8 @@ bool ChatHandler::HandleTaxiCheatCommand(const char* args)
 
     Player* chr = getSelectedPlayer();
     if (!chr)
-    {
-        chr=_session->GetPlayer();
-    }
-
-    // check online security
-    else if (HasLowerSecurity(chr, 0))
+        chr = _session->GetPlayer();
+    else if (HasLowerSecurity(chr, 0)) // check online security
         return false;
 
     if (argstr == "on")

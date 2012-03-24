@@ -1257,7 +1257,7 @@ void LFGMgr::GetCompatibleDungeons(LfgDungeonSet& dungeons, const PlayerSet& pla
             }
         }
     }
-    if (dungeons.size())
+    if (!dungeons.empty())
         lockMap.clear();
 }
 
@@ -1270,7 +1270,7 @@ void LFGMgr::GetCompatibleDungeons(LfgDungeonSet& dungeons, const PlayerSet& pla
 */
 bool LFGMgr::CheckGroupRoles(LfgRolesMap& groles, bool removeLeaderFlag /*= true*/)
 {
-    if (!groles.size())
+    if (groles.empty())
         return false;
 
     uint8 damage = 0;
