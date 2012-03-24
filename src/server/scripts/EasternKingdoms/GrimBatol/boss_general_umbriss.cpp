@@ -2,7 +2,7 @@
  * Copyright (C) 2011-2012 DarkCore <http://www.darkpeninsula.eu/>
  * Copyright (C) 2011-2012 Project SkyFire <http://www.projectskyfire.org/>
  * Copyright (C) 2008-2012 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2012 MaNGOS <http://getmangos.com/> 
+ * Copyright (C) 2005-2012 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -31,44 +31,44 @@ enum CreatureIds
 {
     BOSS_UMBRISS    = 39625,
     MOB_TROGG_MAL   = 39984,
-	MOB_TROGG_DWE   = 45467,
+    MOB_TROGG_DWE   = 45467,
 };
 
 enum Spells
 {
-	//Umbriss
-	SPELL_BERSERK = 74853,
-	SPELL_SECOUSS = 74634,
-	SPELL_SECOUSS_H = 90249,
-	SPELL_ECLAIR = 74670,
-	SPELL_ECLAIR_H = 90250,
-	SPELL_PLAIE = 74846,
-	SPELL_PLAIE_H = 91937,
-	SPELL_APPARITION = 74859,
-	//Trogg Malveillant and Dweller
-	SPELL_MAL = 90169,
-	SPELL_MODGUD = 74837,
-	SPELL_GRIFFE = 90212,
+    //Umbriss
+    SPELL_BERSERK = 74853,
+    SPELL_SECOUSS = 74634,
+    SPELL_SECOUSS_H = 90249,
+    SPELL_ECLAIR = 74670,
+    SPELL_ECLAIR_H = 90250,
+    SPELL_PLAIE = 74846,
+    SPELL_PLAIE_H = 91937,
+    SPELL_APPARITION = 74859,
+    //Trogg Malveillant and Dweller
+    SPELL_MAL = 90169,
+    SPELL_MODGUD = 74837,
+    SPELL_GRIFFE = 90212,
 };
 
 enum Events
 {
-	//Umbriss
+    //Umbriss
     EVENT_BERSERK  = 0,
     EVENT_SECOUSS  = 1,
     EVENT_ECLAIR   = 2,
     EVENT_PLAIE    = 3,
-	EVENT_SUMMON   = 4,
-	//Trogg
-	EVENT_GRIFFE   = 5,
-	EVENT_MAL      = 6,
-	EVENT_MOGUD    = 7,	
+    EVENT_SUMMON   = 4,
+    //Trogg
+    EVENT_GRIFFE   = 5,
+    EVENT_MAL      = 6,
+    EVENT_MOGUD    = 7,
 };
 
 enum SummonIds
 {
     NPC_TROGG_MAL = 39984,
-	NPC_TROGG_DWE = 45467,
+    NPC_TROGG_DWE = 45467,
 };
 
 const Position aSpawnLocations[3] =
@@ -84,50 +84,50 @@ class boss_umbriss : public CreatureScript
         boss_umbriss() : CreatureScript("boss_umbriss") {}
 
         struct boss_umbrissAI : public ScriptedAI
-		{
-			boss_umbrissAI(Creature* pCreature) : ScriptedAI(pCreature), Summons(me)
-			{
-				pInstance = pCreature->GetInstanceScript();
-			}
+        {
+            boss_umbrissAI(Creature* pCreature) : ScriptedAI(pCreature), Summons(me)
+            {
+                pInstance = pCreature->GetInstanceScript();
+            }
 
-			InstanceScript* pInstance;
+            InstanceScript* pInstance;
             EventMap events;
             SummonList Summons;
 
-			void EnterCombat(Unit * /*who*/)
-			{
-				EnterPhaseGround();
-				me->MonsterYell(SAY_AGGRO, 0, 0);
-			}
-			
-			void JustDied(Unit* /*killer*/)
-			{
-				me->MonsterYell(SAY_DIED, 0, 0);
-			}
-			
-			void JustSummoned(Creature *pSummoned)
-			{
-				pSummoned->SetInCombatWithZone();
-				if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM,0))
+            void EnterCombat(Unit * /*who*/)
+            {
+                EnterPhaseGround();
+                me->MonsterYell(SAY_AGGRO, 0, 0);
+            }
+
+            void JustDied(Unit* /*killer*/)
+            {
+                me->MonsterYell(SAY_DIED, 0, 0);
+            }
+
+            void JustSummoned(Creature *pSummoned)
+            {
+                pSummoned->SetInCombatWithZone();
+                if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM,0))
                 pSummoned->AI()->AttackStart(pTarget);
 
-				Summons.Summon(pSummoned);
-			}
-            
-			void EnterPhaseGround()
-			{
-				events.ScheduleEvent(EVENT_SECOUSS, 6000);
-				events.ScheduleEvent(EVENT_ECLAIR, 13000);
-				events.ScheduleEvent(EVENT_PLAIE, 20000);
-				events.ScheduleEvent(EVENT_SUMMON, 60000);
-				events.ScheduleEvent(EVENT_BERSERK, 180000);
-			}
-			
-			void UpdateAI(const uint32 diff)
-			{
+                Summons.Summon(pSummoned);
+            }
+
+            void EnterPhaseGround()
+            {
+                events.ScheduleEvent(EVENT_SECOUSS, 6000);
+                events.ScheduleEvent(EVENT_ECLAIR, 13000);
+                events.ScheduleEvent(EVENT_PLAIE, 20000);
+                events.ScheduleEvent(EVENT_SUMMON, 60000);
+                events.ScheduleEvent(EVENT_BERSERK, 180000);
+            }
+
+            void UpdateAI(const uint32 diff)
+            {
                 if (!UpdateVictim())
                     return;
-					
+
                 events.Update(diff);
 
                 while (uint32 eventId = events.ExecuteEvent())
@@ -160,46 +160,46 @@ class boss_umbriss : public CreatureScript
                             return;
                     }
                 }
-				DoMeleeAttackIfReady();
-			}
-		};
+                DoMeleeAttackIfReady();
+            }
+        };
 
     CreatureAI* GetAI(Creature* creature) const
     {
-		return new boss_umbrissAI(creature);
+        return new boss_umbrissAI(creature);
     }
 };
 
 class npc_malveillant: public CreatureScript
 {
-public: 
- npc_malveillant() : CreatureScript("npc_malveillant") { } 
+public:
+ npc_malveillant() : CreatureScript("npc_malveillant") { }
 
  struct npc_malveillantAI : public ScriptedAI
     {
         npc_malveillantAI(Creature *c) : ScriptedAI(c) {}
 
         EventMap events;
-		
-		void EnterCombat(Unit * /*who*/)
-		{
-			EnterPhaseGround();
-		}
-		
-		void EnterPhaseGround()
-		{
-			events.ScheduleEvent(EVENT_GRIFFE, 2000);
-			events.ScheduleEvent(EVENT_MAL, 6000);
-			events.ScheduleEvent(EVENT_MOGUD, 12000);
-		}
+
+        void EnterCombat(Unit * /*who*/)
+        {
+            EnterPhaseGround();
+        }
+
+        void EnterPhaseGround()
+        {
+            events.ScheduleEvent(EVENT_GRIFFE, 2000);
+            events.ScheduleEvent(EVENT_MAL, 6000);
+            events.ScheduleEvent(EVENT_MOGUD, 12000);
+        }
 
         void UpdateAI(const uint32 diff)
         {
             if (!UpdateVictim())
                 return;
-					
-			events.Update(diff);
-            
+
+            events.Update(diff);
+
             while (uint32 eventId = events.ExecuteEvent())
             {
                 switch(eventId)
@@ -217,7 +217,7 @@ public:
                         events.ScheduleEvent(EVENT_MOGUD, 12000);
                         return;
                 }
-            }			
+            }
 
             DoMeleeAttackIfReady();
         }
@@ -235,34 +235,34 @@ public:
 ****************/
 class npc_dweller: public CreatureScript
 {
-public: 
- npc_dweller() : CreatureScript("npc_dweller") { } 
+public:
+ npc_dweller() : CreatureScript("npc_dweller") { }
 
  struct npc_dwellerAI : public ScriptedAI
     {
         npc_dwellerAI(Creature *c) : ScriptedAI(c) {}
 
         EventMap events;
-		
-		void EnterCombat(Unit * /*who*/)
-		{
-			EnterPhaseGround();
-		}
-		
-		void EnterPhaseGround()
-		{
-			events.ScheduleEvent(EVENT_GRIFFE, 5000);
-		}
+
+        void EnterCombat(Unit * /*who*/)
+        {
+            EnterPhaseGround();
+        }
+
+        void EnterPhaseGround()
+        {
+            events.ScheduleEvent(EVENT_GRIFFE, 5000);
+        }
 
         void UpdateAI(const uint32 diff)
         {
             if (!UpdateVictim())
                 return;
-					
-			events.Update(diff);
 
-			while (uint32 eventId = events.ExecuteEvent())
-			{
+            events.Update(diff);
+
+            while (uint32 eventId = events.ExecuteEvent())
+            {
                 switch(eventId)
                 {
                     case EVENT_GRIFFE:
@@ -270,8 +270,8 @@ public:
                         events.ScheduleEvent(EVENT_GRIFFE, 5000);
                         return;
                 }
-			}
-				
+            }
+
             DoMeleeAttackIfReady();
         }
     };
@@ -283,9 +283,9 @@ public:
 
 };
 
-void AddSC_boss_general_umbriss() 
+void AddSC_boss_general_umbriss()
 {
     new boss_umbriss();
-	new npc_dweller();
-	new npc_malveillant();
+    new npc_dweller();
+    new npc_malveillant();
 }
