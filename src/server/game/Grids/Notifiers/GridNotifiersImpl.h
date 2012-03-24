@@ -49,7 +49,6 @@ inline void Darkcore::ObjectUpdater::Visit(CreatureMapType &m)
 // SEARCHERS & LIST SEARCHERS & WORKERS
 
 // WorldObject searchers & workers
-
 template<class Check>
 void Darkcore::WorldObjectSearcher<Check>::Visit(GameObjectMapType &m)
 {
@@ -164,7 +163,6 @@ void Darkcore::WorldObjectSearcher<Check>::Visit(DynamicObjectMapType &m)
         }
     }
 }
-
 
 template<class Check>
 void Darkcore::WorldObjectLastSearcher<Check>::Visit(GameObjectMapType &m)
