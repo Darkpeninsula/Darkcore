@@ -76,7 +76,7 @@ public:
 
 	struct boss_erudaxAI : public ScriptedAI
 	{
-		boss_erudaxAI(Creature* pCreature) : ScriptedAI(pCreature), ShouldSummonAdds(false)
+		boss_erudaxAI(Creature* pCreature) : ScriptedAI(pCreature), Summons(me)
 		{
 			pInstance = pCreature->GetInstanceScript();
 		}
@@ -87,11 +87,13 @@ public:
 		InstanceScript* pInstance;
 		EventMap events;
 
+        SummonList Summons;
 		bool ShouldSummonAdds;
 
 		void Reset()
 		{
 			me->GetMotionMaster()->MoveTargetedHome();
+            ShouldSummonAdds = false;
 
 			events.Reset();
 
@@ -109,17 +111,14 @@ public:
 			me->GetMotionMaster()->MoveChase(me->getVictim());
 
 			events.ScheduleEvent(EVENT_ENFEEBLING_BLOW, 4000);
-
 			events.ScheduleEvent(EVENT_BINDING_SHADOWS, 9000);
-
 			events.ScheduleEvent(EVENT_SHADOW_GALE, 20000);
 
 			me->MonsterYell(SAY_AGGRO, LANG_UNIVERSAL, NULL);
 
 			//Posizone dei Portal Stalker
-			FacelessPortalStalker = me->SummonCreature(NPC_FACELESS_PORTAL_STALKER,-641.515f,-827.8f,235.5f,3.069f,TEMPSUMMON_MANUAL_DESPAWN);
-
-			FacelessPortalStalker->SetFlag(UNIT_FIELD_FLAGS,UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_NOT_SELECTABLE);
+            if(FacelessPortalStalker = me->SummonCreature(NPC_FACELESS_PORTAL_STALKER,-641.515f,-827.8f,235.5f,3.069f,TEMPSUMMON_MANUAL_DESPAWN))
+                FacelessPortalStalker->SetFlag(UNIT_FIELD_FLAGS,UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_NOT_SELECTABLE);
 		}
 
 		void UpdateAI(const uint32 diff)
@@ -139,13 +138,16 @@ public:
 				if ((rand()%2))
 					me->MonsterYell(SAY_SUMMON, LANG_UNIVERSAL, NULL);
 
-				FacelessPortalStalker->GetAI()->DoCast(FacelessPortalStalker,SPELL_TWILIGHT_PORTAL_VISUAL,true);
-				events.ScheduleEvent(EVENT_REMOVE_TWILIGHT_PORTAL, 7000);
-
-				FacelessPortalStalker->GetAI()->DoCast(FacelessPortalStalker,SPELL_SPAWN_FACELESS,true);
-
-				ShouldSummonAdds = false;
-				events.ScheduleEvent(EVENT_SHADOW_GALE, urand(40000,44000));
+                if(FacelessPortalStalker)
+                {
+                    FacelessPortalStalker->GetAI()->DoCast(FacelessPortalStalker,SPELL_TWILIGHT_PORTAL_VISUAL,true);
+                    events.ScheduleEvent(EVENT_REMOVE_TWILIGHT_PORTAL, 7000);
+                    
+                    FacelessPortalStalker->GetAI()->DoCast(FacelessPortalStalker,SPELL_SPAWN_FACELESS,true);
+                    
+                    ShouldSummonAdds = false;
+                    events.ScheduleEvent(EVENT_SHADOW_GALE, urand(40000,44000));
+                }
 			}
 
 			events.Update(diff);
@@ -154,33 +156,29 @@ public:
 			{
 				switch (eventId)
 				{
-
-				case EVENT_ENFEEBLING_BLOW:
-					DoCastVictim(SPELL_ENFEEBLING_BLOW);
-					events.ScheduleEvent(EVENT_ENFEEBLING_BLOW, urand(19000,24000));
-					break;
-
-				case EVENT_SHADOW_GALE:
-					ShadowGaleTrigger = me->SummonCreature(NPC_SHADOW_GALE_STALKER,-739.665f/*+(urand(0,20)-10)*/,-827.024f/*+(urand(0,20)-10)*/,232.412f,3.1f,TEMPSUMMON_CORPSE_DESPAWN);
-					me->SetReactState(REACT_PASSIVE);
-					me->GetMotionMaster()->MovePoint(POINT_ERUDAX_IS_AT_STALKER,ShadowGaleTrigger->GetPositionX(),ShadowGaleTrigger->GetPositionY(),ShadowGaleTrigger->GetPositionZ());
-					break;
-
-				case EVENT_REMOVE_TWILIGHT_PORTAL:
-					//Rimuove i Portal effect dagli Stalker
-					FacelessPortalStalker->RemoveAllAuras();
-					break;
-
-				case EVENT_BINDING_SHADOWS:
-
-					if (Unit* tempTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 500.0f, true))
-						DoCast(tempTarget,SPELL_BINDING_SHADOWS);
-
-					events.ScheduleEvent(EVENT_BINDING_SHADOWS, urand(12000,17000));
-					break;
-
-				default:
-					break;
+					case EVENT_ENFEEBLING_BLOW:
+						DoCastVictim(SPELL_ENFEEBLING_BLOW);
+						events.ScheduleEvent(EVENT_ENFEEBLING_BLOW, urand(19000,24000));
+						break;
+					case EVENT_SHADOW_GALE:
+               	     	if(ShadowGaleTrigger = me->SummonCreature(NPC_SHADOW_GALE_STALKER,-739.665f/*+(urand(0,20)-10)*/,-827.024f/*+(urand(0,20)-10)*/,232.412f,3.1f,TEMPSUMMON_CORPSE_DESPAWN))
+                	 	{
+                     	   me->SetReactState(REACT_PASSIVE);
+                     	   me->GetMotionMaster()->MovePoint(POINT_ERUDAX_IS_AT_STALKER,ShadowGaleTrigger->GetPositionX(),ShadowGaleTrigger->GetPositionY(),ShadowGaleTrigger->GetPositionZ());
+                 		}
+						break;
+					case EVENT_REMOVE_TWILIGHT_PORTAL:
+						//Rimuove i Portal effect dagli Stalker
+               	     	if(FacelessPortalStalker)
+                     	   FacelessPortalStalker->RemoveAllAuras();
+						break;
+					case EVENT_BINDING_SHADOWS:
+						if (Unit* tempTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 500.0f, true))
+							DoCast(tempTarget,SPELL_BINDING_SHADOWS);
+						events.ScheduleEvent(EVENT_BINDING_SHADOWS, urand(12000,17000));
+						break;
+					default:
+						break;
 				}
 			}
 
@@ -197,19 +195,17 @@ public:
 			ResetMinions();
 		}
 
-
 		void JustDied(Unit* /*killer*/)
 		{	
 			ResetMinions();
-
 			RemoveShadowGaleDebuffFromPlayers();
-
 			me->MonsterYell(SAY_DEATH, LANG_UNIVERSAL, NULL);
 		}
 
 		void JustSummoned(Creature* summon)
 		{
 			summon->setActive(true);
+            Summons.Summon(summon);
 		}
 
 		void MovementInform(uint32 type, uint32 id)
@@ -218,39 +214,20 @@ public:
 			{
 				switch (id)
 				{
-				case POINT_ERUDAX_IS_AT_STALKER:			
-					DoCast(SPELL_SHADOW_GALE_VISUAL);
-					ShouldSummonAdds = true;
-
-					break;
-
-				default:
-					break;
+					case POINT_ERUDAX_IS_AT_STALKER:			
+						DoCast(SPELL_SHADOW_GALE_VISUAL);
+						ShouldSummonAdds = true;
+						break;
+					default:
+						break;
 				}
 			}
 		}
 
-	private:
 		void ResetMinions()
 		{
-			DespawnCreatures(NPC_FACELESS);
-			DespawnCreatures(NPC_FACELESS_HC);
-			DespawnCreatures(NPC_FACELESS_PORTAL_STALKER);
-			DespawnCreatures(NPC_TWILIGHT_HATCHLING);
-			DespawnCreatures(NPC_SHADOW_GALE_STALKER);
+            Summons.DespawnAll();
 			RespawnEggs();
-		}
-
-		void DespawnCreatures(uint32 entry)
-		{
-			std::list<Creature*> creatures;
-			GetCreatureListWithEntryInGrid(creatures, me, entry, 1000.0f);
-
-			if (creatures.empty())
-				return;
-
-			for (std::list<Creature*>::iterator iter = creatures.begin(); iter != creatures.end(); ++iter)
-				(*iter)->DespawnOrUnsummon();
 		}
 
 		void RespawnEggs()
@@ -274,7 +251,6 @@ public:
 		void RemoveShadowGaleDebuffFromPlayers()
 		{
 			Map::PlayerList const &PlayerList =  me->GetMap()->GetPlayers();
-
 			if (!PlayerList.isEmpty())
 			{
 				for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
@@ -296,7 +272,12 @@ public:
 
 	struct mob_facelessAI : public ScriptedAI
 	{
-		mob_facelessAI(Creature* creature) : ScriptedAI(creature), pTarget(NULL), isAtAnEgg(false), isCastingUmbraMending (false) {}
+		mob_facelessAI(Creature* creature) : ScriptedAI(creature)
+        {
+            pTarget = NULL;
+            isAtAnEgg = false;
+            isCastingUmbraMending = false;
+        }
 
 		Creature* pTarget;
 		Unit* pErudax;
@@ -315,10 +296,8 @@ public:
 			if(me->GetMap()->IsHeroic())
 				events.ScheduleEvent(EVENT_CAST_SHIELD_OF_NIGHTMARE_DELAY, 3000);
 
-			if(pTarget != NULL)
-			{
+			if(pTarget)
 				me->GetMotionMaster()->MovePoint(POINT_FACELESS_IS_AT_AN_EGG,pTarget->GetPositionX()-4.0f,pTarget->GetPositionY()-4.0f,pTarget->GetPositionZ());
-			}
 
 			me->SetReactState(REACT_PASSIVE); 
 		}
@@ -334,43 +313,42 @@ public:
 			{
 				switch (eventId)
 				{
-				case EVENT_CAST_SHIELD_OF_NIGHTMARE_DELAY:
-					DoCast(me, SPELL_SHIELD_OF_NIGHTMARE, true);
-					break;
-
-				default:
-					break;
+					case EVENT_CAST_SHIELD_OF_NIGHTMARE_DELAY:
+						DoCast(me, SPELL_SHIELD_OF_NIGHTMARE, true);
+						break;
+					default:
+						break;
 				}
 			}
 
 			if(isCastingUmbraMending)
 			{
-
 				pTarget = GetNextEgg();
 
-				if(pTarget != NULL)
+				if(pTarget)
 					me->GetMotionMaster()->MovePoint(POINT_FACELESS_IS_AT_AN_EGG,pTarget->GetPositionX(),pTarget->GetPositionY(),pTarget->GetPositionZ());
 
 				isAtAnEgg = false;
 				isCastingUmbraMending = false;
-
 				return;
 			}
 
-			if(pTarget->isDead())
-			{
-				if(Unit* pErudax = me->FindNearestCreature(BOSS_ERUDAX,1000.0f, true))
-					DoCast(pErudax, SPELL_UMBRAL_MENDING,false);
-
-				isCastingUmbraMending = true;
-
-				return;
+            if(pTarget)
+            {
+                if(pTarget->isDead())
+                {
+                    if(Unit* pErudax = me->FindNearestCreature(BOSS_ERUDAX,1000.0f, true))
+                        DoCast(pErudax, SPELL_UMBRAL_MENDING,false);
+                    
+                    isCastingUmbraMending = true;
+                    return;
+                }
+                
+                pTarget->AI()->DoZoneInCombat();
+                
+                DoCast(pTarget,SPELL_TWILIGHT_CORRUPTION_DOT,true);
+                DoCast(pTarget,SPELL_TWILIGHT_CORRUPTION_VISUAL,true);
 			}
-
-			pTarget->AI()->DoZoneInCombat();
-
-			DoCast(pTarget,SPELL_TWILIGHT_CORRUPTION_DOT,true);
-			DoCast(pTarget,SPELL_TWILIGHT_CORRUPTION_VISUAL,true);
 		}
 
 		void MovementInform(uint32 type, uint32 id)
@@ -379,12 +357,11 @@ public:
 			{
 				switch (id)
 				{
-				case POINT_FACELESS_IS_AT_AN_EGG:
-					isAtAnEgg = true;
-					break;
-
-				default:
-					break;
+					case POINT_FACELESS_IS_AT_AN_EGG:
+						isAtAnEgg = true;
+						break;
+					default:
+						break;
 				}
 			}
 		}
@@ -395,14 +372,10 @@ public:
 				pTarget->RemoveAllAuras();
 		}
 
-	private:
 		Creature* GetRandomEgg()
 		{	
-			
-
 			std::list<Creature*> creatures;
 			GetCreatureListWithEntryInGrid(creatures, me, NPC_ALEXSTRASZAS_EGG, 300.0f);
-
 
 			if (creatures.empty())
 				return GetNextEgg();
@@ -414,10 +387,8 @@ public:
 			{
 				if (c == r)
 					return (*iter);
-
 				c++;
 			}
-
 			return GetNextEgg();
 		}
 
@@ -443,13 +414,11 @@ public:
 		mob_alexstraszas_eggsAI(Creature* creature) : ScriptedAI(creature)
 		{
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_NOT_SELECTABLE);
-
 			me->SetReactState(REACT_PASSIVE);
 		}
 
 		void JustDied(Unit* killer)
 		{
-
 			DoCastAOE(SPELL_SUMMON_TWILIGHT_HATCHLINGS, true);
 		}
 
@@ -457,9 +426,6 @@ public:
 		{
 			summon->setActive(true);
 			summon->AI()->DoZoneInCombat();
-
-			if (GetPlayerAtMinimumRange(0))
-				summon->Attack(GetPlayerAtMinimumRange(0), true);
 		}
 	};
 };
@@ -476,15 +442,16 @@ public:
 
 	struct mob_shadow_gale_stalkerAI : public ScriptedAI
 	{
-		mob_shadow_gale_stalkerAI(Creature* creature) : ScriptedAI(creature), VisualEffectCasted(false) {}
+		mob_shadow_gale_stalkerAI(Creature* creature) : ScriptedAI(creature)
+        {
+            VisualEffectCasted = false;
+        }
 
-		Unit* pErudax;
 		EventMap events;
 		bool VisualEffectCasted;
 
 		void IsSummonedBy(Unit* summoner)
 		{
-			pErudax = summoner;
 			me->SetFlag(UNIT_FIELD_FLAGS,UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_NOT_SELECTABLE);
 			DoCastAOE(SPELL_SHADOW_GALE_SPEED_TRIGGER);
 		}
@@ -499,23 +466,26 @@ public:
 				{
 					switch (eventId)
 					{
-					case EVENT_TRIGGER_GALE_CHECK_PLAYERS:
+						case EVENT_TRIGGER_GALE_CHECK_PLAYERS:
+							Map::PlayerList const &PlayerList =  me->GetMap()->GetPlayers();
 
-						Map::PlayerList const &PlayerList =  me->GetMap()->GetPlayers();
-
-						if (!PlayerList.isEmpty())
-						{
-							for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
-								if(me->GetDistance(i->getSource()) >= 3)
-								{
-									if(!i->getSource()->HasAura(SPELL_SHADOW_GALE_DEBUFF))
-										me->CastSpell(i->getSource(), SPELL_SHADOW_GALE_DEBUFF, true);
-								}else
-									i->getSource()->RemoveAura(SPELL_SHADOW_GALE_DEBUFF);
-						}
-
-						events.ScheduleEvent(EVENT_TRIGGER_GALE_CHECK_PLAYERS, 1000);
-						break;
+							if (!PlayerList.isEmpty())
+							{
+								for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+									if(me->GetDistance(i->getSource()) >= 3)
+									{
+										if(!i->getSource()->HasAura(SPELL_SHADOW_GALE_DEBUFF))
+											me->CastSpell(i->getSource(), SPELL_SHADOW_GALE_DEBUFF, true);
+									}
+                                    else
+                                	{
+										i->getSource()->RemoveAura(SPELL_SHADOW_GALE_DEBUFF);
+                                    }
+							}
+							events.ScheduleEvent(EVENT_TRIGGER_GALE_CHECK_PLAYERS, 1000);
+							break;
+						default:
+                            break;
 					}
 				}
 			}

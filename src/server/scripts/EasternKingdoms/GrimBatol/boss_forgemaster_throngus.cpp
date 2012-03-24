@@ -104,9 +104,10 @@ public:
 
 	struct boss_forgemaster_throngusAI : public ScriptedAI
 	{
-		boss_forgemaster_throngusAI(Creature *c) : ScriptedAI(c) {}
+		boss_forgemaster_throngusAI(Creature *c) : ScriptedAI(c), Summons(me) {}
 
 		EventMap events;
+        SummonList Summons;
 
 		uint32 currentWaepon;
 		uint8 phases [3];
@@ -123,16 +124,13 @@ public:
 		void JustDied(Unit* /*killer*/)
 		{
 			me->MonsterYell(SAY_DIED, LANG_UNIVERSAL, NULL);
-			DespawnCreatures(NPC_FIRE_PATCH);
-			DespawnCreatures(NPC_TWILIGHT_ARCHER);
+            Summons.DespawnAll();
 		}
 
 		void Reset()
 		{
 			currentWaepon = WEAPON_NON;
-			DespawnCreatures(NPC_FIRE_PATCH);
-			DespawnCreatures(NPC_TWILIGHT_ARCHER);
-
+            Summons.DespawnAll();
 			SetEquipmentSlots(false, 0, 0,0);
 		}
 
@@ -142,25 +140,20 @@ public:
 				return;
 
 			if(currentWaepon == WEAPON_SHIELD && me->GetMap()->IsHeroic() && (!me->HasAura(SPELL_FLAMING_SHIELD)))
-					DoCast(me, SPELL_FLAMING_SHIELD, true);
+                DoCast(me, SPELL_FLAMING_SHIELD, true);
 
 			if(currentWaepon == WEAPON_NON)
 			{
 				ResetWeapon();
 				currentWaepon = WEAPON_CHOOSING;
-
 				DoCast(SPELL_PICK_WEAPON);
-
 				return;
 			}
 
 			if(currentWaepon == WEAPON_CHOOSING)
 			{
-
 				IntializeWeapon();
-
 				events.ScheduleEvent(EVENT_PICK_WEAPON, 30000);
-
 				return;
 			}
 
@@ -171,28 +164,20 @@ public:
 				switch(eventId)
 				{
 				case EVENT_PICK_WEAPON:
-
 					currentWaepon = WEAPON_NON;
 					break;
-
 				case EVENT_PERSONAL_PHALANX:
 					if (Unit* tempTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 500.0f, true))
 						DoCast(tempTarget, SPELL_PERSONAL_PHALANX);
-
 					events.ScheduleEvent(EVENT_PERSONAL_PHALANX, 10000);
 					break;
-
 				case EVENT_IMPALING_SLAM:
 					if (Unit* tempTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 500.0f, true))
 						DoCast(tempTarget, SPELL_IMPALING_SLAM);
-
 					events.ScheduleEvent(EVENT_IMPALING_SLAM, 15000);
 					break;
-
 				case EVENT_DISORIENTING_ROAR:
-
 					DoCastAOE(SPELL_DISORIENTING_ROAR);
-
 					events.ScheduleEvent(EVENT_DISORIENTING_ROAR, 11000);
 				default:
 					break;
@@ -205,11 +190,10 @@ public:
 		void JustSummoned(Creature* summon)
 		{
 			//summon->setActive(true);
-
 			summon->SetFlag(UNIT_FIELD_FLAGS,UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_NOT_SELECTABLE);
-
 			if(summon->GetEntry() == NPC_FIRE_PATCH)
 				summon->CastSpell(summon, SPELL_LAVA_PATCH_VISUAL, true);
+            Summons.Summon(summon);
 		}
 
 		void DamageDealt(Unit* victim, uint32& damage, DamageEffectType /*damageType*/)
@@ -221,7 +205,6 @@ public:
 				me->CastSpell(me->getVictim(), SPELL_BURNING_FLAMES, true);
 		}
 
-	private:
 		inline void IntializeWeapon()
 		{ 
 			currentWaepon = GetNextPhase();
@@ -232,7 +215,6 @@ public:
 			switch(currentWaepon)
 			{
 			case WEAPON_SHIELD:
-
 				SetEquipmentSlots(false, 0, EQUIPMENT_ID_SHIELD,0);
 
 				if(me->GetMap()->IsHeroic())
@@ -242,30 +224,19 @@ public:
 					me->SummonCreature(NPC_TWILIGHT_ARCHER,TwilightArcherSummonPos[i],TEMPSUMMON_MANUAL_DESPAWN);
 
 				events.ScheduleEvent(EVENT_PERSONAL_PHALANX, 10000);
-
 				break;
-
 			case WEAPON_SWORDS:
 				DoCast(me, SPELL_DUAL_BLADES_BUFF, true);
 				DoCast(me, SPELL_TRASH_BUFF, true);
-
 				SetEquipmentSlots(false, EQUIPMENT_ID_SWORD, EQUIPMENT_ID_SWORD,0);
-
 				events.ScheduleEvent(EVENT_DISORIENTING_ROAR, 11000);
-
 				break;
-
 			case WEAPON_MACE:
-
 				if(me->GetMap()->IsHeroic())
 					DoCast(me, SPELL_LAVA_PATCH, true);
-
 				DoCast(me, SPELL_ENCUMBERED, true);
-
 				SetEquipmentSlots(false, EQUIPMENT_ID_MACE, 0,0);
-
 				events.ScheduleEvent(EVENT_IMPALING_SLAM, 7000);
-
 				break;
 			}
 
@@ -273,9 +244,8 @@ public:
 
 		inline void ResetWeapon()
 		{
-
 			events.Reset();
-			DespawnCreatures(NPC_TWILIGHT_ARCHER);
+			Summons.DespawnEntry(NPC_TWILIGHT_ARCHER);
 
 			me->RemoveAura(SPELL_FLAMING_SHIELD);
 			me->RemoveAura(SPELL_PERSONAL_PHALANX);
@@ -308,7 +278,8 @@ public:
 				phases[0] = 0;
 				return v;
 
-			}else
+			}
+            else
 			{
 				for(uint8 i = 0; i <= 2; i++)
 				{
@@ -323,18 +294,6 @@ public:
 			}
 
 			return urand(WEAPON_SHIELD,WEAPON_MACE);
-		}
-
-		void DespawnCreatures(uint32 entry)
-		{
-			std::list<Creature*> creatures;
-			GetCreatureListWithEntryInGrid(creatures, me, entry, 1000.0f);
-
-			if (creatures.empty())
-				return;
-
-			for (std::list<Creature*>::iterator iter = creatures.begin(); iter != creatures.end(); ++iter)
-				(*iter)->DespawnOrUnsummon();
 		}
 	};
 };
@@ -374,7 +333,6 @@ public:
 				switch(eventId)
 				{
 				case EVENT_ARCHER_SHOOT:
-
 					if(Unit* nearPlayer = SelectTarget(SELECT_TARGET_NEAREST, 0, 2, true))
 					{
 						me->CastSpell(nearPlayer,SPELL_FLAMING_ARROW_VISUAL,true);

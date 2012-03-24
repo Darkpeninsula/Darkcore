@@ -113,12 +113,7 @@ class boss_umbriss : public CreatureScript
 
 				Summons.Summon(pSummoned);
 			}
-			
-			void SummonedCreatureDespawn(Creature *summon)
-			{
-				Summons.Despawn(summon);
-			}
-			
+            
 			void EnterPhaseGround()
 			{
 				events.ScheduleEvent(EVENT_SECOUSS, 6000);
@@ -133,40 +128,38 @@ class boss_umbriss : public CreatureScript
                 if (!UpdateVictim())
                     return;
 					
-					events.Update(diff);
+                events.Update(diff);
 
-					while (uint32 eventId = events.ExecuteEvent())
-					{
-						switch(eventId)
-						{
-							case EVENT_SECOUSS:
-								if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
-								DoCast(target, IsHeroic() ? SPELL_SECOUSS_H : SPELL_SECOUSS);
-								events.ScheduleEvent(EVENT_SECOUSS, 6000);
-								return;
-							case EVENT_ECLAIR:
-								if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM,1,100,true))
+                while (uint32 eventId = events.ExecuteEvent())
+                {
+                    switch(eventId)
+                    {
+                        case EVENT_SECOUSS:
+                            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                                DoCast(target, IsHeroic() ? SPELL_SECOUSS_H : SPELL_SECOUSS);
+                            events.ScheduleEvent(EVENT_SECOUSS, 6000);
+                            return;
+                        case EVENT_ECLAIR:
+                            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM,1,100,true))
                                 DoCast(target, IsHeroic() ? SPELL_ECLAIR_H : SPELL_ECLAIR);
-								events.ScheduleEvent(EVENT_ECLAIR, 13000);
-								return;
-							case EVENT_PLAIE:
-								if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
-								DoCast(target, IsHeroic() ? SPELL_PLAIE_H : SPELL_PLAIE);
-								events.ScheduleEvent(EVENT_PLAIE, 20000);
-								return;
-							case EVENT_BERSERK:
-								if(!HealthAbovePct(30))
-									{
-										DoCast(me, SPELL_BERSERK);
-									}
-								return;
-							case EVENT_SUMMON:
-								me->SummonCreature(NPC_TROGG_MAL, aSpawnLocations[0].GetPositionX(), aSpawnLocations[0].GetPositionY(), aSpawnLocations[0].GetPositionZ(), 0.0f, TEMPSUMMON_CORPSE_DESPAWN);
-								me->SummonCreature(NPC_TROGG_DWE, aSpawnLocations[1].GetPositionX(), aSpawnLocations[1].GetPositionY(), aSpawnLocations[1].GetPositionZ(), 0.0f, TEMPSUMMON_CORPSE_DESPAWN);
-								events.ScheduleEvent(EVENT_SUMMON, 60000);
-								return;
-						}
-					}
+                            events.ScheduleEvent(EVENT_ECLAIR, 13000);
+                            return;
+                        case EVENT_PLAIE:
+                            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                                DoCast(target, IsHeroic() ? SPELL_PLAIE_H : SPELL_PLAIE);
+                            events.ScheduleEvent(EVENT_PLAIE, 20000);
+                            return;
+                        case EVENT_BERSERK:
+                            if(!HealthAbovePct(30))
+                                DoCast(me, SPELL_BERSERK);
+                            return;
+                        case EVENT_SUMMON:
+                            me->SummonCreature(NPC_TROGG_MAL, aSpawnLocations[0].GetPositionX(), aSpawnLocations[0].GetPositionY(), aSpawnLocations[0].GetPositionZ(), 0.0f, TEMPSUMMON_CORPSE_DESPAWN);
+                            me->SummonCreature(NPC_TROGG_DWE, aSpawnLocations[1].GetPositionX(), aSpawnLocations[1].GetPositionY(), aSpawnLocations[1].GetPositionZ(), 0.0f, TEMPSUMMON_CORPSE_DESPAWN);
+                            events.ScheduleEvent(EVENT_SUMMON, 60000);
+                            return;
+                    }
+                }
 				DoMeleeAttackIfReady();
 			}
 		};
@@ -206,25 +199,25 @@ public:
                 return;
 					
 			events.Update(diff);
-
-				while (uint32 eventId = events.ExecuteEvent())
-				{
-					switch(eventId)
-					{
-						case EVENT_GRIFFE:
-							DoCastVictim(SPELL_GRIFFE);
-							events.ScheduleEvent(EVENT_GRIFFE, 2000);
-							return;
-						case EVENT_MAL:
-							DoCastVictim(SPELL_MAL);
-							events.ScheduleEvent(EVENT_MAL, 6000);
-							return;
-						case EVENT_MOGUD:
-							DoCastVictim(SPELL_MODGUD);
-							events.ScheduleEvent(EVENT_MOGUD, 12000);
-							return;
-					}
-				}			
+            
+            while (uint32 eventId = events.ExecuteEvent())
+            {
+                switch(eventId)
+                {
+                    case EVENT_GRIFFE:
+                        DoCastVictim(SPELL_GRIFFE);
+                        events.ScheduleEvent(EVENT_GRIFFE, 2000);
+                        return;
+                    case EVENT_MAL:
+                        DoCastVictim(SPELL_MAL);
+                        events.ScheduleEvent(EVENT_MAL, 6000);
+                        return;
+                    case EVENT_MOGUD:
+                        DoCastVictim(SPELL_MODGUD);
+                        events.ScheduleEvent(EVENT_MOGUD, 12000);
+                        return;
+                }
+            }			
 
             DoMeleeAttackIfReady();
         }
@@ -268,16 +261,16 @@ public:
 					
 			events.Update(diff);
 
-				while (uint32 eventId = events.ExecuteEvent())
-				{
-					switch(eventId)
-					{
-						case EVENT_GRIFFE:
-							DoCastVictim(SPELL_GRIFFE);
-							events.ScheduleEvent(EVENT_GRIFFE, 5000);
-							return;
-					}
-				}
+			while (uint32 eventId = events.ExecuteEvent())
+			{
+                switch(eventId)
+                {
+                    case EVENT_GRIFFE:
+                        DoCastVictim(SPELL_GRIFFE);
+                        events.ScheduleEvent(EVENT_GRIFFE, 5000);
+                        return;
+                }
+			}
 				
             DoMeleeAttackIfReady();
         }

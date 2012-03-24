@@ -114,15 +114,11 @@ public:
 
 	struct boss_drahga_shadowburnerAI : public ScriptedAI
 	{
-		boss_drahga_shadowburnerAI(Creature* creature) : ScriptedAI(creature), summons(creature), pValiona(NULL)
-		{
-			//pInstance = creature->GetInstanceScript();
-		}
+		boss_drahga_shadowburnerAI(Creature* creature) : ScriptedAI(creature), Summons(me) {}
 
-		//InstanceScript* pInstance;
 		Phase phase;
 		EventMap events;
-		SummonList summons;
+		SummonList Summons;
 
 		Creature* pValiona;
 
@@ -131,10 +127,8 @@ public:
 			//me->GetMotionMaster()->Clear();
 
 			pValiona = NULL;
-
-			SaveDespawnCreatures();
-
 			phase = PHASE_NON;
+            Summons.DespawnAll();
 		}
 
 		void EnterCombat(Unit* /*pWho*/)
@@ -162,6 +156,7 @@ public:
 
 				summon->GetAI()->DoCast(SPELL_INVOCATION_TRIGGER);
 			}
+            Summons.Summon(summon);
 		}
 
 		void JustDied(Unit * /*victim*/)
@@ -170,7 +165,7 @@ public:
 
 			me->MonsterYell(SAY_DEAD, LANG_UNIVERSAL, NULL);
 
-			SaveDespawnCreatures();
+			Summons.DespawnAll();
 		}
 
 		void MovementInform(uint32 type, uint32 id)
@@ -179,22 +174,19 @@ public:
 			{
 				switch (id)
 				{
-				case POINT_DRAHGA_GO_TO_THE_LAVA:
-
-					me->MonsterYell(SAY_JUMP_DOWN, LANG_UNIVERSAL, NULL);
-
-					pValiona->GetAI()->DoAction(ACTION_DRAGAH_CALLS_VALIONA_FOR_HELP);
-					me->SetSpeed(MOVE_RUN, 1.0f);
-
-					me->GetMotionMaster()->Clear();
-					me->JumpTo(pValiona,2);
-
-					events.ScheduleEvent(EVENT_DRAGAH_ENTER_VEHICLE,2000);
-
-					break;
-
-				default:
-					break;
+                    case POINT_DRAHGA_GO_TO_THE_LAVA:
+                        if(pValiona)
+                        {
+                            me->MonsterYell(SAY_JUMP_DOWN, LANG_UNIVERSAL, NULL);
+                            pValiona->GetAI()->DoAction(ACTION_DRAGAH_CALLS_VALIONA_FOR_HELP);
+                            me->SetSpeed(MOVE_RUN, 1.0f);
+                            me->GetMotionMaster()->Clear();
+                            me->JumpTo(pValiona,2);
+                            events.ScheduleEvent(EVENT_DRAGAH_ENTER_VEHICLE,2000);
+                        }
+                        break;
+                    default:
+                        break;
 				}
 			}
 		}
@@ -203,20 +195,15 @@ public:
 		{
 			switch(action)
 			{
-			case ACTION_DRAGAH_IS_ON_THE_GROUND:
-
-				//me->ExitVehicle();
-
-				me->SetReactState(REACT_AGGRESSIVE);
-				me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-
-				events.ScheduleEvent(EVENT_BURNING_SHADOWBOLT, 4000);
-				events.ScheduleEvent(EVENT_SUMMON_INVOKED_FLAME_SPIRIT, 10000);
-
-				break;
-
-			default:
-				break;
+				case ACTION_DRAGAH_IS_ON_THE_GROUND:
+					//me->ExitVehicle();
+					me->SetReactState(REACT_AGGRESSIVE);
+					me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+					events.ScheduleEvent(EVENT_BURNING_SHADOWBOLT, 4000);
+					events.ScheduleEvent(EVENT_SUMMON_INVOKED_FLAME_SPIRIT, 10000);
+					break;
+				default:
+					break;
 			}
 		}
 
@@ -250,10 +237,10 @@ public:
 				me->GetMotionMaster()->Clear();
 				me->GetMotionMaster()->MoveChase(me->getVictim());
 
-				pValiona->GetAI()->DoAction(ACTION_VALIONA_SHOULD_FLY_AWAY);
-
-				pValiona = NULL;
-
+                if(pValiona)
+                {
+                    pValiona->GetAI()->DoAction(ACTION_VALIONA_SHOULD_FLY_AWAY);
+                }
 			}
 
 			events.Update(diff);
@@ -262,56 +249,26 @@ public:
 			{
 				switch (eventId)
 				{
-				case EVENT_BURNING_SHADOWBOLT:
-
-					if (Unit *pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0))
-						DoCast(pTarget, RAID_MODE(SPELL_BURNING_SHADOWBOLT,SPELL_BURNING_SHADOWBOLT_H));
-
-					events.ScheduleEvent(EVENT_BURNING_SHADOWBOLT,4000);
-					break;
-				case EVENT_SUMMON_INVOKED_FLAME_SPIRIT:
-
-					me->MonsterYell(SAY_SUMMON, LANG_UNIVERSAL, NULL);
-
-					DoCast(SPELL_INVOCATION_OF_FLAME);
-
-					events.ScheduleEvent(EVENT_SUMMON_INVOKED_FLAME_SPIRIT,20000);
-					break;
-
-				case EVENT_DRAGAH_ENTER_VEHICLE:
-					me->GetMotionMaster()->Clear();
-
-					// me->EnterVehicle(pValiona, 1);
-					break;
-
-				default:
-					break;
+					case EVENT_BURNING_SHADOWBOLT:
+						if (Unit *pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0))
+							DoCast(pTarget, RAID_MODE(SPELL_BURNING_SHADOWBOLT,SPELL_BURNING_SHADOWBOLT_H));
+						events.ScheduleEvent(EVENT_BURNING_SHADOWBOLT,4000);
+						break;
+					case EVENT_SUMMON_INVOKED_FLAME_SPIRIT:
+						me->MonsterYell(SAY_SUMMON, LANG_UNIVERSAL, NULL);
+						DoCast(SPELL_INVOCATION_OF_FLAME);
+						events.ScheduleEvent(EVENT_SUMMON_INVOKED_FLAME_SPIRIT,20000);
+						break;
+					case EVENT_DRAGAH_ENTER_VEHICLE:
+						me->GetMotionMaster()->Clear();
+						// me->EnterVehicle(pValiona, 1);
+						break;
+					default:
+						break;
 				}
 			}
 
 			DoMeleeAttackIfReady();
-		}
-
-	private:
-
-		void DespawnCreatures(uint32 entry, float distance)
-		{
-			std::list<Creature*> creatures;
-			GetCreatureListWithEntryInGrid(creatures, me, entry, distance);
-
-			if (creatures.empty())
-				return;
-
-			for (std::list<Creature*>::iterator iter = creatures.begin(); iter != creatures.end(); ++iter)
-				(*iter)->DespawnOrUnsummon();
-		}
-
-		void SaveDespawnCreatures()
-		{
-			DespawnCreatures(NPC_INVOCATION_OF_THE_FLAME_STALKER,500.0f); // Maybe the Core crashes on unload the Trigger
-			DespawnCreatures(NPC_INVOKED_FLAMING_SPIRIT,500.0f);
-			DespawnCreatures(NPC_SEEPING_TWILIGHT_TRIGGER,500.0f);
-			DespawnCreatures(NPC_VALIONA,500.0f);
 		}
 	};
 };
@@ -328,29 +285,18 @@ public:
 
 	struct mob_valiona_gbAI : public ScriptedAI
 	{
-		mob_valiona_gbAI(Creature* creature) : ScriptedAI(creature), summons(creature)//, vehicle(creature->GetVehicleKit())
-		{
-			//pInstance = creature->GetInstanceScript();
+		mob_valiona_gbAI(Creature* creature) : ScriptedAI(creature), Summons(me) {}
 
-			//ASSERT(vehicle);
-		}
-
-		//InstanceScript* pInstance;
 		EventMap events;
 		uint8 currentWaypoint;
-		SummonList summons;
+		SummonList Summons;
 		Unit* pDragah;
-
-		// Vehicle* vehicle;
 
 		void Reset()
 		{
 			me->SetSpeed(MOVE_WALK, 3.0f);
-
 			me->SetFlying(true);
-
 			events.Reset();
-
 			me->SetReactState(REACT_PASSIVE);
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
 			//me->GetMotionMaster()->MoveTargetedHome();
@@ -370,6 +316,8 @@ public:
 
 			if(me->isInCombat())
 				summon->AI()->DoZoneInCombat();
+
+            Summons.Summon(summon);
 		}
 
 		void IsSummonedBy(Unit* summoner)
@@ -379,7 +327,7 @@ public:
 
 		void UpdateAI(const uint32 diff)
 		{
-			if (!UpdateVictim() || me-> HasUnitState(UNIT_STATE_CASTING))
+			if (!UpdateVictim() || me->HasUnitState(UNIT_STATE_CASTING))
 				return;
 
 			events.Update(diff);
@@ -388,28 +336,23 @@ public:
 			{
 				switch (eventId)
 				{
-				case EVENT_VALIONAS_FLAME:
-					if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0))
-						DoCast(pTarget, SPELL_VALIONAS_FLAME);
-					events.RepeatEvent(urand(15000,25000));
-					break;
-
-				case EVENT_SHREDDING_SWIPE:
-
-					if(me->getVictim())
-						DoCastVictim(SPELL_SHREDDING_SWIPE);
-
-					events.RepeatEvent(urand(21000,30000));
-					break;
-
-				case EVENT_DEVOURING_FLAMES:
-					DoCast(SelectTarget(SELECT_TARGET_RANDOM, 0), SPELL_DEVOURING_FLAMES_H);
-					events.RepeatEvent(urand(30000,35000));
-					break;
-
-				default:
-					events.PopEvent();
-					break;
+					case EVENT_VALIONAS_FLAME:
+						if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0))
+							DoCast(pTarget, SPELL_VALIONAS_FLAME);
+						events.RepeatEvent(urand(15000,25000));
+						break;
+					case EVENT_SHREDDING_SWIPE:
+						if(me->getVictim())
+							DoCastVictim(SPELL_SHREDDING_SWIPE);
+						events.RepeatEvent(urand(21000,30000));
+						break;
+					case EVENT_DEVOURING_FLAMES:
+						DoCast(SelectTarget(SELECT_TARGET_RANDOM, 0), SPELL_DEVOURING_FLAMES_H);
+						events.RepeatEvent(urand(30000,35000));
+						break;
+					default:
+						events.PopEvent();
+						break;
 				}
 			}
 
@@ -420,32 +363,23 @@ public:
 		{
 			switch(action)
 			{
-			case ACTION_DRAGAH_CALLS_VALIONA_FOR_HELP:
-				DoZoneInCombat();
-
-				me->MonsterYell(SAY_VALIONA, LANG_UNIVERSAL, NULL);
-
-				currentWaypoint = 1;
-				me->GetMotionMaster()->MovePoint(POINT_VALIONA_FLY_IN_THE_AIR, position[1]);
-				break;
-
-			case ACTION_VALIONA_SHOULD_FLY_AWAY:
-				events.Reset();
-
-				me->RemoveAllAuras();
-				DoCast(me, SPELL_TWILIGHT_SHIFT, true);
-
-				me->SetReactState(REACT_PASSIVE);
-				me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-
-				me->SetFlying(true);
-
-				me->GetMotionMaster()->MovePoint(POINT_VALIONA_FLY_AWAY, position[1]);
-
-				break;
-
-			default:
-				break;
+				case ACTION_DRAGAH_CALLS_VALIONA_FOR_HELP:
+					DoZoneInCombat();
+					me->MonsterYell(SAY_VALIONA, LANG_UNIVERSAL, NULL);
+					currentWaypoint = 1;
+					me->GetMotionMaster()->MovePoint(POINT_VALIONA_FLY_IN_THE_AIR, position[1]);
+					break;
+				case ACTION_VALIONA_SHOULD_FLY_AWAY:
+					events.Reset();
+					me->RemoveAllAuras();
+					DoCast(me, SPELL_TWILIGHT_SHIFT, true);
+					me->SetReactState(REACT_PASSIVE);
+					me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+					me->SetFlying(true);
+					me->GetMotionMaster()->MovePoint(POINT_VALIONA_FLY_AWAY, position[1]);
+					break;
+				default:
+					break;
 			}
 		}
 
@@ -456,61 +390,40 @@ public:
 
 			switch (id)
 			{
-			case POINT_VALIONA_FLY_IN_THE_AIR:
-				currentWaypoint++;
+				case POINT_VALIONA_FLY_IN_THE_AIR:
+					currentWaypoint++;
+					if(currentWaypoint < 3) // You can extend the Waypoints by yourself if you want
+						me->GetMotionMaster()->MovePoint(POINT_VALIONA_FLY_IN_THE_AIR, position[currentWaypoint]);
+    	            else
+						me->GetMotionMaster()->MoveLand(POINT_VALIONA_LAND, position[3],5);
+					break;
+				case POINT_VALIONA_LAND:
+                    if(pDragah)
+                    	pDragah->GetAI()->DoAction(ACTION_DRAGAH_IS_ON_THE_GROUND);
 
-				if(currentWaypoint < 3) // You can extend the Waypoints by yourself if you want
-				{
-					me->GetMotionMaster()->MovePoint(POINT_VALIONA_FLY_IN_THE_AIR, position[currentWaypoint]);
-				}else
-					me->GetMotionMaster()->MoveLand(POINT_VALIONA_LAND, position[3],5);
+					me->SetSpeed(MOVE_WALK, 1.0f);
+					me->SetFlying(false);
+					me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+					me->SetReactState(REACT_AGGRESSIVE);
+					me->GetMotionMaster()->Clear();
+					me->GetMotionMaster()->MoveChase(me->getVictim());
 
-				break;
+					events.ScheduleEvent(EVENT_VALIONAS_FLAME, urand(4000,7000));
+					events.ScheduleEvent(EVENT_SHREDDING_SWIPE, urand(10000,13000));
 
-			case POINT_VALIONA_LAND:
-				pDragah->GetAI()->DoAction(ACTION_DRAGAH_IS_ON_THE_GROUND);
-
-				me->SetSpeed(MOVE_WALK, 1.0f);
-
-				me->SetFlying(false);
-				me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-				me->SetReactState(REACT_AGGRESSIVE);
-
-				me->GetMotionMaster()->Clear();
-				me->GetMotionMaster()->MoveChase(me->getVictim());
-
-				events.ScheduleEvent(EVENT_VALIONAS_FLAME, urand(4000,7000));
-				events.ScheduleEvent(EVENT_SHREDDING_SWIPE, urand(10000,13000));
-
-				if(/*me->GetMap()->IsHeroic()*/ true) // To test it on non heroic difficulty
-					events.ScheduleEvent(EVENT_DEVOURING_FLAMES, urand(15000,17000));
-				break;
-
-			case POINT_VALIONA_FLY_AWAY:
-				DespawnCreatures(NPC_SEEPING_TWILIGHT_TRIGGER,500.0f);
-				me->GetMotionMaster()->MovePoint(POINT_VALIONA_IS_AWAY, position[4]);
-				break;
-
-			case POINT_VALIONA_IS_AWAY:
-				me->DespawnOrUnsummon();
-				break;
-
-			default:
-				break;
+					if(me->GetMap()->IsHeroic()) // To test it on non heroic difficulty
+						events.ScheduleEvent(EVENT_DEVOURING_FLAMES, urand(15000,17000));
+					break;
+				case POINT_VALIONA_FLY_AWAY:
+					Summons.DespawnAll();
+					me->GetMotionMaster()->MovePoint(POINT_VALIONA_IS_AWAY, position[4]);
+					break;
+				case POINT_VALIONA_IS_AWAY:
+					me->DespawnOrUnsummon();
+					break;
+				default:
+					break;
 			}
-		}
-
-	private:
-		void DespawnCreatures(uint32 entry, float distance)
-		{
-			std::list<Creature*> creatures;
-			GetCreatureListWithEntryInGrid(creatures, me, entry, distance);
-
-			if (creatures.empty())
-				return;
-
-			for (std::list<Creature*>::iterator iter = creatures.begin(); iter != creatures.end(); ++iter)
-				(*iter)->DespawnOrUnsummon();
 		}
 	};
 };
@@ -527,29 +440,14 @@ public:
 
 	struct mob_invoked_flame_spiritAI : public ScriptedAI
 	{
-		mob_invoked_flame_spiritAI(Creature* creature) : ScriptedAI(creature), pTarget(NULL) {}
+		mob_invoked_flame_spiritAI(Creature* creature) : ScriptedAI(creature) {}
 
 		Unit* pTarget;
 
 		void IsSummonedBy(Unit* summoner)
 		{
 			DoZoneInCombat();
-
-			/*uint8 p = urand(0, me->GetMap()->GetPlayers().getSize());
-
-			Map::PlayerList const &PlayerList = me->GetMap()->GetPlayers();
-
-			if (!PlayerList.isEmpty())
-			{
-			for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
-			{
-			if(i == p)
-			pTarget = i->getSource();
-			}
-			}*/
-
 			me->GetMotionMaster()->MoveChase(GetPlayerAtMinimumRange(1.0f));
-
 			me->SetReactState(REACT_PASSIVE);
 		}
 
@@ -561,7 +459,7 @@ public:
 			if(me->GetDistance(me->getVictim()) < 1.0f )
 			{
 				DoCastVictim(RAID_MODE(SPELL_SUPERNOVA,	SPELL_SUPERNOVA_H));
-				me -> DespawnOrUnsummon();
+				me->DespawnOrUnsummon();
 			}
 		}
 	};
