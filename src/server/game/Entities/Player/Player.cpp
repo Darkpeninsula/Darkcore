@@ -17386,8 +17386,8 @@ bool Player::LoadFromDB(uint32 guid, SQLQueryHolder *holder)
             SetArenaTeamInfoField(arena_slot, ArenaTeamInfoType(j), 0);
     }
 
-    SetCurrency(CURRENCY_TYPE_CONQUEST_POINTS, fields[38].GetUInt32());
-    SetCurrency(CURRENCY_TYPE_HONOR_POINTS, fields[39].GetUInt32());
+    SetCurrency(CURRENCY_TYPE_CONQUEST_POINTS, GetCurrency(CURRENCY_TYPE_CONQUEST_POINTS));
+    SetCurrency(CURRENCY_TYPE_HONOR_POINTS, GetCurrency(CURRENCY_TYPE_CONQUEST_POINTS));
     SetUInt32Value(PLAYER_FIELD_LIFETIME_HONORABLE_KILLS, fields[40].GetUInt32());
     SetUInt16Value(PLAYER_FIELD_KILLS, 0, fields[41].GetUInt16());
     SetUInt16Value(PLAYER_FIELD_KILLS, 1, fields[42].GetUInt16());
