@@ -161,9 +161,7 @@ void ArenaTeamMgr::DistributeArenaPoints()
     {
         // Add points to player if online
         if (Player* player = HashMapHolder<Player>::Find(playerItr->first))
-            player->ModifyConquestPoints(playerItr->second, &trans);
-        else    // Update database
-            trans->PAppend("UPDATE characters SET conquestPoints = conquestPoints + %u WHERE guid=%u", playerItr->second, playerItr->first);
+            player->ModifyConquestPoints(playerItr->second);
     }
 
     CharacterDatabase.CommitTransaction(trans);

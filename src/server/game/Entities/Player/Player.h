@@ -1326,7 +1326,7 @@ class Player : public Unit, public GridObject<Player>
         uint32 GetCurrency(uint32 id) const;
         bool HasCurrency(uint32 id, uint32 count) const;
         void SetCurrency(uint32 id, uint32 count);
-        void ModifyConquestPoints(int32 value, SQLTransaction* trans);
+        void ModifyConquestPoints(int32 value);
         void ModifyCurrency(uint32 id, int32 count, bool force = false);
 
         void ApplyEquipCooldown(Item* pItem);

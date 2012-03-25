@@ -7524,7 +7524,7 @@ void Player::SetCurrency(uint32 id, uint32 count)
     ModifyCurrency(id, int32(count) - GetCurrency(id));
 }
 
-void Player::ModifyConquestPoints(int32 value, SQLTransaction* trans /*=NULL*/)
+void Player::ModifyConquestPoints(int32 value)
 {
     if (value < 0)
         value = 0;
