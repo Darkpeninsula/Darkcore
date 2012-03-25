@@ -7524,39 +7524,40 @@ void Player::SetCurrency(uint32 id, uint32 count)
     ModifyCurrency(id, int32(count) - GetCurrency(id));
 }
 
-void Player::ModifyConquestPoints(int32 value)
-{
-    if (value < 0)
-        value = 0;
-
-    ModifyCurrency(CURRENCY_TYPE_CONQUEST_POINTS, value);
-}
+//TODO: Implement it.
+//void Player::ModifyConquestPoints(int32 value, SQLTransaction* trans /*=NULL*/)
+//{
+//    int32 newValue = int32(GetConquestPoints()) + value;
+//    if (newValue < 0)
+//        newValue = 0;
+//    SetConquestPoints(uint32(newValue));
+//}
 
 // NYI, need rename
 uint32 Player::_GetCurrencyWeekCap(const CurrencyTypesEntry* currency) const
 {
     uint32 cap = currency->WeekCap;
-    switch (currency->ID)
-    {
-        case CURRENCY_TYPE_CONQUEST_POINTS:
-            cap = uint32( m_conquestPointsWeekCap[CP_SOURCE_ARENA] * PLAYER_CURRENCY_PRECISION * sWorld->getRate(RATE_CONQUEST_POINTS_WEEK_LIMIT));
-        break;
-        case CURRENCY_TYPE_JUSTICE_POINTS:
-        {
-            uint32 justicecap = sWorld->getIntConfig(CONFIG_MAX_JUSTICE_POINTS) * PLAYER_CURRENCY_PRECISION;
-            if (justicecap > 0)
-                cap = justicecap;
-            break;
-        }
-    }
+    //switch (currency->ID)
+    //{
+    //case CURRENCY_TYPE_CONQUEST_POINTS:
+    //    cap = uint32( m_conquestPointsWeekCap[CP_SOURCE_ARENA] * PLAYER_CURRENCY_PRECISION * sWorld->getRate(RATE_CONQUEST_POINTS_WEEK_LIMIT));
+    //    break;
+    //case CURRENCY_TYPE_JUSTICE_POINTS:
+    //    {
+    //        uint32 justicecap = sWorld->getIntConfig(CONFIG_MAX_JUSTICE_POINTS) * PLAYER_CURRENCY_PRECISION;
+    //        if (justicecap > 0)
+    //            cap = justicecap;
+    //        break;
+    //    }
+    //}
 
-    if (cap != currency->WeekCap && IsInWorld() && !GetSession()->PlayerLoading())
-    {
-        WorldPacket packet(SMSG_UPDATE_CURRENCY_WEEK_LIMIT, 8);
-        packet << uint32(cap / PLAYER_CURRENCY_PRECISION);
-        packet << uint32(currency->ID);
-        GetSession()->SendPacket(&packet);
-    }
+    //if (cap != currency->WeekCap && IsInWorld() && !GetSession()->PlayerLoading())
+    //{
+    //    WorldPacket packet(SMSG_UPDATE_CURRENCY_WEEK_LIMIT, 8);
+    //    packet << uint32(cap / PLAYER_CURRENCY_PRECISION);
+    //    packet << uint32(currency->ID);
+    //    GetSession()->SendPacket(&packet);
+    //}
 
     return cap;
 }
