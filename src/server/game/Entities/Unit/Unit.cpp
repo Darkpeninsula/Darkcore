@@ -6887,10 +6887,9 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     return false;
                 triggered_spell_id = 25742;
                 float ap = GetTotalAttackPowerValue(BASE_ATTACK);
-                int32 holy = SpellBaseDamageBonus(SPELL_SCHOOL_MASK_HOLY) +
-                             SpellBaseDamageBonusForVictim(SPELL_SCHOOL_MASK_HOLY, victim);
+                int32 holy = SpellBaseDamageBonus(SPELL_SCHOOL_MASK_HOLY) + SpellBaseDamageBonusForVictim(SPELL_SCHOOL_MASK_HOLY, victim);
 
-                basepoints0 = uint32(GetAttackTime(BASE_ATTACK) * (0.011f * ap + 0.022f * holy));
+                basepoints0 = uint32(GetAttackTime(BASE_ATTACK) * (0.011f * (ap * 0.22f) * holy) * 100 / 100);
                 break;
             }
             // Light's Beacon - Beacon of Light
