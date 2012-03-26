@@ -15674,9 +15674,14 @@ void Player::RewardQuest(Quest const *quest, uint32 reward, Object* questGiver, 
         InitTalentForLevel();
     }
 
-    //Need added currency fields to quest template.
-    //if (quest->GetRewArenaPoints())
-    //    ModifyConquestPoints(quest->GetRewArenaPoints());
+    // currencies reward
+    for (uint32 i=0; i<QUEST_CURRENCY_COUNT; i++)
+    {
+        uint32 currId = pQuest->GetRewCurrencyId(i);
+        uint32 currCount = pQuest->GetRewCurrencyCount(i);
+        if( currId && currCount )
+            ModifyCurrency(currId, currCount * PLAYER_CURRENCY_PRECISION);
+    }
 
     // Send reward mail
     if (uint32 mail_template_id = quest->GetRewMailTemplateId())
