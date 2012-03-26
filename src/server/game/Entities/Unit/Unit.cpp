@@ -258,7 +258,7 @@ _vehicleKit(NULL), m_unitTypeMask(UNIT_MASK_NONE), m_HostileRefManager(this), mo
         m_heal_done [i] = 0;
 
     for (uint32 i = 0; i < 120; ++i)
-        m_damage_taken [i] = 0
+        m_damage_taken [i] = 0;
 }
 
 ////////////////////////////////////////////////////////////
@@ -624,7 +624,7 @@ uint32 Unit::DealDamage(Unit* victim, uint32 damage, CleanDamage const* cleanDam
     if (damagetype == DIRECT_DAMAGE || damagetype == SPELL_DIRECT_DAMAGE)
     {
         m_damage_done [0] += damage;
-        pVictim->m_damage_taken [0] += damage;
+        victim->m_damage_taken [0] += damage;
     }
 
     if (damagetype != NODAMAGE)

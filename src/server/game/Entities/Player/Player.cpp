@@ -15677,8 +15677,8 @@ void Player::RewardQuest(Quest const *quest, uint32 reward, Object* questGiver, 
     // currencies reward
     for (uint32 i=0; i<QUEST_CURRENCY_COUNT; i++)
     {
-        uint32 currId = pQuest->GetRewCurrencyId(i);
-        uint32 currCount = pQuest->GetRewCurrencyCount(i);
+        uint32 currId = quest->GetRewCurrencyId(i);
+        uint32 currCount = quest->GetRewCurrencyCount(i);
         if( currId && currCount )
             ModifyCurrency(currId, currCount * PLAYER_CURRENCY_PRECISION);
     }
