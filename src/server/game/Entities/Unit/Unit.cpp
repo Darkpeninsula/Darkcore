@@ -250,6 +250,15 @@ _vehicleKit(NULL), m_unitTypeMask(UNIT_MASK_NONE), m_HostileRefManager(this), mo
     _targetLocked = false;
 
     m_spellModTakingSpell = NULL;
+    
+    for (uint32 i = 0; i < 120; ++i)
+        m_damage_done [i] = 0;
+
+    for (uint32 i = 0; i < 120; ++i)
+        m_heal_done [i] = 0;
+
+    for (uint32 i = 0; i < 120; ++i)
+        m_damage_taken [i] = 0
 }
 
 ////////////////////////////////////////////////////////////
@@ -308,6 +317,32 @@ void Unit::Update(uint32 p_time)
 
     if (!IsInWorld())
         return;
+
+    // This is required for GetHealingDoneInPastSecs(), GetDamageDoneInPastSecs() and GetDamageTakenInPastSecs()!
+    DmgandHealDoneTimer -= p_time;
+
+    if (DmgandHealDoneTimer <= 0)
+    {
+        for (uint32 i = 119; i > 0; i--)
+        {
+            m_damage_done [i] = m_damage_done [i - 1];
+        }
+        m_damage_done [0] = 0;
+
+        for (uint32 i = 119; i > 0; i--)
+        {
+            m_heal_done [i] = m_heal_done [i - 1];
+        }
+        m_heal_done [0] = 0;
+
+        for (uint32 i = 119; i > 0; i--)
+        {
+            m_damage_taken [i] = m_damage_taken [i - 1];
+        }
+        m_damage_taken [0] = 0;
+
+        DmgandHealDoneTimer = 1000;
+    }
 
     _UpdateSpells(p_time);
 
@@ -585,6 +620,12 @@ uint32 Unit::DealDamage(Unit* victim, uint32 damage, CleanDamage const* cleanDam
 
     if (IsAIEnabled)
         GetAI()->DamageDealt(victim, damage, damagetype);
+
+    if (damagetype == DIRECT_DAMAGE || damagetype == SPELL_DIRECT_DAMAGE)
+    {
+        m_damage_done [0] += damage;
+        pVictim->m_damage_taken [0] += damage;
+    }
 
     if (damagetype != NODAMAGE)
     {
@@ -10271,6 +10312,8 @@ int32 Unit::DealHeal(Unit* victim, uint32 addhealth)
 
     if (addhealth)
         gain = victim->ModifyHealth(int32(addhealth));
+
+    m_heal_done [0] += addhealth;
 
     Unit* unit = this;
 

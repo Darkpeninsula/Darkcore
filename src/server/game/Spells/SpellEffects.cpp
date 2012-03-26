@@ -1772,10 +1772,10 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
             // Death strike
             if (m_spellInfo->SpellFamilyFlags[0] & SPELLFAMILYFLAG_DK_DEATH_STRIKE)
             {
-                if ((m_caster->CountPctFromMaxHealth(7)) > (20 * m_caster->GetDamageTakenInPastSecs(5) / 100))
-                    bp = m_caster->CountPctFromMaxHealth(7);
+                if(((m_caster->GetDamageTakenInPastSecs(5) * 20) / 100) > m_caster->CountPctFromMaxHealth(damage))
+                    bp = ((m_caster->GetDamageTakenInPastSecs(5) * 20) / 100);
                 else
-                    bp = (20 * m_caster->GetDamageTakenInPastSecs(5) / 100);
+                    bp = m_caster->CountPctFromMaxHealth(damage);
 
                 // Improved Death Strike
                 if (AuraEffect const* aurEff = m_caster->GetAuraEffect(SPELL_AURA_ADD_PCT_MODIFIER, SPELLFAMILY_DEATHKNIGHT, 2751, 0))
