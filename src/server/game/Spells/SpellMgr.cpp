@@ -3060,6 +3060,7 @@ void SpellMgr::LoadSpellCustomAttr()
             case 28271: // Polymorph (other animal)
             case 8122:  // Physic Scream
             case 5484:  // Howl of Terror
+            case 82691: // Ring of Frost
                 spellInfo->AuraInterruptFlags = AURA_INTERRUPT_FLAG_TAKE_DAMAGE;
                 break;
             case 89023: // Blessed life (spell, not talent)
