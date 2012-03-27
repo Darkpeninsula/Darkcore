@@ -1076,8 +1076,8 @@ class ObjectMgr
             if (itr == _coreStringLocaleStore.end()) return NULL;
             return &itr->second;
         }
-        const char *GetCoreString(int32 entry, LocaleConstant locale_idx) const;
-        const char *GetCoreStringForDBCLocale(int32 entry) const { return GetCoreString(entry, DBCLocaleIndex); }
+        const char* GetCoreString(int32 entry, LocaleConstant locale_idx) const;
+        const char* GetCoreStringForDBCLocale(int32 entry) const { return GetCoreString(entry, DBCLocaleIndex); }
         LocaleConstant GetDBCLocaleIndex() const { return DBCLocaleIndex; }
         void SetDBCLocaleIndex(LocaleConstant locale) { DBCLocaleIndex = locale; }
 

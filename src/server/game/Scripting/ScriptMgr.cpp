@@ -183,7 +183,7 @@ void DoScriptText(int32 iTextEntry, WorldObject* pSource, Unit* target)
 
     if (data->SoundId)
     {
-        if (GetSoundEntriesStore()->LookupEntry(data->SoundId))
+        if (sSoundEntriesStore.LookupEntry(data->SoundId))
             pSource->SendPlaySound(data->SoundId, false);
         else
             sLog->outError("TSCR: DoScriptText entry %i tried to process invalid sound id %u.", iTextEntry, data->SoundId);
@@ -262,7 +262,7 @@ void ScriptMgr::Initialize()
 void ScriptMgr::Unload()
 {
     #define SCR_CLEAR(T) \
-        FOR_SCRIPTS(T, itr, end) \
+        for (SCR_REG_ITR(T) itr = SCR_REG_LST(T).begin(); itr != SCR_REG_LST(T).end(); ++itr) \
             delete itr->second; \
         SCR_REG_LST(T).clear();
 

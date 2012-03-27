@@ -31,16 +31,15 @@ void IdleMovementGenerator::Initialize(Unit &owner)
     Reset(owner);
 }
 
-void
-IdleMovementGenerator::Reset(Unit& owner)
+void IdleMovementGenerator::Reset(Unit& owner)
 {
-    if (owner.HasUnitState(UNIT_STATE_MOVE))
+    if (!owner.IsStopped())
         owner.StopMoving();
 }
 
 void RotateMovementGenerator::Initialize(Unit& owner)
 {
-    if (owner.HasUnitState(UNIT_STATE_MOVE))
+    if (!owner.IsStopped())
         owner.StopMoving();
 
     if (owner.getVictim())
@@ -82,20 +81,17 @@ void RotateMovementGenerator::Finalize(Unit &unit)
       unit.ToCreature()->AI()->MovementInform(ROTATE_MOTION_TYPE, 0);
 }
 
-void
-DistractMovementGenerator::Initialize(Unit& owner)
+void DistractMovementGenerator::Initialize(Unit& owner)
 {
     owner.AddUnitState(UNIT_STATE_DISTRACTED);
 }
 
-void
-DistractMovementGenerator::Finalize(Unit& owner)
+void DistractMovementGenerator::Finalize(Unit& owner)
 {
     owner.ClearUnitState(UNIT_STATE_DISTRACTED);
 }
 
-bool
-DistractMovementGenerator::Update(Unit& /*owner*/, const uint32& time_diff)
+bool DistractMovementGenerator::Update(Unit& /*owner*/, const uint32& time_diff)
 {
     if (time_diff > _timer)
         return false;
@@ -104,8 +100,7 @@ DistractMovementGenerator::Update(Unit& /*owner*/, const uint32& time_diff)
     return true;
 }
 
-void
-AssistanceDistractMovementGenerator::Finalize(Unit &unit)
+void AssistanceDistractMovementGenerator::Finalize(Unit &unit)
 {
     unit.ClearUnitState(UNIT_STATE_DISTRACTED);
     unit.ToCreature()->SetReactState(REACT_AGGRESSIVE);

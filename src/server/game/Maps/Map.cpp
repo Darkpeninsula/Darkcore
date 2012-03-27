@@ -492,6 +492,7 @@ void Map::VisitNearbyCellsOf(WorldObject* obj, TypeContainerVisitor<Darkcore::Ob
             markCell(cell_id);
             CellCoord pair(x, y);
             Cell cell(pair);
+            cell.SetNoCreate();
             Visit(cell, gridVisitor);
             Visit(cell, worldVisitor);
         }
