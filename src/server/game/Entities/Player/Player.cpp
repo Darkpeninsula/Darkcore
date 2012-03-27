@@ -21230,13 +21230,27 @@ inline bool Player::_StoreOrEquipNewItem(uint32 vendorslot, uint32 item, uint8 c
     {
         ItemExtendedCostEntry const* iece = sItemExtendedCostStore.LookupEntry(crItem->ExtendedCost);
 
-        //TODO: ModifyCurrency
-
         for (uint8 i = 0; i < MAX_ITEM_EXTENDED_COST_REQUIREMENTS; ++i)
         {
             if (iece->RequiredItem[i])
                 DestroyItemCount(iece->RequiredItem[i], (iece->RequiredItemCount[i] * count), true);
         }
+
+		for (int i = 0; i < MAX_ITEM_EXT_COST_CURRENCIES; ++i)
+		{
+			switch (iece->RequiredCurrency [i])
+			{
+				case NULL: break;
+				case CURRENCY_TYPE_CONQUEST_POINTS: // There are currencies that include multiplier in dbc
+				case CURRENCY_TYPE_HONOR_POINTS:
+				case CURRENCY_TYPE_JUSTICE_POINTS:
+				case CURRENCY_TYPE_VALOR_POINTS:
+					ModifyCurrency(iece->RequiredCurrency[i], -int32(iece->RequiredCurrencyCount[i] * count));
+					break;
+				default: // other ones need multiplier
+					ModifyCurrency(iece->RequiredCurrency[i], -int32(iece->RequiredCurrencyCount[i] * count * PLAYER_CURRENCY_PRECISION));
+			}
+		}
     }
 
     Item* it = bStore ?
@@ -21357,15 +21371,30 @@ bool Player::BuyItemFromVendorSlot(uint64 vendorguid, uint32 vendorslot, uint32 
             }
         }
 
-        // currency price
-        for (int i = 0; i < MAX_ITEM_EXT_COST_CURRENCIES; ++i)
-        {
-            if (iece->RequiredCurrency[i] && !HasCurrency(iece->RequiredCurrency[i], iece->RequiredCurrencyCount[i]))
-            {
-                SendEquipError(EQUIP_ERR_VENDOR_MISSING_TURNINS, NULL, NULL);
-                return false;
-            }
-        }
+		// currency price
+		for (uint8 i = 0; i < MAX_ITEM_EXT_COST_CURRENCIES; ++i)
+		{
+			switch (iece->RequiredCurrency[i])
+			{
+                case NULL: break;
+				case CURRENCY_TYPE_CONQUEST_POINTS: // There are currencies that include multiplier in dbc
+				case CURRENCY_TYPE_HONOR_POINTS:
+				case CURRENCY_TYPE_JUSTICE_POINTS:
+				case CURRENCY_TYPE_VALOR_POINTS:
+					if (!HasCurrency(iece->RequiredCurrency[i], iece->RequiredCurrencyCount[i]))
+					{
+						SendEquipError(EQUIP_ERR_VENDOR_MISSING_TURNINS, NULL,NULL);
+						return false;
+					}
+					break;
+				default: // other ones need multiplier
+					if (!HasCurrency(iece->RequiredCurrency[i], iece->RequiredCurrencyCount[i] * PLAYER_CURRENCY_PRECISION))
+					{
+						SendEquipError(EQUIP_ERR_VENDOR_MISSING_TURNINS, NULL,NULL);
+						return false;
+					}
+			}
+		}
 
         // check for personal arena rating requirement
         if (GetMaxPersonalArenaRatingRequirement(iece->RequiredArenaSlot) < iece->RequiredPersonalArenaRating)
