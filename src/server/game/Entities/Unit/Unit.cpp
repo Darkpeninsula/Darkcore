@@ -6889,7 +6889,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                 float ap = GetTotalAttackPowerValue(BASE_ATTACK);
                 int32 holy = SpellBaseDamageBonus(SPELL_SCHOOL_MASK_HOLY) + SpellBaseDamageBonusForVictim(SPELL_SCHOOL_MASK_HOLY, victim);
 
-                basepoints0 = uint32(GetAttackTime(BASE_ATTACK) * (0.011f * (ap * 0.22f) * holy) * 100 / 100);
+                basepoints0 = int32(GetAttackTime(BASE_ATTACK) * int32(ap * 0.011f + 0.022f * holy) / 1000);
                 break;
             }
             // Light's Beacon - Beacon of Light
