@@ -14,3 +14,4 @@ REPLACE INTO `spell_proc_event` VALUES (61216, 0, 4, 2056, 0, 0, 4112, 0, 0, 100
 REPLACE INTO `spell_proc_event` VALUES (61221, 0, 4, 2056, 0, 0, 4112, 0, 0, 100, 0);
 REPLACE INTO `spell_proc_event` VALUES (84722, 0, 3, 16384, 0, 0, 0, 0, 0, 100, 0);
 REPLACE INTO `spell_proc_event` VALUES (84723, 0, 3, 16384, 0, 0, 0, 0, 0, 100, 0);
+REPLACE INTO `spell_proc_event` VALUES (85285, 0, 0, 0, 0, 0, 0, 0, 0, 0, 30);
