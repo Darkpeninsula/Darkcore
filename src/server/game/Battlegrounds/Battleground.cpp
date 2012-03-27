@@ -905,7 +905,8 @@ void Battleground::EndBattleground(uint32 winner)
 
 uint32 Battleground::GetBonusHonorFromKill(uint32 kills) const
 {
-    //variable kills means how many honorable kills you scored (so we need kills * honor_for_one_kill)
+    // (damage + healing + (HKs*1000) + (killing blows * 10000)) / deaths
+    // variable kills means how many honorable kills you scored (so we need kills * honor_for_one_kill)
     uint32 maxLevel = std::min(GetMaxLevel(), 80U);
     return Darkcore::Honor::hk_honor_at_level(maxLevel, float(kills));
 }
