@@ -15,3 +15,7 @@ REPLACE INTO `spell_proc_event` VALUES (61221, 0, 4, 2056, 0, 0, 4112, 0, 0, 100
 REPLACE INTO `spell_proc_event` VALUES (84722, 0, 3, 16384, 0, 0, 0, 0, 0, 100, 0);
 REPLACE INTO `spell_proc_event` VALUES (84723, 0, 3, 16384, 0, 0, 0, 0, 0, 100, 0);
 REPLACE INTO `spell_proc_event` VALUES (85285, 0, 0, 0, 0, 0, 0, 0, 0, 0, 30);
+
+-- (56836) Glyph of Silencing Shot
+DELETE FROM `spell_proc_event` WHERE `entry` IN (56836);
+INSERT INTO `spell_proc_event` VALUES (56836, 0x00, 0x09, 0x00040000, 0x00000000, 0x00000000, 0x00000100, 0x00000000, 0, 0, 0);
