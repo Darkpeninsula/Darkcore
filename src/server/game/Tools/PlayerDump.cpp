@@ -529,18 +529,18 @@ DumpReturn PlayerDumpReader::LoadDump(const std::string& file, uint32 account, s
 
                     result = CharacterDatabase.PQuery("SELECT 1 FROM characters WHERE name = '%s'", name.c_str());
                     if (result)
-                        if (!changenth(line, 37, "1"))       // characters.at_login set to "rename on login"
+                        if (!changenth(line, 33, "1"))       // characters.at_login set to "rename on login"
                             ROLLBACK(DUMP_FILE_BROKEN);
                 }
                 else if (!changenth(line, 3, name.c_str())) // characters.name
                     ROLLBACK(DUMP_FILE_BROKEN);
 
                 const char null[5] = "NULL";
-                if (!changenth(line, 69, null))             // characters.deleteInfos_Account
+                if (!changenth(line, 65, null))             // characters.deleteInfos_Account
                     ROLLBACK(DUMP_FILE_BROKEN);
-                if (!changenth(line, 70, null))             // characters.deleteInfos_Name
+                if (!changenth(line, 66, null))             // characters.deleteInfos_Name
                     ROLLBACK(DUMP_FILE_BROKEN);
-                if (!changenth(line, 71, null))             // characters.deleteDate
+                if (!changenth(line, 67, null))             // characters.deleteDate
                     ROLLBACK(DUMP_FILE_BROKEN);
                 break;
             }
