@@ -6108,10 +6108,10 @@ void AuraEffect::HandleAuraSwapSpells(AuraApplication const * aurApp, uint8 mode
 
     if(!spellOverride)
         return;
-    
+
     uint32 aura = spellOverride->aura;
     uint32 affSpell = spellOverride->affSpell;
-    
+
     //Check Aura
     if(aura > 0 && !target->HasAura(aura))
         return;

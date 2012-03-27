@@ -59,8 +59,8 @@ enum Spells
     SPELL_BLIGHT_OF_OZUMAT_DAMAGE_ZONE = 83608, // HC: 91494
 
     // Phase 3 AOE
-    SPELL_BLIGHT_OF_OZUMAT_DAMAGE_AOE = 83561, // HC: 91495   
-};  
+    SPELL_BLIGHT_OF_OZUMAT_DAMAGE_AOE = 83561, // HC: 91495
+};
 
 class mob_neptulon : public CreatureScript
 {
@@ -113,7 +113,7 @@ public:
                 return;
 
             if (playerAliveChecker <= diff)
-            {    
+            {
                 if(!isPlayerAlive())
                     Reset();
 
@@ -121,7 +121,7 @@ public:
             } else playerAliveChecker -= diff;
 
             if (generalTimer <= diff)
-            {    
+            {
                 HandleWave();
 
                 generalTimer = 10000;
@@ -141,7 +141,7 @@ public:
         }
 
         void HandleWave()
-        {          
+        {
             if(waveCount < 6)
             { // Phase 1
 
@@ -163,7 +163,7 @@ public:
                 {
                     for(uint8 i = 3; i <= 5; i++)
                         if(Creature* summon = me->SummonCreature(NPC_FACELESS_SAPPER, SpawnPositions[i],TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000))
-                        {                  
+                        {
                             summon->AI()->DoZoneInCombat(summon);
                             summon->SetReactState(REACT_PASSIVE);
                             summon->SetFacingToObject(me);
@@ -197,7 +197,7 @@ public:
 
                 for(uint8 i = 0; i <= (summonEntry == NPC_DEEP_MURLOC_INVADER ? 2 : 0); i++)
                     if(Creature* summon = me->SummonCreature(summonEntry, SpawnPositions[p],TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000))
-                    {                  
+                    {
                         summon->AI()->DoZoneInCombat(summon);
                     }
 
@@ -311,7 +311,7 @@ public:
                 EndEncounter();
 
             if (abilityTimer <= diff)
-            {    
+            {
                 if(phase == 1)
                 {
                     if(Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 200, true))

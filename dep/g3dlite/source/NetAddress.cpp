@@ -70,14 +70,14 @@ void NetAddress::init(
     uint16                      port) {
 
     uint32 addr;
-    
+
     if (hostname == "") {
         addr = INADDR_NONE;
     } else {
         addr = inet_addr(hostname.c_str());
     }
 
-	// The address wasn't in numeric form, resolve it
+    // The address wasn't in numeric form, resolve it
     if (addr == INADDR_NONE) {
         // Get the IP address of the server and store it in host
         struct hostent* host = gethostbyname(hostname.c_str());

@@ -35,7 +35,7 @@
 
 namespace G3D {
 bool CollisionDetection::ignoreBool;
-Vector3	CollisionDetection::ignore;
+Vector3 CollisionDetection::ignore;
 Array<Vector3> CollisionDetection::ignoreArray;
 
 Vector3 CollisionDetection::separatingAxisForSolidBoxSolidBox(
@@ -238,7 +238,7 @@ bool CollisionDetection::conservativeBoxBoxTest(
 bool CollisionDetection::fixedSolidBoxIntersectsFixedSolidBox(
     const Box&      box1,
     const Box&      box2,
-	const int		lastSeparatingAxis) {
+    const int       lastSeparatingAxis) {
     // for explanations of the variable please refer to the
     // paper and fillSolidBoxSolidBoxInfo()
     Vector3 a;
@@ -369,7 +369,7 @@ float CollisionDetection::penetrationDepthForFixedBoxFixedBox(
     // test if the boxes can be separated by a plane normal to
     // any of the three axes of box1, any of the three axes of box2,
     // (test 9 possible cross products later)
-	float penetration = -finf();
+    float penetration = -finf();
     int penetrationAxisIndex = -1;
 
     for (int i = 0; i < 6; i++) {
@@ -391,44 +391,44 @@ float CollisionDetection::penetrationDepthForFixedBoxFixedBox(
     // for each edge-edge case we have to adjust the magnitude of
     // penetration since we did not include the dot(L, L) denominator
     // that can be smaller than 1.0 for the edge-edge cases.
-	if (!parallelAxes) {
-	    double edgeDistances[9];
+    if (!parallelAxes) {
+        double edgeDistances[9];
 
-		// run through edge-edge cases to see if we can find a separating axis
-		for (int i = 6; i < 15; i++) {
-			float projectedDistance =
-				projectedDistanceForSolidBoxSolidBox(i, a, b, D, c, ca, ad, bd);
+        // run through edge-edge cases to see if we can find a separating axis
+        for (int i = 6; i < 15; i++) {
+            float projectedDistance =
+                projectedDistanceForSolidBoxSolidBox(i, a, b, D, c, ca, ad, bd);
 
-			// found a separating axis, the boxes do not intersect,
-			// correct magnitude and return projected distance
-			if (projectedDistance > 0.0) {
-				Vector3 L = separatingAxisForSolidBoxSolidBox(i, box1, box2);
-				projectedDistance /= dot(L, L);
-				return -projectedDistance;
-			}
+            // found a separating axis, the boxes do not intersect,
+            // correct magnitude and return projected distance
+            if (projectedDistance > 0.0) {
+                Vector3 L = separatingAxisForSolidBoxSolidBox(i, box1, box2);
+                projectedDistance /= dot(L, L);
+                return -projectedDistance;
+            }
 
-			edgeDistances[i - 6] = projectedDistance;
-		}
+            edgeDistances[i - 6] = projectedDistance;
+        }
 
-		// no separating axis found, the boxes do intersect,
-		// correct the magnitudes of the projectedDistance values
-		for (int i = 6; i < 15; i++) {
-			// find the negative penetration value with the smallest magnitude,
-			// the adjustment done for the edge-edge cases only increases
-			// magnitude by dividing by a number smaller than 1 and greater than 0
-			float projectedDistance = (float)edgeDistances[i - 6];
-			if (projectedDistance > penetration) {
-				Vector3 L = separatingAxisForSolidBoxSolidBox(i, box1, box2);
-				projectedDistance /= dot(L, L);
-				if (projectedDistance > penetration) {
-					penetration = projectedDistance;
-					penetrationAxisIndex = i;
-				}
-			}
-		}
-	}
+        // no separating axis found, the boxes do intersect,
+        // correct the magnitudes of the projectedDistance values
+        for (int i = 6; i < 15; i++) {
+            // find the negative penetration value with the smallest magnitude,
+            // the adjustment done for the edge-edge cases only increases
+            // magnitude by dividing by a number smaller than 1 and greater than 0
+            float projectedDistance = (float)edgeDistances[i - 6];
+            if (projectedDistance > penetration) {
+                Vector3 L = separatingAxisForSolidBoxSolidBox(i, box1, box2);
+                projectedDistance /= dot(L, L);
+                if (projectedDistance > penetration) {
+                    penetration = projectedDistance;
+                    penetrationAxisIndex = i;
+                }
+            }
+        }
+    }
 
-	// get final separating axis vector
+    // get final separating axis vector
     Vector3 L = separatingAxisForSolidBoxSolidBox(penetrationAxisIndex,
             box1, box2);
 
@@ -886,7 +886,7 @@ bool __fastcall CollisionDetection::rayAABox(
     // Find candidate planes.
     for (int i = 0; i < 3; ++i) {
         if (ray.origin()[i] < MinB[i]) {
-            location[i]	= MinB[i];
+            location[i] = MinB[i];
             inside      = false;
 
             // Calculate T distances to candidate planes
@@ -894,7 +894,7 @@ bool __fastcall CollisionDetection::rayAABox(
                 MaxT[i] = (MinB[i] - ray.origin()[i]) * invDir[i];
             }
         } else if (ray.origin()[i] > MaxB[i]) {
-            location[i]	= MaxB[i];
+            location[i] = MaxB[i];
             inside      = false;
 
             // Calculate T distances to candidate planes
@@ -905,7 +905,7 @@ bool __fastcall CollisionDetection::rayAABox(
     }
 
     if (inside) {
-    	// Ray origin inside bounding box
+        // Ray origin inside bounding box
         location = ray.origin();
         return true;
     }
@@ -1026,10 +1026,10 @@ float CollisionDetection::collisionTimeForMovingSphereFixedSphere(
 
 /*
 float CollisionDetection::collisionTimeForMovingPointFixedTriangle(
-    const Vector3&			point,
-    const Vector3&			velocity,
+    const Vector3&          point,
+    const Vector3&          velocity,
     const Triangle&       triangle,
-    Vector3&				outLocation,
+    Vector3&                outLocation,
     Vector3&                outNormal) {
     double time = collisionTimeForMovingPointFixedPlane(point, velocity, triangle.plane(), outLocation, outNormal);
 
@@ -1188,73 +1188,73 @@ bool CollisionDetection::collisionLocationForMovingPointFixedAABox(
     bool&                   Inside,
     Vector3&                normal) {
     // Integer representation of a floating-point value.
-    #define IR(x)	((uint32&)x)
+    #define IR(x)   ((uint32&)x)
 
     Inside = true;
-	const Vector3& MinB = box.low();
-	const Vector3& MaxB = box.high();
-	Vector3 MaxT(-1.0f, -1.0f, -1.0f);
+    const Vector3& MinB = box.low();
+    const Vector3& MaxB = box.high();
+    Vector3 MaxT(-1.0f, -1.0f, -1.0f);
 
-	// Find candidate planes.
+    // Find candidate planes.
     for (int i = 0; i < 3; ++i) {
-		if (origin[i] < MinB[i]) {
-			location[i]	= MinB[i];
-			Inside      = false;
+        if (origin[i] < MinB[i]) {
+            location[i] = MinB[i];
+            Inside      = false;
 
-			// Calculate T distances to candidate planes
+            // Calculate T distances to candidate planes
             if (IR(dir[i])) {
                 MaxT[i] = (MinB[i] - origin[i]) / dir[i];
             }
         } else if (origin[i] > MaxB[i]) {
-			location[i]	= MaxB[i];
-			Inside	    = false;
+            location[i] = MaxB[i];
+            Inside      = false;
 
-			// Calculate T distances to candidate planes
+            // Calculate T distances to candidate planes
             if (IR(dir[i])) {
                 MaxT[i] = (MaxB[i] - origin[i]) / dir[i];
             }
-		}
-	}
+        }
+    }
 
-	if (Inside) {
-    	// Ray origin inside bounding box
+    if (Inside) {
+        // Ray origin inside bounding box
         location = origin;
-		return false;
-	}
+        return false;
+    }
 
-	// Get largest of the maxT's for final choice of intersection
-	int WhichPlane = 0;
-    if (MaxT[1] > MaxT[WhichPlane])	{
+    // Get largest of the maxT's for final choice of intersection
+    int WhichPlane = 0;
+    if (MaxT[1] > MaxT[WhichPlane]) {
         WhichPlane = 1;
     }
 
-    if (MaxT[2] > MaxT[WhichPlane])	{
+    if (MaxT[2] > MaxT[WhichPlane]) {
         WhichPlane = 2;
     }
 
-	// Check final candidate actually inside box
+    // Check final candidate actually inside box
     if (IR(MaxT[WhichPlane]) & 0x80000000) {
         // Miss the box
         return false;
     }
 
-	for (int i = 0; i < 3; ++i) {
+    for (int i = 0; i < 3; ++i) {
         if (i != WhichPlane) {
-			location[i] = origin[i] + MaxT[WhichPlane] * dir[i];
+            location[i] = origin[i] + MaxT[WhichPlane] * dir[i];
             if ((location[i] < MinB[i]) ||
                 (location[i] > MaxB[i])) {
                 // On this plane we're outside the box extents, so
                 // we miss the box
                 return false;
             }
-		}
-	}
+        }
+    }
 
     // Choose the normal to be the plane normal facing into the ray
     normal = Vector3::zero();
     normal[WhichPlane] = (dir[WhichPlane] > 0) ? -1.0 : 1.0;
 
-	return true;
+    return true;
 
     #undef IR
 }
@@ -1289,11 +1289,11 @@ float CollisionDetection::collisionTimeForMovingPointFixedRectangle(
 /** Used by findRayCapsuleIntersection.
     @cite From magic software http://www.magic-software.com/Source/Intersection3D/MgcIntr3DLinCap.cpp */
 static int findRayCapsuleIntersectionAux(
-	const Vector3&		rkOrigin,
-	const Vector3&		rkDirection,
-    const Capsule&		rkCapsule,
-	double   			afT[2]) {
-	Vector3 capsuleDirection = rkCapsule.point(1) - rkCapsule.point(0);
+    const Vector3&      rkOrigin,
+    const Vector3&      rkDirection,
+    const Capsule&      rkCapsule,
+    double              afT[2]) {
+    Vector3 capsuleDirection = rkCapsule.point(1) - rkCapsule.point(0);
 
     // set up quadratic Q(t) = a*t^2 + 2*b*t + c
     Vector3 kU, kV, kW = capsuleDirection;
@@ -1355,14 +1355,14 @@ static int findRayCapsuleIntersectionAux(
         if ((0.0f <= fTmp) && (fTmp <= fWLength)) {
             afT[iQuantity] = fT * fInvDLength;
             iQuantity++;
-		}
+        }
 
         fT = (-fB + fRoot)*fInv;
         fTmp = kP.z + fT*kD.z;
 
-		if ((0.0f <= fTmp) && (fTmp <= fWLength)) {
+        if ((0.0f <= fTmp) && (fTmp <= fWLength)) {
             afT[iQuantity++] = fT*fInvDLength;
-		}
+        }
 
         if (iQuantity == 2) {
             // line intersects capsule wall in two places
@@ -1391,7 +1391,7 @@ static int findRayCapsuleIntersectionAux(
             afT[iQuantity++] = fT*fInvDLength;
             if (iQuantity == 2) {
                 return 2;
-			}
+            }
         }
 
         fT = -fB + fRoot;
@@ -1400,7 +1400,7 @@ static int findRayCapsuleIntersectionAux(
             afT[iQuantity++] = fT*fInvDLength;
             if (iQuantity == 2) {
                 return 2;
-			}
+            }
         }
     } else if (fDiscr == 0.0f) {
         fT = -fB;
@@ -1409,7 +1409,7 @@ static int findRayCapsuleIntersectionAux(
             afT[iQuantity++] = fT*fInvDLength;
             if (iQuantity == 2) {
                 return 2;
-			}
+            }
         }
     }
 
@@ -1427,7 +1427,7 @@ static int findRayCapsuleIntersectionAux(
             afT[iQuantity++] = fT*fInvDLength;
             if (iQuantity == 2) {
                 return 2;
-			}
+            }
         }
 
         fT = -fB + fRoot;
@@ -1436,7 +1436,7 @@ static int findRayCapsuleIntersectionAux(
             afT[iQuantity++] = fT*fInvDLength;
             if (iQuantity == 2) {
                 return 2;
-			}
+            }
         }
     } else if (fDiscr == 0.0f) {
         fT = -fB;
@@ -1445,7 +1445,7 @@ static int findRayCapsuleIntersectionAux(
             afT[iQuantity++] = fT*fInvDLength;
             if (iQuantity == 2) {
                 return 2;
-			}
+            }
         }
     }
 
@@ -1455,23 +1455,23 @@ static int findRayCapsuleIntersectionAux(
 /** Used by collisionTimeForMovingPointFixedCapsule.
     @cite From magic software http://www.magic-software.com/Source/Intersection3D/MgcIntr3DLinCap.cpp
 
-	@param rkRay      The ray
-	@param rkCapsule  The capsule
-	@param riQuantity The number of intersections found
-	@param akPoint    The intersections found
-	@return           True if there is at least one intersection
-	*/
+    @param rkRay      The ray
+    @param rkCapsule  The capsule
+    @param riQuantity The number of intersections found
+    @param akPoint    The intersections found
+    @return           True if there is at least one intersection
+    */
 static bool findRayCapsuleIntersection(
-	const Ray&			rkRay,
-	const Capsule&		rkCapsule,
-	int&				riQuantity,
-	Vector3				akPoint[2]) {
+    const Ray&          rkRay,
+    const Capsule&      rkCapsule,
+    int&                riQuantity,
+    Vector3             akPoint[2]) {
     double afT[2];
     riQuantity = findRayCapsuleIntersectionAux(rkRay.origin(), rkRay.direction(), rkCapsule, afT);
 
     // Only return intersections that occur in the future
     int iClipQuantity = 0;
-	int i;
+    int i;
     for (i = 0; i < riQuantity; ++i) {
         if (afT[i] >= 0.0f) {
             akPoint[iClipQuantity] = rkRay.origin() + afT[i] * rkRay.direction();
@@ -1484,29 +1484,29 @@ static bool findRayCapsuleIntersection(
 }
 
 float CollisionDetection::collisionTimeForMovingPointFixedCapsule(
-	const Vector3&		_point,
-	const Vector3&		velocity,
-	const Capsule&		capsule,
-	Vector3&		    location,
+    const Vector3&      _point,
+    const Vector3&      velocity,
+    const Capsule&      capsule,
+    Vector3&            location,
     Vector3&            outNormal) {
-	float timeScale = velocity.magnitude();
+    float timeScale = velocity.magnitude();
 
     if (timeScale == 0.0f) {
         timeScale = 1;
     }
 
-	Vector3 direction = velocity / timeScale;
-	int numIntersections;
-	Vector3 intersection[2];
-	findRayCapsuleIntersection(Ray::fromOriginAndDirection(_point, direction), capsule, numIntersections, intersection);
+    Vector3 direction = velocity / timeScale;
+    int numIntersections;
+    Vector3 intersection[2];
+    findRayCapsuleIntersection(Ray::fromOriginAndDirection(_point, direction), capsule, numIntersections, intersection);
 
-	if (numIntersections == 2) {
-		// A collision can only occur if there are two intersections.  If there is one
-		// intersection, that one is exiting the capsule.
+    if (numIntersections == 2) {
+        // A collision can only occur if there are two intersections.  If there is one
+        // intersection, that one is exiting the capsule.
 
-		// Find the entering intersection (the first one that occurs).
-		float d0 = (intersection[0] - _point).squaredMagnitude();
-		float d1 = (intersection[1] - _point).squaredMagnitude();
+        // Find the entering intersection (the first one that occurs).
+        float d0 = (intersection[0] - _point).squaredMagnitude();
+        float d1 = (intersection[1] - _point).squaredMagnitude();
 
         // Compute the surface normal (if we aren't ignoring the result)
         if (&outNormal != &ignore) {
@@ -1515,29 +1515,29 @@ float CollisionDetection::collisionTimeForMovingPointFixedCapsule(
         }
 
         if (d0 > d1) {
-			location = intersection[1];
-			return sqrt(d1) / timeScale;
-		} else {
-			location = intersection[0];
-			return sqrt(d0) / timeScale;
-		}
-	} else {
-		// No entering intersection discovered; return no intersection.
-		location = Vector3::inf();
-		return finf();
-	}
+            location = intersection[1];
+            return sqrt(d1) / timeScale;
+        } else {
+            location = intersection[0];
+            return sqrt(d0) / timeScale;
+        }
+    } else {
+        // No entering intersection discovered; return no intersection.
+        location = Vector3::inf();
+        return finf();
+    }
 }
 
 float CollisionDetection::collisionTimeForMovingSphereFixedPlane(
-    const Sphere&		sphere,
-    const Vector3&		velocity,
-    const Plane&		plane,
-    Vector3&			location,
+    const Sphere&       sphere,
+    const Vector3&      velocity,
+    const Plane&        plane,
+    Vector3&            location,
     Vector3&            outNormal) {
-	if (sphere.radius == 0) {
-		// Optimization for zero radius sphere
+    if (sphere.radius == 0) {
+        // Optimization for zero radius sphere
         return collisionTimeForMovingPointFixedPlane(sphere.center, velocity, plane, location, outNormal);
-	}
+    }
 
     // The collision point on the sphere will be the point at
     // center - (radius * normal).  Collisions only occur when
@@ -1572,7 +1572,7 @@ float CollisionDetection::collisionTimeForMovingSphereFixedPlane(
 }
 
 float CollisionDetection::collisionTimeForMovingSphereFixedTriangle(
-    const class Sphere&		sphere,
+    const class Sphere&     sphere,
     const Vector3&              velocity,
     const Triangle&             triangle,
     Vector3&                    outLocation,
@@ -1752,17 +1752,17 @@ float CollisionDetection::collisionTimeForMovingSphereFixedBox(
 }
 
 float CollisionDetection::collisionTimeForMovingSphereFixedCapsule(
-	const Sphere&		sphere,
-	const Vector3&		velocity,
-	const Capsule&		capsule,
-	Vector3&		    location,
+    const Sphere&       sphere,
+    const Vector3&      velocity,
+    const Capsule&      capsule,
+    Vector3&            location,
     Vector3&            outNormal) {
     (void)outNormal;
 
-	Capsule _capsule(capsule.point(0), capsule.point(1), capsule.radius() + sphere.radius);
+    Capsule _capsule(capsule.point(0), capsule.point(1), capsule.radius() + sphere.radius);
 
     Vector3 normal;
-	double time = collisionTimeForMovingPointFixedCapsule(sphere.center, velocity, _capsule, location, normal);
+    double time = collisionTimeForMovingPointFixedCapsule(sphere.center, velocity, _capsule, location, normal);
 
     if (time < finf()) {
         // Location is now the position of the center of the sphere at the time of collision.
@@ -1779,7 +1779,7 @@ Vector3 CollisionDetection::bounceDirection(
     const float     collisionTime,
     const Vector3&  collisionLocation,
     const Vector3&  collisionNormal) {
-	// Location when the collision occurs
+    // Location when the collision occurs
     Vector3 sphereLocation  = sphere.center + velocity * collisionTime;
 
     Vector3 normal          = (sphereLocation - collisionLocation);
@@ -1851,10 +1851,10 @@ Vector3 CollisionDetection::closestPointOnLineSegment(
 }
 
 Vector3 CollisionDetection::closestPointOnTrianglePerimeter(
-    const Vector3&			v0,
-    const Vector3&			v1,
-    const Vector3&			v2,
-    const Vector3&			point) {
+    const Vector3&          v0,
+    const Vector3&          v1,
+    const Vector3&          v2,
+    const Vector3&          point) {
     Vector3 v[3] = {v0, v1, v2};
     Vector3 edgeDirection[3] = {(v1 - v0), (v2 - v1), (v0 - v2)};
     float   edgeLength[3];
@@ -1921,11 +1921,11 @@ Vector3 CollisionDetection::closestPointOnTrianglePerimeter(
 }
 
 bool CollisionDetection::isPointInsideTriangle(
-    const Vector3&			v0,
-    const Vector3&			v1,
-    const Vector3&			v2,
-    const Vector3&			normal,
-    const Vector3&			point,
+    const Vector3&          v0,
+    const Vector3&          v1,
+    const Vector3&          v2,
+    const Vector3&          normal,
+    const Vector3&          point,
     float                   b[3],
     Vector3::Axis           primaryAxis) {
     if (primaryAxis == Vector3::DETECT_AXIS) {

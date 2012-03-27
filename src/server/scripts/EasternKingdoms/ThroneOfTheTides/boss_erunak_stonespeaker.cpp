@@ -17,7 +17,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
- 
+
 #include "ScriptPCH.h"
 #include "throne_of_the_tides.h"
 
@@ -168,7 +168,7 @@ public:
                     events.ScheduleEvent(EVENT_MAGMA_SPLASH, 17000);
                     break;
                 }
-            }            
+            }
 
             DoMeleeAttackIfReady();
         }
@@ -220,7 +220,7 @@ public:
                 {
 
                 case EVENT_ENSLAVE:
-                    
+
                     events.ScheduleEvent(EVENT_ENSLAVE, 31000);
                     break;
                 case EVENT_ABSORB_MAGIC:
@@ -239,7 +239,7 @@ public:
                 default:
                     break;
                 }
-            }        
+            }
 
             DoMeleeAttackIfReady();
         }

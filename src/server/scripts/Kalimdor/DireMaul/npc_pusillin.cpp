@@ -24,20 +24,20 @@
 
 enum pus
 {
-    SAY_1   = -1901000, 
-    SAY_2   = -1901001, 
-    SAY_3   = -1901002, 
-    SAY_4   = -1901003, 
-    SAY_5   = -1901004, 
+    SAY_1   = -1901000,
+    SAY_2   = -1901001,
+    SAY_3   = -1901002,
+    SAY_4   = -1901003,
+    SAY_5   = -1901004,
 
     NPC_IMP = 13276
 };
 
 enum eSpells
 {
-    SPELL_BLAST_WAVE            = 17145, 
-    SPELL_FIRE_BLAST            = 14145, 
-    SPELL_FIREBALL              = 15228, 
+    SPELL_BLAST_WAVE            = 17145,
+    SPELL_FIRE_BLAST            = 14145,
+    SPELL_FIREBALL              = 15228,
     SPELL_RUNN                  = 22735
 };
 

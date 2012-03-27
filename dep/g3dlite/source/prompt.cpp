@@ -494,14 +494,14 @@ static int textPrompt(
 
 // See http://developer.apple.com/documentation/Carbon/Reference/Carbon_Event_Manager_Ref/index.html
 
-#define CARBON_COMMANDID_START	128
-#define CARBON_BUTTON_SPACING	12
-#define CARBON_BUTTON_HEIGHT	20
-#define CARBON_BUTTON_MINWIDTH	69
-#define CARBON_WINDOW_PADDING	20
+#define CARBON_COMMANDID_START  128
+#define CARBON_BUTTON_SPACING   12
+#define CARBON_BUTTON_HEIGHT    20
+#define CARBON_BUTTON_MINWIDTH  69
+#define CARBON_WINDOW_PADDING   20
 
 struct CallbackData {
-    WindowRef	refWindow;
+    WindowRef   refWindow;
 
     /** Index of this particular button */
     int         myIndex;
@@ -535,11 +535,11 @@ static int guiPrompt
  const char*         prompt,
  const char**        choice,
  int                 numChoices) {
-    WindowRef	 window;
+    WindowRef    window;
 
-    int          iNumButtonRows	= 0;
+    int          iNumButtonRows = 0;
     int          iButtonWidth   = -1;
-    OSStatus	 err            = noErr;
+    OSStatus     err            = noErr;
 
     // Determine number of rows of buttons
     while (iButtonWidth < CARBON_BUTTON_MINWIDTH) {
@@ -551,8 +551,8 @@ static int guiPrompt
     }
 
     // Window Variables
-    Rect	rectWin = {0, 0, 200 + ((iNumButtonRows-1) * (CARBON_BUTTON_HEIGHT+CARBON_BUTTON_SPACING)), 550};			// top, left, bottom, right
-    CFStringRef	szWindowTitle = CFStringCreateWithCString(kCFAllocatorDefault, windowTitle, kCFStringEncodingUTF8);
+    Rect    rectWin = {0, 0, 200 + ((iNumButtonRows-1) * (CARBON_BUTTON_HEIGHT+CARBON_BUTTON_SPACING)), 550};           // top, left, bottom, right
+    CFStringRef szWindowTitle = CFStringCreateWithCString(kCFAllocatorDefault, windowTitle, kCFStringEncodingUTF8);
 
     window = NULL;
 
@@ -562,28 +562,28 @@ static int guiPrompt
     assert(err == noErr);
 
     // Event Handler Variables
-    EventTypeSpec	buttonSpec[] = {{ kEventClassControl, kEventControlHit }, { kEventClassCommand, kEventCommandProcess }};
-    EventHandlerUPP	buttonHandler = NewEventHandlerUPP(DoCommandEvent);
+    EventTypeSpec   buttonSpec[] = {{ kEventClassControl, kEventControlHit }, { kEventClassCommand, kEventCommandProcess }};
+    EventHandlerUPP buttonHandler = NewEventHandlerUPP(DoCommandEvent);
 
     // Static Text Variables
-    Rect		rectStatic = {20, 20, 152, 530};
-    CFStringRef		szStaticText = CFStringCreateWithCString(kCFAllocatorDefault, prompt, kCFStringEncodingUTF8);
-    ControlRef		refStaticText = NULL;
+    Rect        rectStatic = {20, 20, 152, 530};
+    CFStringRef     szStaticText = CFStringCreateWithCString(kCFAllocatorDefault, prompt, kCFStringEncodingUTF8);
+    ControlRef      refStaticText = NULL;
     err = CreateStaticTextControl(window, &rectStatic, szStaticText, NULL, &refStaticText);
 
     // Button Variables
-    Rect		bounds[numChoices];
-    CFStringRef		caption[numChoices];
-    ControlRef		button[numChoices];
+    Rect        bounds[numChoices];
+    CFStringRef     caption[numChoices];
+    ControlRef      button[numChoices];
 
     int whichButton=-1;
     CallbackData        callbackData[numChoices];
 
     // Create the Buttons and assign event handlers
     for (int i = 0; i < numChoices; ++i) {
-        bounds[i].top	 = 160 + ((CARBON_BUTTON_HEIGHT+CARBON_BUTTON_SPACING)*(i%iNumButtonRows));
-        bounds[i].right	 = 530 - ((iButtonWidth+CARBON_BUTTON_SPACING)*(i/iNumButtonRows));
-        bounds[i].left	 = bounds[i].right - iButtonWidth;
+        bounds[i].top    = 160 + ((CARBON_BUTTON_HEIGHT+CARBON_BUTTON_SPACING)*(i%iNumButtonRows));
+        bounds[i].right  = 530 - ((iButtonWidth+CARBON_BUTTON_SPACING)*(i/iNumButtonRows));
+        bounds[i].left   = bounds[i].right - iButtonWidth;
         bounds[i].bottom = bounds[i].top + CARBON_BUTTON_HEIGHT;
 
         // Convert the button captions to Apple strings

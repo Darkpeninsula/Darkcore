@@ -61,25 +61,25 @@ enum
     SPELL_DARK_BREATH                = 74806, // Inflicts 17, 500 to 22, 500 Shadow damage to players in front of Halion
     SPELL_DUSK_SHROUD                = 75484, // Inflicts 3, 000 Shadow damage every 2 seconds to everyone in the Twilight Realm
     //Combustion
-    NPC_COMBUSTION                    = 40001, 
+    NPC_COMBUSTION                    = 40001,
     SPELL_MARK_OF_COMBUSTION        = 74567, // Dummy effect only
     SPELL_FIERY_COMBUSTION            = 74562, // Inflicts 4, 000 Fire damage every 2 seconds for 30 seconds to a random raider. Every time Fiery Combustion does damage, it applies a stackable Mark of Combustion.
-    SPELL_COMBUSTION_EXPLODE        = 74607, 
-    SPELL_COMBUSTION_AURA            = 74629, 
+    SPELL_COMBUSTION_EXPLODE        = 74607,
+    SPELL_COMBUSTION_AURA            = 74629,
     //Consumption
-    NPC_CONSUMPTION                    = 40135, 
+    NPC_CONSUMPTION                    = 40135,
     SPELL_MARK_OF_CONSUMPTION        = 74795, // Dummy effect only
     SPELL_SOUL_CONSUMPTION            = 74792, // Inflicts 4, 000 Shadow damage every 2 seconds for 30 seconds to a random raider. Every time Soul Consumption does damage, it applies a stackable Mark of Consumption.
-    SPELL_CONSUMPTION_EXPLODE        = 74799, 
-    SPELL_CONSUMPTION_AURA            = 74803, 
-    SPELL_GROW_UP                    = 36300, 
+    SPELL_CONSUMPTION_EXPLODE        = 74799,
+    SPELL_CONSUMPTION_AURA            = 74803,
+    SPELL_GROW_UP                    = 36300,
     //Summons
     NPC_METEOR_STRIKE                = 40029, //casts "impact zone" then meteor
-    NPC_METEOR_STRIKE_1                = 40041, 
-    NPC_METEOR_STRIKE_2                = 40042, 
-    NPC_ORB_CUTTER                    = 40081, 
+    NPC_METEOR_STRIKE_1                = 40041,
+    NPC_METEOR_STRIKE_2                = 40042,
+    NPC_ORB_CUTTER                    = 40081,
 
-    FR_RADIUS                        = 45, 
+    FR_RADIUS                        = 45,
 
     //SAYS
     SAY_HALION_SPAWN                = -1666100, //17499 Meddlesome insects, you're too late! The Ruby Sanctum is lost.
@@ -1714,7 +1714,7 @@ class spell_halion_fiery_combustion : public SpellScriptLoader
             PrepareAuraScript(spell_halion_fiery_combustion_AuraScript)
             enum Spells
             {
-                SPELL_MARK_OF_COMBUSTION = 74567, 
+                SPELL_MARK_OF_COMBUSTION = 74567,
                 SPELL_COMBUSTION_EXPLODE = 74607
             };
 
@@ -1773,7 +1773,7 @@ class spell_halion_soul_consumption : public SpellScriptLoader
             PrepareAuraScript(spell_halion_soul_consumption_AuraScript)
             enum Spells
             {
-                SPELL_MARK_OF_CONSUMPTION = 74795, 
+                SPELL_MARK_OF_CONSUMPTION = 74795,
                 SPELL_CONSUMPTION_EXPLODE = 74799
             };
 

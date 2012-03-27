@@ -2701,9 +2701,9 @@ void SpellMgr::LoadActionBarSpellOverride()
 {
     uint32 oldMSTime = getMSTime();
     mActionBarSpellOverrideMap.clear();
-    
-    QueryResult result = WorldDatabase.Query("SELECT overrideSpell, affSpell, aura FROM spell_override ORDER BY overrideSpell ASC"); 
-    
+
+    QueryResult result = WorldDatabase.Query("SELECT overrideSpell, affSpell, aura FROM spell_override ORDER BY overrideSpell ASC");
+
     if (!result)
     {
         sLog->outString(">> Loaded 0 actionbar spell override. DB table `spell_override` is empty.");
@@ -2747,7 +2747,7 @@ void SpellMgr::LoadActionBarSpellOverride()
         mActionBarSpellOverrideMap[overrideSpell]= actbarSpellov;
     }
     while (result->NextRow());
-    
+
     sLog->outString(">> Loaded %u actionbar spell override in %u ms", mActionBarSpellOverrideMap.size(), GetMSTimeDiffToNow(oldMSTime));
     sLog->outString();
 }

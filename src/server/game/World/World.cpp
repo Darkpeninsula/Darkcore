@@ -2845,7 +2845,7 @@ void World::InitGuildAdvancementDailyResetTime()
 void World::ResetGuildAdvancementDailyXP()
 {
     sLog->outDetail("Guild Advancement Daily XP status reset for all characters.");
-   
+
     QueryResult result = CharacterDatabase.Query("SELECT level,xp,guildid FROM guild");
 
     if (!result)

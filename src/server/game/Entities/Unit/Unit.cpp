@@ -250,7 +250,7 @@ _vehicleKit(NULL), m_unitTypeMask(UNIT_MASK_NONE), m_HostileRefManager(this), mo
     _targetLocked = false;
 
     m_spellModTakingSpell = NULL;
-    
+
     for (uint32 i = 0; i < 120; ++i)
         m_damage_done [i] = 0;
 
@@ -8260,7 +8260,7 @@ bool Unit::HandleAuraProc(Unit* victim, uint32 damage, Aura* triggeredByAura, Sp
                 case 2061:
                 case 32546:
                 {
-                    if (m_caster->HasAura(14751))
+                    if (HasAura(14751))
                     {
                         CastSpell(this, 81208, true);
                         *handled = true;
@@ -8270,7 +8270,7 @@ bool Unit::HandleAuraProc(Unit* victim, uint32 damage, Aura* triggeredByAura, Sp
                 case 33076:
                 case 596:
                 {
-                    if (m_caster->HasAura(14751))
+                    if (HasAura(14751))
                     {
                         CastSpell(this, 81206, true);
                         *handled = true;
@@ -8280,7 +8280,7 @@ bool Unit::HandleAuraProc(Unit* victim, uint32 damage, Aura* triggeredByAura, Sp
                 case 585:
                 case 73510:
                 {
-                    if (m_caster->HasAura(14751))
+                    if (HasAura(14751))
                     {
                         CastSpell(this, 81209, true);
                         *handled = true;

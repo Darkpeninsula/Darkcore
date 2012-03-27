@@ -44,9 +44,9 @@ void ExtractDBCFiles(int locale, bool basicLocale)
         {
             // Only take existing files
             if ( pFileEntry->dwFlags & MPQ_FILE_EXISTS &&
-			   (pFileEntry->dwFlags & MPQ_FILE_PATCH_FILE) == 0 &&
-			   (pFileEntry->dwFlags & MPQ_FILE_DELETE_MARKER) == 0 &&
-			   pFileEntry->szFileName != NULL)
+               (pFileEntry->dwFlags & MPQ_FILE_PATCH_FILE) == 0 &&
+               (pFileEntry->dwFlags & MPQ_FILE_DELETE_MARKER) == 0 &&
+               pFileEntry->szFileName != NULL)
             {
                 std::string name = pFileEntry->szFileName;
                 if (i != 0)
@@ -61,7 +61,7 @@ void ExtractDBCFiles(int locale, bool basicLocale)
                 }
 
                 if (name.rfind(".dbc") == name.length() - strlen(".dbc") ||
-					name.rfind(".db2") == name.length() - strlen(".db2"))
+                    name.rfind(".db2") == name.length() - strlen(".db2"))
                 {
                     //Verify if this dbc isn't in the list yet. StormLibs return some extra dbcs :P
                     if (i != 0)
@@ -98,7 +98,7 @@ void ExtractDBCFiles(int locale, bool basicLocale)
         path += langs[locale];
         path += "/";
     }
-	CreateDir(path);
+    CreateDir(path);
 
     // extract DBCs
     int count = 0;

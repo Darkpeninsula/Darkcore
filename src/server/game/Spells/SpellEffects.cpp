@@ -550,7 +550,7 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                         if (m_caster->HasSpell(95740))   // Shadow Orbs
                         {
                             int chance = 10;
-                            
+
                             if (m_caster->HasAura(33191)) // Harnessed Shadows rank1
                                 chance += 4;
                             else if (m_caster->HasAura(78228))  // Harnessed Shadows rank2
@@ -1801,39 +1801,39 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
             }
             switch (m_spellInfo->Id)
             {
-				case 49020: // Obliterate
-				case 66198: // Obliterate Off-Hand
+                case 49020: // Obliterate
+                case 66198: // Obliterate Off-Hand
                 {
                     uint32 count = unitTarget->GetDiseasesByCaster(m_caster->GetGUID());
                     if (count > 0)
                        damage = int32(damage + (damage * count * 12.5 / 100));
                     break;
                 }
-				// Death Grip 
-				case 49576:
-				{ 
-					if (!unitTarget) 
-						return; 
- 
-					m_caster->CastSpell(unitTarget, 49560, true); 
-                    return; 
-				} 
-				case 49560: 
-				{ 
-					if (!unitTarget) 
-						return;
-
-					unitTarget->CastSpell(m_caster->GetPositionX(), m_caster->GetPositionY(), m_caster->GetPositionZ(), damage, true); 
-                    return;
-				}
-				case 46584: // Raise Dead
+                // Death Grip
+                case 49576:
                 {
-					if (m_caster->GetTypeId() != TYPEID_PLAYER)
+                    if (!unitTarget)
                         return;
-                    
+
+                    m_caster->CastSpell(unitTarget, 49560, true);
+                    return;
+                }
+                case 49560:
+                {
+                    if (!unitTarget)
+                        return;
+
+                    unitTarget->CastSpell(m_caster->GetPositionX(), m_caster->GetPositionY(), m_caster->GetPositionZ(), damage, true);
+                    return;
+                }
+                case 46584: // Raise Dead
+                {
+                    if (m_caster->GetTypeId() != TYPEID_PLAYER)
+                        return;
+
                     if (effIndex != 0)
                         return;
-                    
+
                     // Do we have talent Master of Ghouls?
                     if (m_caster->HasAura(52143))
                         // summon as pet
@@ -1841,12 +1841,12 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
                     else
                         // or guardian
                         spell_id = 46585;
-                        
+
                     if (m_targets.HasDst())
                         targets.SetDst(*m_targets.GetDstPos());
                     else
                         targets.SetDst(*m_caster);
-                    
+
                     // Remove cooldown - summon spellls have category
                     m_caster->ToPlayer()->RemoveSpellCooldown(52150, true);
                     m_caster->ToPlayer()->RemoveSpellCooldown(46585, true);

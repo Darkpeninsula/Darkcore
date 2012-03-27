@@ -228,7 +228,7 @@ public:
                     HandleGameObject(uiCommanderUlthokDoor, true);
                     HandleGameObject(uiMindebenderGhurshaDoor, true);
 
-                    
+
                     HandleGameObject(uiOzumatDoor, true);
 
                 }else if (data == IN_PROGRESS)
