@@ -27,6 +27,7 @@
 #include "Log.h"
 #include "MapReference.h"
 #include "Player.h"
+#include "CreatureTextMgr.h"
 
 //Disable CreatureAI when charmed
 void CreatureAI::OnCharmed(bool /*apply*/)
