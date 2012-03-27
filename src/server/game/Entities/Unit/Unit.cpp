@@ -8260,23 +8260,32 @@ bool Unit::HandleAuraProc(Unit* victim, uint32 damage, Aura* triggeredByAura, Sp
                 case 2061:
                 case 32546:
                 {
-                    CastSpell(this, 81208, true);
-                    *handled = true;
-                    return true;
+                    if (m_caster->HasAura(14751))
+                    {
+                        CastSpell(this, 81208, true);
+                        *handled = true;
+                        break;
+                    }
                 }
                 case 33076:
                 case 596:
                 {
-                    CastSpell(this, 81206, true);
-                    *handled = true;
-                    return true;
+                    if (m_caster->HasAura(14751))
+                    {
+                        CastSpell(this, 81206, true);
+                        *handled = true;
+                        break;
+                    }
                 }
                 case 585:
                 case 73510:
                 {
-                    CastSpell(this, 81209, true);
-                    *handled = true;
-                    break;
+                    if (m_caster->HasAura(14751))
+                    {
+                        CastSpell(this, 81209, true);
+                        *handled = true;
+                        break;
+                    }
                 }
                 break;
             }
