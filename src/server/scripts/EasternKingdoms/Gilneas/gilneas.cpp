@@ -631,22 +631,26 @@ public:
         {
             if (tQuestCredit <= ((float)diff/8))
             {
-                opened = 0;
-                aPlayer->KilledMonsterCredit(35830, 0);
-                if (spawnKind == 3)
+                if(aPlayer)
                 {
-                    if (Creature* spawnedCreature = go->SummonCreature(NPC_RAMPAGING_WORGEN_2, wx, wy, z, angle, TEMPSUMMON_TIMED_DESPAWN, SUMMON1_TTL))
+                    opened = 0;
+                    aPlayer->KilledMonsterCredit(35830, 0);
+                    if (spawnKind == 3)
                     {
-                        spawnedCreature->SetPhaseMask(6, 1);
-                        spawnedCreature->Respawn(1);
-                        spawnedCreature->getThreatManager().resetAllAggro();
-                        aPlayer->AddThreat(spawnedCreature, 1.0f);
-                        spawnedCreature->AddThreat(aPlayer, 1.0f);
+                        if (Creature* spawnedCreature = go->SummonCreature(NPC_RAMPAGING_WORGEN_2, wx, wy, z, angle, TEMPSUMMON_TIMED_DESPAWN, SUMMON1_TTL))
+                        {
+                            spawnedCreature->SetPhaseMask(6, 1);
+                            spawnedCreature->Respawn(1);
+                            spawnedCreature->getThreatManager().resetAllAggro();
+                            aPlayer->AddThreat(spawnedCreature, 1.0f);
+                            spawnedCreature->AddThreat(aPlayer, 1.0f);
+                        }
                     }
                 }
             }
             else tQuestCredit -= ((float)diff/8);
         }
+
         if (DoorTimer <= diff)
         {
             if (go->GetGoState() == GO_STATE_ACTIVE)
