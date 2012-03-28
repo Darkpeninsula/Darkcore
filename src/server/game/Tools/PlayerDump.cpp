@@ -24,6 +24,7 @@
 #include "UpdateFields.h"
 #include "ObjectMgr.h"
 #include "AccountMgr.h"
+#include "Configuration/Config.h"
 
 #define DUMP_TABLE_COUNT 27
 struct DumpTable
@@ -363,7 +364,19 @@ DumpReturn PlayerDumpWriter::WriteDump(const std::string& file, uint32 guid)
             fclose(f);
             return DUMP_FILE_OPEN_ERROR;
         }
-    FILE* fout = fopen(file.c_str(), "w");
+
+    FILE* fout = NULL;
+
+    std::string dumpsDir = ConfigMgr::GetStringDefault("DumpsDir", "");
+    if (!dumpsDir.empty())
+    {
+        if ((dumpsDir.at(dumpsDir.length()-1) != '/') && (dumpsDir.at(dumpsDir.length()-1) != '\\'))
+            dumpsDir.push_back('/');
+
+        fout = fopen((dumpsDir+file).c_str(), "w");
+    }else 
+        fout = fopen(file.c_str(), "w");
+    
     if (!fout)
         return DUMP_FILE_OPEN_ERROR;
 
@@ -397,7 +410,18 @@ DumpReturn PlayerDumpReader::LoadDump(const std::string& file, uint32 account, s
     if (charcount >= 10)
         return DUMP_TOO_MANY_CHARS;
 
-    FILE* fin = fopen(file.c_str(), "r");
+    FILE* fin = NULL;
+
+    std::string dumpsDir = ConfigMgr::GetStringDefault("DumpsDir", "");
+    if (!dumpsDir.empty())
+    {
+        if ((dumpsDir.at(dumpsDir.length()-1) != '/') && (dumpsDir.at(dumpsDir.length()-1) != '\\'))
+            dumpsDir.push_back('/');
+
+        fin = fopen((dumpsDir+file).c_str(), "r");
+    }else
+        fin = fopen(file.c_str(), "r");
+
     if (!fin)
         return DUMP_FILE_OPEN_ERROR;
 

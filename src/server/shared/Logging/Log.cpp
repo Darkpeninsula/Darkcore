@@ -179,14 +179,6 @@ void Log::Initialize()
 
     // Char log settings
     m_charLog_Dump = ConfigMgr::GetBoolDefault("CharLogDump", false);
-    m_charLog_Dump_Separate = ConfigMgr::GetBoolDefault("CharLogDump.Separate", false);
-    if (m_charLog_Dump_Separate)
-    {
-        m_dumpsDir = ConfigMgr::GetStringDefault("CharLogDump.SeparateDir", "");
-        if (!m_dumpsDir.empty())
-            if ((m_dumpsDir.at(m_dumpsDir.length() - 1) != '/') && (m_dumpsDir.at(m_dumpsDir.length() - 1) != '\\'))
-                m_dumpsDir.push_back('/');
-    }
 }
 
 void Log::ReloadConfig()
@@ -971,16 +963,10 @@ void Log::outChar(const char * str, ...)
 void Log::outCharDump(const char * str, uint32 account_id, uint32 guid, const char * name)
 {
     FILE* file = NULL;
-    if (m_charLog_Dump_Separate)
-    {
-        char fileName[29]; // Max length: name(12) + guid(11) + _.log (5) + \0
-        snprintf(fileName, 29, "%d_%s.log", guid, name);
-        std::string sFileName(m_dumpsDir);
-        sFileName.append(fileName);
-        file = fopen((m_logsDir + sFileName).c_str(), "w");
-    }
-    else
-        file = charLogfile;
+    char fileName[29]; // Max length: name(12) + guid(11) + _.log (5) + \0
+    snprintf(fileName, 29, "%d_%s.log", guid, name);
+    file = fopen(fileName.c_str(), "w");
+
     if (file)
     {
         fprintf(file, "== START DUMP == (account: %u guid: %u name: %s )\n%s\n== END DUMP ==\n",

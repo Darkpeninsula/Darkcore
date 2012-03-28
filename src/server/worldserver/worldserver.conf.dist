@@ -527,21 +527,12 @@ CharLogTimestamp = 0
 CharLogDump = 0
 
 #
-#    CharLogDump.Separate
-#        Description: Write character dump to separate files files rather than adding it to the
-#                     CharLogFile.
-#        Default:     0 - (Disabled)
-#                     1 - (Enabled)
-
-CharLogDump.Separate = 0
-
-#
-#    CharLogDump.SeparateDir
-#        Description: Write dump files into the sub folder within the log folder.
+#    DumpsDir
+#        Description: Write dump files into the sub folder.
 #        Example:     "chardumps" - (Enabled)
 #        Default:     ""         - (Disabled)
 
-CharLogDump.SeparateDir = ""
+DumpsDir = ""
 
 #
 #    GmLogFile
