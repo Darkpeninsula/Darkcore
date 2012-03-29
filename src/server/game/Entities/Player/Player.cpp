@@ -4282,7 +4282,7 @@ void Player::ReduceSpellCooldown(uint32 spell_id, uint32 seconds)
         WorldPacket data(SMSG_MODIFY_COOLDOWN, 4 + 8 + 4);
         data << uint32(spell_id); // Spell ID
         data << uint64(GetGUID()); // Player GUID
-        data << int32(-seconds); // Cooldown mod in milliseconds
+        data << uint32(-seconds); // Cooldown mod in milliseconds
         GetSession()->SendPacket(&data);
     }
 }

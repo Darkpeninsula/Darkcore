@@ -965,7 +965,7 @@ void Log::outCharDump(const char * str, uint32 account_id, uint32 guid, const ch
     FILE* file = NULL;
     char fileName[29]; // Max length: name(12) + guid(11) + _.log (5) + \0
     snprintf(fileName, 29, "%d_%s.log", guid, name);
-    file = fopen(fileName.c_str(), "w");
+    file = fopen(fileName, "w");
 
     if (file)
     {
