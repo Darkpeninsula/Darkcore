@@ -4862,10 +4862,13 @@ SpellCastResult Spell::CheckCast(bool strict)
             case SPELL_EFFECT_HEAL_MAX_HEALTH:
             {
                 Unit* target = m_targets.GetUnitTarget();
-                // Cannot be cast on paladin with Forbearance
-                if (m_spellInfo->Id == 633)
-                    if (target->HasAura(25771))
-                        return SPELL_FAILED_TARGET_AURASTATE;
+                if(target)
+                {
+                    // Cannot be cast on paladin with Forbearance
+                    if (m_spellInfo->Id == 633)
+                        if (target->HasAura(25771))
+                            return SPELL_FAILED_TARGET_AURASTATE;
+                }
                 break;
             }
             case SPELL_EFFECT_LEARN_SPELL:
@@ -5276,10 +5279,13 @@ SpellCastResult Spell::CheckCast(bool strict)
             case SPELL_AURA_SCHOOL_IMMUNITY:
             {
                 Unit* target = m_targets.GetUnitTarget();
-                // Cannot be cast on paladin with Forbearance
-                if (m_spellInfo->Id == 642 || m_spellInfo->Id == 1022)
-                    if (target->HasAura(25771))
-                        return SPELL_FAILED_TARGET_AURASTATE;
+                if(target)
+                {
+                    // Cannot be cast on paladin with Forbearance
+                    if (m_spellInfo->Id == 642 || m_spellInfo->Id == 1022)
+                        if (target->HasAura(25771))
+                            return SPELL_FAILED_TARGET_AURASTATE;
+                }
                 break;
             }
             case SPELL_AURA_MOD_POSSESS_PET:
