@@ -634,8 +634,8 @@ public:
                 if(aPlayer)
                 {
                     opened = 0;
-                    int32 ModSpellBasePoints0 = int32(35830);
-                    aPlayer->CastCustomSpell(aPlayer, 83996, &ModSpellBasePoints0, NULL, NULL, true, NULL);
+                    //int32 ModSpellBasePoints0 = int32(35830);
+                    //aPlayer->CastCustomSpell(aPlayer, 83996, &ModSpellBasePoints0, NULL, NULL, true, NULL);
                     if (spawnKind == 3)
                     {
                         if (Creature* spawnedCreature = go->SummonCreature(NPC_RAMPAGING_WORGEN_2, wx, wy, z, angle, TEMPSUMMON_TIMED_DESPAWN, SUMMON1_TTL))
