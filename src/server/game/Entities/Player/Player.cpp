@@ -877,6 +877,16 @@ Player::Player(WorldSession* session): Unit(true), _achievementMgr(this), _reput
     for (uint8 i = 0; i < MAX_POWERS; ++i)
         _powerFraction[i] = 0;
 
+    for (int i = 0; i < MAX_SPELL_STATS_BUFF; ++i)
+    {
+        SpellId[i] = 0;
+        percvalue1[i] = 0;
+        percvalue2[i] = 0;
+        percvalue3[i] = 0;
+        percvalue4[i] = 0;
+        percvalue5[i] = 0;
+    }
+
     isDebugAreaTriggers = false;
 
     SetPendingBind(0, 0);
@@ -8096,6 +8106,397 @@ void Player::_ApplyItemMods(Item *item, uint8 slot, bool apply)
     ApplyEnchantment(item, apply);
 
     sLog->outDebug(LOG_FILTER_PLAYER_ITEMS, "_ApplyItemMods complete.");
+}
+
+void Player::SaveBonusStats(Player* player, int spellnumber, int row, float value, float perc, uint32 spellid, uint32 playerguid, bool percent, bool turn)
+{
+    if (!spellid || turn == true)
+        return;
+    float percvalue = 0;
+
+    switch (row)
+    {
+    case 1:
+        percvalue = player->GetPercValue1(spellnumber);
+        if (percvalue == 0)
+            player->SetPercValue1(spellnumber, value);
+        break;
+    case 2:
+        percvalue = player->GetPercValue2(spellnumber);
+        if (percvalue == 0)
+            player->SetPercValue2(spellnumber, value);
+        break;
+    case 3:
+        percvalue = player->GetPercValue3(spellnumber);
+        if (percvalue == 0)
+            player->SetPercValue3(spellnumber, value);
+        break;
+    case 4:
+        percvalue = player->GetPercValue4(spellnumber);
+        if (percvalue == 0)
+            player->SetPercValue4(spellnumber, value);
+        break;
+    case 5:
+        percvalue = player->GetPercValue5(spellnumber);
+        if (percvalue == 0)
+            player->SetPercValue5(spellnumber, value);
+        break;
+    }
+}
+
+void Player::AuraBonusesCheck(Player* player, bool percent, bool turn, float perc, float value, SpellEntry const *spellInfo, uint32 playerguid, uint32 state, UnitMods unitMod, UnitModifierType modifierType, CombatRating cr, Stats stat, int row, bool apply)
+{
+    if (!player || !spellInfo)
+        return;
+
+    int number = player->FindSpellNumber(spellInfo->Id);
+
+    if (turn == true) // If buff is not on the player.
+        switch (row)
+        {
+        case 1:
+            value = player->GetPercValue1(number);
+            break;
+        case 2:
+            value = player->GetPercValue2(number);
+            break;
+        case 3:
+            value = player->GetPercValue3(number);
+            break;
+        case 4:
+            value = player->GetPercValue4(number);
+            break;
+        case 5:
+            value = player->GetPercValue5(number);
+            break;
+        }
+
+    switch (state)
+    {
+    case 0:
+        if (percent == true && turn == false) // If there is a percent value and the buff is on the player.
+        {
+            if (unitMod == UNIT_MOD_HEALTH)
+                value = player->GetMaxHealth()*perc/100; // %X value
+            if (unitMod == UNIT_MOD_MANA)
+                value = player->GetMaxPower(POWER_MANA)*perc/100; // %X value
+        }
+        player->SaveBonusStats(player, number, row, value, perc, spellInfo->Id, playerguid, percent, turn); // Write the value to the character database.
+        player->HandleStatModifier(unitMod, modifierType, float(value), apply);
+        break;
+    case 1:
+        if (percent == true && turn == false) // If there is a percent value and the buff is on the player.
+        {
+            value = player->GetRatingBonusValue(cr)*perc/100;
+            if (perc < 0) // +%X RATING
+            {
+                float RatingChange = abs(perc); // Convert it to positive.
+                value = RatingChange * player->GetRatingCoefficient(cr); // +%X Value
+            }
+        }
+        player->SaveBonusStats(player, number, row, value, perc, spellInfo->Id, playerguid, percent, turn); // Write the value to the character database.
+        player->ApplyRatingMod(cr, int32(value), apply);
+        break;
+    case 2:
+        if (percent == true && turn == false) // If there is a percent value and the buff is on the player.
+            value = player->m_baseManaRegen*perc/100; // %X value
+        player->SaveBonusStats(player, number, row, value, perc, spellInfo->Id, playerguid, percent, turn); // Write the value to the character database.
+        player->ApplyManaRegenBonus(int32(value), apply);
+        break;
+    case 3:
+        player->UpdateSpellPower();
+        if (percent == true && turn == false) // If there is a percent value and the buff is on the player.
+            value = player->GetBaseSpellPowerBonus()*perc/100; // %X value
+        player->SaveBonusStats(player, number, row, value, perc, spellInfo->Id, playerguid, percent, turn); // Write the value to the character database.
+        player->ApplySpellPowerBonus(int32(value), apply);
+        break;
+    case 4:
+        if (percent == true && turn == false) // If there is a percent value and the buff is on the player.
+            value = player->m_baseHealthRegen*perc/100; // %X value
+        player->SaveBonusStats(player, number, row, value, perc, spellInfo->Id, playerguid, percent, turn); // Write the value to the character database.
+        player->ApplyHealthRegenBonus(int32(value), apply);
+        break;
+    case 5:
+        if (percent == true && turn == false) // If there is a percent value and the buff is on the player.
+            value = player->GetStat(stat)*perc/100; // %X value
+        player->SaveBonusStats(player, number, row, value, perc, spellInfo->Id, playerguid, percent, turn); // Write the value to the character database.
+        player->HandleStatModifier(unitMod, modifierType, float(value), apply);
+        break;
+    case 6:
+        if (percent == true && turn == false) // If there is a percent value and the buff is on the player.
+            value = player->GetInt32Value(PLAYER_FIELD_MOD_TARGET_RESISTANCE)*perc/100; // %X value
+        player->SaveBonusStats(player, number, row, value, perc, spellInfo->Id, playerguid, percent, turn); // Write the value to the character database.
+        player->ApplyModInt32Value(PLAYER_FIELD_MOD_TARGET_RESISTANCE, -float(value), apply);
+        player->m_spellPenetrationItemMod += apply ? value : -float(value);
+        break;
+    case 7:
+        if(float(value) > 0.f)
+        {
+            if (cr == UNIT_MOD_ATTACK_POWER_POS)
+            {
+                if (percent == true && turn == false) // If there is a percent value and the buff is on the player.
+                    value = player->GetModifierValue(UNIT_MOD_ATTACK_POWER_POS, BASE_VALUE)*perc/100; // %X value
+                player->SaveBonusStats(player, number, row, value, perc, spellInfo->Id, playerguid, percent, turn); // Write the value to the character database.
+                player->HandleStatModifier(UNIT_MOD_ATTACK_POWER_POS, modifierType, float(value), apply);
+            }
+            else
+            {
+                if (percent == true && turn == false) // If there is a percent value and the buff is on the player.
+                    value = player->GetModifierValue(UNIT_MOD_ATTACK_POWER_RANGED_POS, BASE_VALUE)*perc/100; // %X value
+                player->SaveBonusStats(player, number, row, value, perc, spellInfo->Id, playerguid, percent, turn); // Write the value to the character database.
+                player->HandleStatModifier(UNIT_MOD_ATTACK_POWER_RANGED_POS, modifierType, float(value), apply);
+            }
+        }
+        else
+        {
+            if (cr == UNIT_MOD_ATTACK_POWER_NEG)
+            {
+                if (percent == true && turn == false) // If there is a percent value and the buff is on the player.
+                    value = player->GetModifierValue(UNIT_MOD_ATTACK_POWER_NEG, BASE_VALUE)*perc/100; // %X value
+                player->SaveBonusStats(player, number, row, value, perc, spellInfo->Id, playerguid, percent, turn); // Write the value to the character database.
+                player->HandleStatModifier(UNIT_MOD_ATTACK_POWER_NEG, modifierType, -float(value), apply);
+            }
+            else
+            {
+                if (percent == true && turn == false) // If there is a percent value and the buff is on the player.
+                    value = player->GetModifierValue(UNIT_MOD_ATTACK_POWER_RANGED_NEG, BASE_VALUE)*perc/100; // %X value
+                player->SaveBonusStats(player, number, row, value, perc, spellInfo->Id, playerguid, percent, turn); // Write the value to the character database.
+                player->HandleStatModifier(UNIT_MOD_ATTACK_POWER_RANGED_NEG, modifierType, -float(value), apply);
+            }
+        }
+        break;
+    case 8:
+        if(float(value) > 0.f)
+        {
+            if (percent == true && turn == false) // If there is a percent value and the buff is on the player.
+                value = player->GetModifierValue(UNIT_MOD_ATTACK_POWER_RANGED_POS, BASE_VALUE)*perc/100; // %X value
+            player->SaveBonusStats(player, number, row, value, perc, spellInfo->Id, playerguid, percent, turn); // Write the value to the character database.
+            player->HandleStatModifier(UNIT_MOD_ATTACK_POWER_RANGED_POS, TOTAL_VALUE, float(value), apply);
+        }
+        else
+        {
+            if (percent == true && turn == false) // If there is a percent value and the buff is on the player.
+                value = player->GetModifierValue(UNIT_MOD_ATTACK_POWER_RANGED_NEG, BASE_VALUE)*perc/100; // %X value
+            player->SaveBonusStats(player, number, row, value, perc, spellInfo->Id, playerguid, percent, turn); // Write the value to the character database.
+            player->HandleStatModifier(UNIT_MOD_ATTACK_POWER_RANGED_NEG, TOTAL_VALUE, -float(value), apply);
+        }
+        break;
+    }
+
+    if (turn == true) // If X is not on the player, then change the percent values as 0.
+    {
+        switch (row)
+        {
+        case 1:
+            if (player->GetPercValue1(number))
+                player->SetPercValue1(number, 0);
+            break;
+        case 2:
+            if (player->GetPercValue2(number))
+                player->SetPercValue2(number, 0);
+            break;
+        case 3:
+            if (player->GetPercValue3(number))
+                player->SetPercValue3(number, 0);
+            break;
+        case 4:
+            if (player->GetPercValue4(number))
+                player->SetPercValue4(number, 0);
+            break;
+        case 5:
+            if (player->GetPercValue5(number))
+                player->SetPercValue5(number, 0);
+            break;
+        }
+    }
+}
+
+void Player::_ApplyAuraBonuses(Player* player, uint32 spellid, uint32 TypeOfStat, float value, int row, bool percent, bool turn, bool apply)
+{
+    SpellEntry const *spellInfo = sSpellStore.LookupEntry(spellid);
+    if (!spellInfo || !player)
+        return;
+
+    float realperc;
+    float perc = 0;
+
+    const SpellStatsEntry * SpellStats = sSpellMgr->GetSpellStats(spellid);
+    if (SpellStats && percent == true && turn == false) // If the buff is on the player.
+    {
+        switch (row)
+        {
+        case 1:
+            perc = SpellStats->percent1;
+            break;
+        case 2:
+            perc = SpellStats->percent2;
+            break;
+        case 3:
+            perc = SpellStats->percent3;
+            break;
+        case 4:
+            perc = SpellStats->percent4;
+            break;
+        case 5:
+            perc = SpellStats->percent5;
+            break;
+        }
+    }
+
+    realperc = perc;
+    
+    switch (TypeOfStat)
+    {
+        case SPELL_MOD_MANA:
+            AuraBonusesCheck(player, percent, turn, realperc, value, spellInfo, GetGUIDLow(), 0, UNIT_MOD_MANA, BASE_VALUE, CR_WEAPON_SKILL, STAT_AGILITY, row, apply); // CR_WEAPON_SKILL and  STAT_AGILITY will not use(like NULL), because there is a unitMOd..
+            break;
+        case SPELL_MOD_HEALTH:                           // modify HP
+            AuraBonusesCheck(player, percent, turn, realperc, value, spellInfo, GetGUIDLow(), 0, UNIT_MOD_HEALTH, BASE_VALUE, CR_WEAPON_SKILL, STAT_AGILITY, row, apply); // CR_WEAPON_SKILL and  STAT_AGILITY will not use(like NULL), because there is a unitMOd..
+            break;
+        case SPELL_MOD_AGILITY:                          // modify agility
+            AuraBonusesCheck(player, percent, turn, realperc, value, spellInfo, GetGUIDLow(), 5, UNIT_MOD_STAT_AGILITY, BASE_VALUE, CR_WEAPON_SKILL, STAT_AGILITY, row, apply); // CR_WEAPON_SKILL will not use(like NULL), because there is a unitMOd and state is 5..
+            break;
+        case SPELL_MOD_STRENGTH:                         //modify strength
+            AuraBonusesCheck(player, percent, turn, realperc, value, spellInfo, GetGUIDLow(), 5, UNIT_MOD_STAT_STRENGTH, BASE_VALUE, CR_WEAPON_SKILL, STAT_STRENGTH, row, apply); // CR_WEAPON_SKILL will not use(like NULL), because there is a unitMOd and state is 5..
+            break;
+        case SPELL_MOD_INTELLECT:                        //modify intellect
+            AuraBonusesCheck(player, percent, turn, realperc, value, spellInfo, GetGUIDLow(), 5, UNIT_MOD_STAT_INTELLECT, BASE_VALUE, CR_WEAPON_SKILL, STAT_INTELLECT, row, apply); // CR_WEAPON_SKILL will not use(like NULL), because there is a unitMOd and state is 5..
+            break;
+        case SPELL_MOD_SPIRIT:                           //modify spirit
+            AuraBonusesCheck(player, percent, turn, realperc, value, spellInfo, GetGUIDLow(), 5, UNIT_MOD_STAT_SPIRIT, BASE_VALUE, CR_WEAPON_SKILL, STAT_SPIRIT, row, apply); // CR_WEAPON_SKILL will not use(like NULL), because there is a unitMOd and state is 5..
+            break;
+        case SPELL_MOD_STAMINA:                          //modify stamina
+            AuraBonusesCheck(player, percent, turn, realperc, value, spellInfo, GetGUIDLow(), 5, UNIT_MOD_STAT_STAMINA, BASE_VALUE, CR_WEAPON_SKILL, STAT_STAMINA, row, apply); // CR_WEAPON_SKILL will not use(like NULL), because there is a unitMOd and state is 5..
+            break;
+        case SPELL_MOD_DEFENSE_SKILL_RATING:
+            AuraBonusesCheck(player, percent, turn, realperc, value, spellInfo, GetGUIDLow(), 1, UNIT_MOD_STAT_STAMINA, BASE_VALUE, CR_DEFENSE_SKILL, STAT_STAMINA, row, apply); // UNIT_MOD_STAT_STAMINA, BASE_VALUE, STAT_STAMINA will not use(like NULL), because there is a CombatRating and state is 1..
+            break;
+        case SPELL_MOD_DODGE_RATING:
+            AuraBonusesCheck(player, percent, turn, realperc, value, spellInfo, GetGUIDLow(), 1, UNIT_MOD_STAT_STAMINA, BASE_VALUE, CR_DODGE, STAT_STAMINA, row, apply); // UNIT_MOD_STAT_STAMINA, BASE_VALUE, STAT_STAMINA will not use(like NULL), because there is a CombatRating and state is 1..
+            break;
+        case SPELL_MOD_PARRY_RATING:
+            AuraBonusesCheck(player, percent, turn, realperc, value, spellInfo, GetGUIDLow(), 1, UNIT_MOD_STAT_STAMINA, BASE_VALUE, CR_PARRY, STAT_STAMINA, row, apply); // UNIT_MOD_STAT_STAMINA, BASE_VALUE, STAT_STAMINA will not use(like NULL), because there is a CombatRating and state is 1..
+            break;
+        case SPELL_MOD_BLOCK_RATING:
+            AuraBonusesCheck(player, percent, turn, realperc, value, spellInfo, GetGUIDLow(), 1, UNIT_MOD_STAT_STAMINA, BASE_VALUE, CR_BLOCK, STAT_STAMINA, row, apply); // UNIT_MOD_STAT_STAMINA, BASE_VALUE, STAT_STAMINA will not use(like NULL), because there is a CombatRating and state is 1..
+            break;
+        case SPELL_MOD_HIT_MELEE_RATING:
+            AuraBonusesCheck(player, percent, turn, realperc, value, spellInfo, GetGUIDLow(), 1, UNIT_MOD_STAT_STAMINA, BASE_VALUE, CR_HIT_MELEE, STAT_STAMINA, row, apply); // UNIT_MOD_STAT_STAMINA, BASE_VALUE, STAT_STAMINA will not use(like NULL), because there is a CombatRating and state is 1..
+            break;
+        case SPELL_MOD_HIT_RANGED_RATING:
+            AuraBonusesCheck(player, percent, turn, realperc, value, spellInfo, GetGUIDLow(), 1, UNIT_MOD_STAT_STAMINA, BASE_VALUE, CR_HIT_RANGED, STAT_STAMINA, row, apply); // UNIT_MOD_STAT_STAMINA, BASE_VALUE, STAT_STAMINA will not use(like NULL), because there is a CombatRating and state is 1..
+            break;
+        case SPELL_MOD_HIT_SPELL_RATING:
+            AuraBonusesCheck(player, percent, turn, realperc, value, spellInfo, GetGUIDLow(), 1, UNIT_MOD_STAT_STAMINA, BASE_VALUE, CR_HIT_SPELL, STAT_STAMINA, row, apply); // UNIT_MOD_STAT_STAMINA, BASE_VALUE, STAT_STAMINA will not use(like NULL), because there is a CombatRating and state is 1..
+            break;
+        case SPELL_MOD_CRIT_MELEE_RATING:
+            AuraBonusesCheck(player, percent, turn, realperc, value, spellInfo, GetGUIDLow(), 1, UNIT_MOD_STAT_STAMINA, BASE_VALUE, CR_CRIT_MELEE, STAT_STAMINA, row, apply); // UNIT_MOD_STAT_STAMINA, BASE_VALUE, STAT_STAMINA will not use(like NULL), because there is a CombatRating and state is 1..
+            break;
+        case SPELL_MOD_CRIT_RANGED_RATING:
+            AuraBonusesCheck(player, percent, turn, realperc, value, spellInfo, GetGUIDLow(), 1, UNIT_MOD_STAT_STAMINA, BASE_VALUE, CR_CRIT_RANGED, STAT_STAMINA, row, apply); // UNIT_MOD_STAT_STAMINA, BASE_VALUE, STAT_STAMINA will not use(like NULL), because there is a CombatRating and state is 1..
+            break;
+        case SPELL_MOD_CRIT_SPELL_RATING:
+            AuraBonusesCheck(player, percent, turn, realperc, value, spellInfo, GetGUIDLow(), 1, UNIT_MOD_STAT_STAMINA, BASE_VALUE, CR_CRIT_SPELL, STAT_STAMINA, row, apply); // UNIT_MOD_STAT_STAMINA, BASE_VALUE, STAT_STAMINA will not use(like NULL), because there is a CombatRating and state is 1..
+            break;
+        case SPELL_MOD_HIT_TAKEN_MELEE_RATING:
+            AuraBonusesCheck(player, percent, turn, realperc, value, spellInfo, GetGUIDLow(), 1, UNIT_MOD_STAT_STAMINA, BASE_VALUE, CR_HIT_TAKEN_MELEE, STAT_STAMINA, row, apply); // UNIT_MOD_STAT_STAMINA, BASE_VALUE, STAT_STAMINA will not use(like NULL), because there is a CombatRating and state is 1..
+            break;
+        case SPELL_MOD_HIT_TAKEN_RANGED_RATING:
+            AuraBonusesCheck(player, percent, turn, realperc, value, spellInfo, GetGUIDLow(), 1, UNIT_MOD_STAT_STAMINA, BASE_VALUE, CR_HIT_TAKEN_RANGED, STAT_STAMINA, row, apply); // UNIT_MOD_STAT_STAMINA, BASE_VALUE, STAT_STAMINA will not use(like NULL), because there is a CombatRating and state is 1..
+            break;
+        case SPELL_MOD_HIT_TAKEN_SPELL_RATING:
+            AuraBonusesCheck(player, percent, turn, realperc, value, spellInfo, GetGUIDLow(), 1, UNIT_MOD_STAT_STAMINA, BASE_VALUE, CR_HIT_TAKEN_SPELL, STAT_STAMINA, row, apply); // UNIT_MOD_STAT_STAMINA, BASE_VALUE, STAT_STAMINA will not use(like NULL), because there is a CombatRating and state is 1..
+            break;
+        case SPELL_MOD_CRIT_TAKEN_MELEE_RATING:
+            /*AuraBonusesCheck(player, percent, turn, realperc, value, spellInfo, GetGUIDLow(), 1, UNIT_MOD_STAT_STAMINA, BASE_VALUE, CR_CRIT_TAKEN_MELEE, STAT_STAMINA, row, apply); // UNIT_MOD_STAT_STAMINA, BASE_VALUE, STAT_STAMINA will not use(like NULL), because there is a CombatRating and state is 1..*/
+            break;
+        case SPELL_MOD_CRIT_TAKEN_RANGED_RATING:
+            /*AuraBonusesCheck(player, percent, turn, realperc, value, spellInfo, GetGUIDLow(), 1, UNIT_MOD_STAT_STAMINA, BASE_VALUE, CR_CRIT_TAKEN_RANGED, STAT_STAMINA, row, apply); // UNIT_MOD_STAT_STAMINA, BASE_VALUE, STAT_STAMINA will not use(like NULL), because there is a CombatRating and state is 1..*/
+            break;
+        case SPELL_MOD_CRIT_TAKEN_SPELL_RATING:
+            AuraBonusesCheck(player, percent, turn, realperc, value, spellInfo, GetGUIDLow(), 1, UNIT_MOD_STAT_STAMINA, BASE_VALUE, CR_CRIT_TAKEN_SPELL, STAT_STAMINA, row, apply); // UNIT_MOD_STAT_STAMINA, BASE_VALUE, STAT_STAMINA will not use(like NULL), because there is a CombatRating and state is 1..
+            break;
+        case SPELL_MOD_HASTE_MELEE_RATING:
+            AuraBonusesCheck(player, percent, turn, realperc, value, spellInfo, GetGUIDLow(), 1, UNIT_MOD_STAT_STAMINA, BASE_VALUE, CR_HASTE_MELEE, STAT_STAMINA, row, apply); // UNIT_MOD_STAT_STAMINA, BASE_VALUE, STAT_STAMINA will not use(like NULL), because there is a CombatRating and state is 1..
+            break;
+        case SPELL_MOD_HASTE_RANGED_RATING:
+            AuraBonusesCheck(player, percent, turn, realperc, value, spellInfo, GetGUIDLow(), 1, UNIT_MOD_STAT_STAMINA, BASE_VALUE, CR_HASTE_RANGED, STAT_STAMINA, row, apply); // UNIT_MOD_STAT_STAMINA, BASE_VALUE, STAT_STAMINA will not use(like NULL), because there is a CombatRating and state is 1..
+            break;
+        case SPELL_MOD_HASTE_SPELL_RATING:
+            AuraBonusesCheck(player, percent, turn, realperc, value, spellInfo, GetGUIDLow(), 1, UNIT_MOD_STAT_STAMINA, BASE_VALUE, CR_HASTE_SPELL, STAT_STAMINA, row, apply); // UNIT_MOD_STAT_STAMINA, BASE_VALUE, STAT_STAMINA will not use(like NULL), because there is a CombatRating and state is 1..
+            break;
+        case SPELL_MOD_HIT_RATING:
+            // SPELL_MOD_HIT_MELEE_RATING(16) + SPELL_MOD_HIT_RANGED_RATING(17) + SPELL_MOD_HIT_SPELL_RATING(18)
+            // NOTE: The values of 16, 17 and 18 must be same.
+            break;
+        case SPELL_MOD_CRIT_RATING:
+            // SPELL_MOD_CRIT_MELEE_RATING(19) + SPELL_MOD_CRIT_RANGED_RATING(20) + SPELL_MOD_CRIT_SPELL_RATING(21)
+            // NOTE: The values of 19, 20 and 21 must be same.
+            break;
+        case SPELL_MOD_HIT_TAKEN_RATING:
+            // SPELL_MOD_HIT_TAKEN_MELEE_RATING(22) + SPELL_MOD_HIT_TAKEN_RANGED_RATING(23) + SPELL_MOD_HIT_TAKEN_SPELL_RATING(24)
+            // NOTE: The values of 22, 23 and 24 must be same.
+            break;
+        case SPELL_MOD_CRIT_TAKEN_RATING:
+            // SPELL_MOD_CRIT_TAKEN_MELEE_RATING(25) + SPELL_MOD_CRIT_TAKEN_RANGED_RATING(26) + SPELL_MOD_CRIT_TAKEN_SPELL_RATING(27)
+            // NOTE: The values of 25, 26 and 27 must be same.
+            break;
+        case SPELL_MOD_RESILIENCE_RATING:
+            AuraBonusesCheck(player, percent, turn, realperc, value, spellInfo, GetGUIDLow(), 1, UNIT_MOD_STAT_STAMINA, BASE_VALUE, CR_RESILIENCE_PLAYER_DAMAGE_TAKEN, STAT_STAMINA, row, apply); // UNIT_MOD_STAT_STAMINA, BASE_VALUE, STAT_STAMINA will not use(like NULL), because there is a CombatRating and state is 1..
+            break;
+        case SPELL_MOD_HASTE_RATING:
+            // SPELL_MOD_HASTE_MELEE_RATING(28) + SPELL_MOD_HASTE_RANGED_RATING(29) + SPELL_MOD_HASTE_SPELL_RATING(30)
+            // NOTE: The Values of 28, 29 and 30 must be same.
+            break;
+        case SPELL_MOD_EXPERTISE_RATING:
+            AuraBonusesCheck(player, percent, turn, realperc, value, spellInfo, GetGUIDLow(), 1, UNIT_MOD_STAT_STAMINA, BASE_VALUE, CR_EXPERTISE, STAT_STAMINA, row, apply); // UNIT_MOD_STAT_STAMINA, BASE_VALUE, STAT_STAMINA will not use(like NULL), because there is a CombatRating and state is 1..
+            break;
+        case SPELL_MOD_ATTACK_POWER:
+            // if value > 0 -> SPELL_MOD_ATTACK_POWER_POS_AND_NEG
+            // if value < 0 -> SPELL_MOD_ATTACK_POWER_RANGED_POS_AND_NEG
+            // SPELL_MOD_ATTACK_POWER_POS_AND_NEG(57) + SPELL_MOD_ATTACK_POWER_RANGED_POS_AND_NEG(58)
+            // NOTE: The values of 57 and 58 must be same.
+            break;
+        case SPELL_MOD_RANGED_ATTACK_POWER:
+            AuraBonusesCheck(player, percent, turn, realperc, value, spellInfo, GetGUIDLow(), 8, UNIT_MOD_MANA, BASE_VALUE, CR_WEAPON_SKILL, STAT_AGILITY, row, apply); // CR_WEAPON_SKILL, STAT_AGILITY, UNIT_MOD_MANA, BASE_VALUE  will not use(like NULL), because state is 13..
+            break;
+//      case SPELL_MOD_FERAL_ATTACK_POWER:
+//          ApplyFeralAPBonus(int32(value), apply);
+//          break;
+        case SPELL_MOD_MANA_REGENERATION: // bura
+            AuraBonusesCheck(player, percent, turn, realperc, value, spellInfo, GetGUIDLow(), 2, UNIT_MOD_STAT_STAMINA, BASE_VALUE, CR_ARMOR_PENETRATION, STAT_STAMINA, row, apply); // UNIT_MOD_STAT_STAMINA, BASE_VALUE, CR_ARMOR_PENETRATION, STAT_STAMINA will not use(like NULL), because state is 2..
+            break;
+        case SPELL_MOD_ARMOR_PENETRATION_RATING: // bura
+            AuraBonusesCheck(player, percent, turn, realperc, value, spellInfo, GetGUIDLow(), 1, UNIT_MOD_STAT_STAMINA, BASE_VALUE, CR_ARMOR_PENETRATION, STAT_STAMINA, row, apply); // UNIT_MOD_STAT_STAMINA, BASE_VALUE, STAT_STAMINA will not use(like NULL), because there is a CombatRating and state is 1..
+            break;
+        case SPELL_MOD_SPELL_POWER:
+            AuraBonusesCheck(player, percent, turn, realperc, value, spellInfo, GetGUIDLow(), 3, UNIT_MOD_STAT_STAMINA, BASE_VALUE, CR_ARMOR_PENETRATION, STAT_STAMINA, row, apply); // UNIT_MOD_STAT_STAMINA, BASE_VALUE, CR_ARMOR_PENETRATION, STAT_STAMINA will not use(like NULL), because state is 3..
+            break;
+        case SPELL_MOD_HEALTH_REGEN:
+            AuraBonusesCheck(player, percent, turn, realperc, value, spellInfo, GetGUIDLow(), 4, UNIT_MOD_STAT_STAMINA, BASE_VALUE, CR_ARMOR_PENETRATION, STAT_STAMINA, row, apply); // UNIT_MOD_STAT_STAMINA, BASE_VALUE, CR_ARMOR_PENETRATION, STAT_STAMINA will not use(like NULL), because state is 4..
+            break;
+        case SPELL_MOD_SPELL_PENETRATION:
+            AuraBonusesCheck(player, percent, turn, realperc, value, spellInfo, GetGUIDLow(), 6, UNIT_MOD_STAT_STAMINA, BASE_VALUE, CR_ARMOR_PENETRATION, STAT_STAMINA, row, apply); // UNIT_MOD_STAT_STAMINA, BASE_VALUE, CR_ARMOR_PENETRATION, STAT_STAMINA will not use(like NULL), because state is 6..
+            break;
+        // deprecated item mods
+        case SPELL_MOD_SPELL_HEALING_DONE:
+        case SPELL_MOD_SPELL_DAMAGE_DONE:
+            break;
+        case SPELL_MOD_ATTACK_POWER_POS_AND_NEG: // independent
+            // NOTE: The value have to be same with SPELL_MOD_ATTACK_POWER_RANGED_POS_AND_NEG's value.
+            if(float(value) > 0.f) // BASE_VALUE
+                AuraBonusesCheck(player, percent, turn, realperc, value, spellInfo, GetGUIDLow(), 7, UNIT_MOD_ATTACK_POWER_POS, TOTAL_VALUE, CR_WEAPON_SKILL, STAT_AGILITY, row, apply); // CR_WEAPON_SKILL and  STAT_AGILITY will not use(like NULL), because there is a unitMOd and state is 7..
+            else
+                AuraBonusesCheck(player, percent, turn, realperc, value, spellInfo, GetGUIDLow(), 7, UNIT_MOD_ATTACK_POWER_NEG, TOTAL_VALUE, CR_WEAPON_SKILL, STAT_AGILITY, row, apply); // CR_WEAPON_SKILL and  STAT_AGILITY will not use(like NULL), because there is a unitMOd and state is 7..
+            break;
+        case SPELL_MOD_ATTACK_POWER_RANGED_POS_AND_NEG: // independent
+            // NOTE: The value have to be same with SPELL_MOD_ATTACK_POWER_POS_AND_NEG's value.
+            if(float(value) > 0.f) // BASE_VALUE
+                AuraBonusesCheck(player, percent, turn, realperc, value, spellInfo, GetGUIDLow(), 7, UNIT_MOD_ATTACK_POWER_RANGED_POS, TOTAL_VALUE, CR_WEAPON_SKILL, STAT_AGILITY, row, apply); // CR_WEAPON_SKILL and  STAT_AGILITY will not use(like NULL), because there is a unitMOd and state is 7..
+            else
+                AuraBonusesCheck(player, percent, turn, realperc, value, spellInfo, GetGUIDLow(), 7, UNIT_MOD_ATTACK_POWER_RANGED_NEG, TOTAL_VALUE, CR_WEAPON_SKILL, STAT_AGILITY, row, apply); // CR_WEAPON_SKILL and  STAT_AGILITY will not use(like NULL), because there is a unitMOd and state is 7..
+            break;
+    }
 }
 
 void Player::ApplyReforgedStats(Item* item, bool apply)

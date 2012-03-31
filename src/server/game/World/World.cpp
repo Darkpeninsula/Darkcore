@@ -1388,6 +1388,9 @@ void World::SetInitialWorldSettings()
     sLog->outString("Loading Spell Group Stack Rules...");
     sSpellMgr->LoadSpellGroupStackRules();
 
+    sLog->outString("Loading Spell Stats...");
+    sSpellMgr->LoadSpellStats();
+
     sLog->outString("Loading NPC Texts...");
     sObjectMgr->LoadGossipText();
 
