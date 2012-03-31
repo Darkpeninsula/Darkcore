@@ -109,8 +109,9 @@ class spell_warr_bloodthirst : public SpellScriptLoader
                 if (Unit* caster = GetCaster())
                 {
                     int32 dmg = int32(GetHitDamage() * caster->GetTotalAttackPowerValue(BASE_ATTACK) / 100);
+                    int32 heal = int32(500);
                     SetHitDamage(dmg);
-                    caster->CastSpell(caster, 23885, true);
+                    caster->CastCustomSpell(caster, 23885, &heal, NULL, NULL, true);
                 }
             }
 
