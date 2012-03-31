@@ -1128,6 +1128,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder* holder)
         pCurrChar->InitTaxiNodesForLevel();
         pCurrChar->InitGlyphsForLevel();
         pCurrChar->InitTalentForLevel();
+        pCurrChar->RemoveAtLoginFlag(AT_LOGIN_RESET_STATS);
     }
 
     // show time before shutdown if shutdown planned.
