@@ -533,15 +533,16 @@ enum PlayerExtraFlags
 // 2^n values
 enum AtLoginFlags
 {
-    AT_LOGIN_NONE              = 0x00,
-    AT_LOGIN_RENAME            = 0x01,
-    AT_LOGIN_RESET_SPELLS      = 0x02,
-    AT_LOGIN_RESET_TALENTS     = 0x04,
-    AT_LOGIN_CUSTOMIZE         = 0x08,
-    AT_LOGIN_RESET_PET_TALENTS = 0x10,
-    AT_LOGIN_FIRST             = 0x20,
-    AT_LOGIN_CHANGE_FACTION    = 0x40,
-    AT_LOGIN_CHANGE_RACE       = 0x80
+    AT_LOGIN_NONE              = 0x000,
+    AT_LOGIN_RENAME            = 0x001,
+    AT_LOGIN_RESET_SPELLS      = 0x002,
+    AT_LOGIN_RESET_TALENTS     = 0x004,
+    AT_LOGIN_CUSTOMIZE         = 0x008,
+    AT_LOGIN_RESET_PET_TALENTS = 0x010,
+    AT_LOGIN_FIRST             = 0x020,
+    AT_LOGIN_CHANGE_FACTION    = 0x040,
+    AT_LOGIN_CHANGE_RACE       = 0x080,
+    AT_LOGIN_RESET_STATS       = 0x160
 };
 
 typedef std::map<uint32, QuestStatusData> QuestStatusMap;
@@ -1115,6 +1116,34 @@ class Player : public Unit, public GridObject<Player>
     public:
         explicit Player (WorldSession *session);
         ~Player ();
+
+       float Player::percvalue1[MAX_SPELL_STATS_BUFF]; // Maximum 200 buff.
+       float Player::percvalue2[MAX_SPELL_STATS_BUFF]; // Maximum 200 buff.
+       float Player::percvalue3[MAX_SPELL_STATS_BUFF]; // Maximum 200 buff.
+       float Player::percvalue4[MAX_SPELL_STATS_BUFF]; // Maximum 200 buff.
+       float Player::percvalue5[MAX_SPELL_STATS_BUFF]; // Maximum 200 buff.
+       uint32 Player::SpellId[MAX_SPELL_STATS_BUFF]; // Maximum 200 buff.
+       int Number;
+
+       float GetPercValue1(int number) const { return percvalue1[number]; }
+       float GetPercValue2(int number) const { return percvalue2[number]; }
+       float GetPercValue3(int number) const { return percvalue3[number]; }
+       float GetPercValue4(int number) const { return percvalue4[number]; }
+       float GetPercValue5(int number) const { return percvalue5[number]; }
+
+       void SetPercValue1(int number, float value) { percvalue1[number] = value; }
+       void SetPercValue2(int number, float value) { percvalue2[number] = value; }
+       void SetPercValue3(int number, float value) { percvalue3[number] = value; }
+       void SetPercValue4(int number, float value) { percvalue4[number] = value; }
+       void SetPercValue5(int number, float value) { percvalue5[number] = value; }
+       
+       float FindSpellNumber(uint32 spellid) const
+       {
+           for(int i = 0; i < MAX_SPELL_STATS_BUFF; ++i) // Maximum 200 buff.
+               if (SpellId[i] == spellid)
+                   return i;
+           return NULL;
+       }
 
         void CleanupsBeforeDelete(bool finalCleanup = true);
 
@@ -2150,7 +2179,11 @@ class Player : public Unit, public GridObject<Player>
         void _ApplyAllItemMods();
         void _ApplyAllLevelScaleItemMods(bool apply);
         void _ApplyItemBonuses(ItemTemplate const *proto, uint8 slot, bool apply, bool only_level_scale = false);
+        void _ApplyAuraBonuses(Player* player, uint32 spellid, uint32 TypeOfStat, float value, int row, bool percent, bool turn, bool apply);
         void _ApplyWeaponDamage(uint8 slot, ItemTemplate const *proto, ScalingStatValuesEntry const *ssv, bool apply);
+        
+        void AuraBonusesCheck(Player* player, bool percent, bool turn, float perc, float value, SpellEntry const *spellInfo, uint32 playerguid, uint32 state, UnitMods unitMod, UnitModifierType modifierType, CombatRating cr, Stats stat, int row, bool apply);
+        void SaveBonusStats(Player* player, int spellnumber, int row, float value, float perc, uint32 spellid, uint32 playerguid, bool percent, bool turn);
 
         bool EnchantmentFitsRequirements(uint32 enchantmentcondition, int8 slot);
         void ToggleMetaGemsActive(uint8 exceptslot, bool apply);

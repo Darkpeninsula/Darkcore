@@ -1124,6 +1124,16 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder* holder)
 
     if (pCurrChar->HasAtLoginFlag(AT_LOGIN_FIRST))
         pCurrChar->RemoveAtLoginFlag(AT_LOGIN_FIRST);
+    
+    if (pCurrChar->HasAtLoginFlag(AT_LOGIN_RESET_STATS))
+    {
+        pCurrChar->InitRunes();
+        pCurrChar->InitStatsForLevel(true);
+        pCurrChar->InitTaxiNodesForLevel();
+        pCurrChar->InitGlyphsForLevel();
+        pCurrChar->InitTalentForLevel();
+        pCurrChar->RemoveAtLoginFlag(AT_LOGIN_RESET_STATS);
+    }
 
     // show time before shutdown if shutdown planned.
     if (sWorld->IsShuttingDown())
