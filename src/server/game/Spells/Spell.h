@@ -81,67 +81,6 @@ enum SpellRangeFlag
     SPELL_RANGE_RANGED              = 2,     // hunter range and ranged weapon
 };
 
-enum SpellsModType // These are only for "spell_stats".
-{
-    SPELL_MOD_MANA                            = 0,
-    SPELL_MOD_HEALTH                          = 1,
-    SPELL_MOD_AGILITY                         = 3,
-    SPELL_MOD_STRENGTH                        = 4,
-    SPELL_MOD_INTELLECT                       = 5,
-    SPELL_MOD_SPIRIT                          = 6,
-    SPELL_MOD_STAMINA                         = 7,
-    SPELL_MOD_DEFENSE_SKILL_RATING            = 12,
-    SPELL_MOD_DODGE_RATING                    = 13,
-    SPELL_MOD_PARRY_RATING                    = 14,
-    SPELL_MOD_BLOCK_RATING                    = 15,
-    SPELL_MOD_HIT_MELEE_RATING                = 16,
-    SPELL_MOD_HIT_RANGED_RATING               = 17,
-    SPELL_MOD_HIT_SPELL_RATING                = 18,
-    SPELL_MOD_CRIT_MELEE_RATING               = 19,
-    SPELL_MOD_CRIT_RANGED_RATING              = 20,
-    SPELL_MOD_CRIT_SPELL_RATING               = 21,
-    SPELL_MOD_HIT_TAKEN_MELEE_RATING          = 22,
-    SPELL_MOD_HIT_TAKEN_RANGED_RATING         = 23,
-    SPELL_MOD_HIT_TAKEN_SPELL_RATING          = 24,
-    SPELL_MOD_CRIT_TAKEN_MELEE_RATING         = 25,
-    SPELL_MOD_CRIT_TAKEN_RANGED_RATING        = 26,
-    SPELL_MOD_CRIT_TAKEN_SPELL_RATING         = 27,
-    SPELL_MOD_HASTE_MELEE_RATING              = 28,
-    SPELL_MOD_HASTE_RANGED_RATING             = 29,
-    SPELL_MOD_HASTE_SPELL_RATING              = 30,
-    SPELL_MOD_HIT_RATING                      = 31,
-    SPELL_MOD_CRIT_RATING                     = 32,
-    SPELL_MOD_HIT_TAKEN_RATING                = 33,
-    SPELL_MOD_CRIT_TAKEN_RATING               = 34,
-    SPELL_MOD_RESILIENCE_RATING               = 35,
-    SPELL_MOD_HASTE_RATING                    = 36,
-    SPELL_MOD_EXPERTISE_RATING                = 37,
-    SPELL_MOD_ATTACK_POWER                    = 38,
-    SPELL_MOD_RANGED_ATTACK_POWER             = 39,
-    SPELL_MOD_FERAL_ATTACK_POWER              = 40,                 // not in 3.3
-    SPELL_MOD_SPELL_HEALING_DONE              = 41,                 // deprecated
-    SPELL_MOD_SPELL_DAMAGE_DONE               = 42,                 // deprecated
-    SPELL_MOD_MANA_REGENERATION               = 43,
-    SPELL_MOD_ARMOR_PENETRATION_RATING        = 44,
-    SPELL_MOD_SPELL_POWER                     = 45,
-    SPELL_MOD_HEALTH_REGEN                    = 46,
-    SPELL_MOD_SPELL_PENETRATION               = 47,
-    SPELL_MOD_BLOCK_VALUE                     = 48,
-    SPELL_MOD_MASTERY_RATING                  = 49,
-    SPELL_MOD_EXTRA_ARMOR                     = 50,
-    SPELL_MOD_FIRE_RESISTANCE                 = 51,
-    SPELL_MOD_FROST_RESISTANCE                = 52,
-    SPELL_MOD_HOLY_RESISTANCE                 = 53,
-    SPELL_MOD_SHADOW_RESISTANCE               = 54,
-    SPELL_MOD_NATURE_RESISTANCE               = 55,
-    SPELL_MOD_ARCANE_RESISTANCE               = 56,
-    SPELL_MOD_ATTACK_POWER_POS_AND_NEG        = 57,                 // independent
-    SPELL_MOD_ATTACK_POWER_RANGED_POS_AND_NEG = 58                  // independent
-};
-
-#define MAX_SPELL_MOD 58
-#define MAX_SPELL_STATS_BUFF 2000
-
 enum SpellLogType
 {
     SPELL_LOG_NON_MELEE_DAMAGE          = 29868,

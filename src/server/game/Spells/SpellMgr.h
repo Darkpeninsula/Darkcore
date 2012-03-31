@@ -376,27 +376,6 @@ struct SpellThreatEntry
 
 typedef std::map<uint32, SpellThreatEntry> SpellThreatMap;
 
-struct SpellStatsEntry
-{
-    int         stattype1;
-    float       value1;
-    float       percent1;
-    int         stattype2;
-    float       value2;
-    float       percent2;
-    int         stattype3;
-    float       value3;
-    float       percent3;
-    int         stattype4;
-    float       value4;
-    float       percent4;
-    int         stattype5;
-    float       value5;
-    float       percent5;
-};
-
-typedef UNORDERED_MAP<uint32, SpellStatsEntry> SpellStatsMap;
-
 // coordinates for spells (accessed using SpellMgr functions)
 struct SpellTargetPosition
 {
@@ -599,15 +578,6 @@ class SpellMgr
         // not strict check returns provided spell if rank not avalible
         uint32 GetSpellWithRank(uint32 spell_id, uint32 rank, bool strict = false) const;
 
-       // Spell stats
-       SpellStatsEntry const* GetSpellStats(uint32 spellId) const
-       {
-           SpellStatsMap::const_iterator itr = mSpellStatsMap.find(spellId);
-           if (itr != mSpellStatsMap.end())
-               return &itr->second;
-           return NULL;
-       }
-
         // Spell Required table
         SpellRequiredMapBounds GetSpellsRequiredForSpellBounds(uint32 spell_id) const;
         SpellsRequiringSpellMapBounds GetSpellsRequiringSpellBounds(uint32 spell_id) const;
@@ -643,7 +613,7 @@ class SpellMgr
         // Spell proc table
         SpellProcEntry const* GetSpellProcEntry(uint32 spellId) const;
         bool CanSpellTriggerProcOnEvent(SpellProcEntry const& procEntry, ProcEventInfo& eventInfo);
-
+        
         // Actionbar override spell
         ActionBarSpellOverride const* GetActionBarSpellOverride(uint32 overrideSpell) const;
 
@@ -694,7 +664,6 @@ class SpellMgr
         void LoadSpellThreats();
         void LoadSkillLineAbilityMap();
         void LoadSpellPetAuras();
-        void LoadSpellStats();
         void LoadEnchantCustomAttr();
         void LoadSpellEnchantProcData();
         void LoadSpellLinked();
@@ -709,7 +678,6 @@ class SpellMgr
 
     private:
         SpellDifficultySearcherMap mSpellDifficultySearcherMap;
-        SpellStatsMap              mSpellStatsMap;
         SpellChainMap              mSpellChains;
         SpellsRequiringSpellMap    mSpellsReqSpell;
         SpellRequiredMap           mSpellReq;

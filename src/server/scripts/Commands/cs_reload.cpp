@@ -153,7 +153,6 @@ public:
             { "spell_target_position",       SEC_ADMINISTRATOR, true,  &HandleReloadSpellTargetPositionCommand,        "", NULL },
             { "spell_threats",               SEC_ADMINISTRATOR, true,  &HandleReloadSpellThreatsCommand,               "", NULL },
             { "spell_group_stack_rules",     SEC_ADMINISTRATOR, true,  &HandleReloadSpellGroupStackRulesCommand,       "", NULL },
-            { "spell_stats",                 SEC_ADMINISTRATOR, true,  &HandleReloadSpellStatsCommand,                 "", NULL },
             { "core_string",                 SEC_ADMINISTRATOR, true,  &HandleReloadCoreStringCommand,              "", NULL },
             { "waypoint_scripts",            SEC_ADMINISTRATOR, true,  &HandleReloadWpScriptsCommand,                  "", NULL },
             { "waypoint_data",               SEC_ADMINISTRATOR, true,  &HandleReloadWpCommand,                         "", NULL },
@@ -297,7 +296,6 @@ public:
         HandleReloadSpellTargetPositionCommand(handler, "a");
         HandleReloadSpellThreatsCommand(handler, "a");
         HandleReloadSpellGroupStackRulesCommand(handler, "a");
-        HandleReloadSpellStatsCommand(handler,"a");
         HandleReloadSpellPetAurasCommand(handler, "a");
         return true;
     }
@@ -911,14 +909,6 @@ public:
         handler->SendGlobalGMSysMessage("DB table `spell_pet_auras` reloaded.");
         return true;
     }
-
-   static bool HandleReloadSpellStatsCommand(ChatHandler* handler, const char* /*args*/)
-   {
-       sLog->outString("Re-Loading Spell Stats...");
-       sSpellMgr->LoadSpellStats();
-       handler->SendGlobalGMSysMessage("DB table `spell_stats` reloaded.");
-       return true;
-   }
 
     static bool HandleReloadPageTextsCommand(ChatHandler* handler, const char* /*args*/)
     {
