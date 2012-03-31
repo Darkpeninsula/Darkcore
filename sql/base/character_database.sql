@@ -560,6 +560,27 @@ LOCK TABLES `character_branchspec` WRITE;
 UNLOCK TABLES;
 
 --
+-- Table structure for table `character_cp_weekcap`
+--
+
+CREATE TABLE `character_cp_weekcap` (
+  `guid` int(10) unsigned NOT NULL DEFAULT '0',
+  `source` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `maxWeekRating` smallint(5) unsigned NOT NULL DEFAULT '0',
+  `weekCap` smallint(5) unsigned NOT NULL DEFAULT '0',
+  KEY `idx_guid` (`guid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `character_cp_weekcap`
+--
+
+LOCK TABLES `character_cp_weekcap` WRITE;
+/*!40000 ALTER TABLE `character_cp_weekcap` DISABLE KEYS */;
+/*!40000 ALTER TABLE `character_cp_weekcap` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `character_currency`
 --
 

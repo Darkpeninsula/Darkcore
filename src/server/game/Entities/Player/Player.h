@@ -63,6 +63,7 @@ typedef std::deque<Mail*> PlayerMails;
 #define PLAYER_MAX_SKILLS           127
 #define PLAYER_MAX_DAILY_QUESTS     25
 #define PLAYER_EXPLORED_ZONES_SIZE  144
+#define PLAYER_DEFAULT_CONQUEST_POINTS_WEEK_CAP 1350
 
 // 2^n values, Player::m_isunderwater is a bitmask. These are Darkcore internal values, they are never send to any client
 enum PlayerUnderwaterState
@@ -847,6 +848,7 @@ enum PlayerLoginQueryIndex
     PLAYER_LOGIN_QUERY_LOADSEASONALQUESTSTATUS  = 31,
     PLAYER_LOGIN_QUERY_LOADTALENTBRANCHSPECS    = 32,
     PLAYER_LOGIN_QUERY_LOAD_CURRENCY            = 33,
+    PLAYER_LOGIN_QUERY_LOAD_CP_WEEK_CAP         = 34,
     MAX_PLAYER_LOGIN_QUERY,
 };
 
@@ -909,6 +911,13 @@ enum CurrencyItems
 {
     ITEM_HONOR_POINTS_ID    = 43308,
     ITEM_ARENA_POINTS_ID    = 43307
+};
+
+enum ConquestPointsSources
+{
+    CP_SOURCE_ARENA     = 0,
+    CP_SOURCE_RATED_BG  = 1,
+    CP_SOURCE_MAX
 };
 
 enum ReferAFriendError
@@ -1327,7 +1336,7 @@ class Player : public Unit, public GridObject<Player>
         bool HasCurrency(uint32 id, uint32 count) const;
         void SetCurrency(uint32 id, uint32 count);
         void ModifyConquestPoints(int32 value);
-        void ModifyCurrency(uint32 id, int32 count, bool force = false);
+        void ModifyCurrency(uint32 id, int32 count);
 
         void ApplyEquipCooldown(Item* pItem);
 
@@ -1468,6 +1477,9 @@ class Player : public Unit, public GridObject<Player>
         void ResetDailyQuestStatus();
         void ResetWeeklyQuestStatus();
         void ResetSeasonalQuestStatus(uint16 event_id);
+
+        void ResetCurrencyWeekCap();
+        void UpdateMaxWeekRating(ConquestPointsSources source, uint8 slot);
 
         uint16 FindQuestSlot(uint32 quest_id) const;
         uint32 GetQuestSlotQuestId(uint16 slot) const { return GetUInt32Value(PLAYER_QUEST_LOG_1_1 + slot * MAX_QUEST_OFFSET + QUEST_ID_OFFSET); }
@@ -1716,6 +1728,7 @@ class Player : public Unit, public GridObject<Player>
         void RecalculateMasteryAuraEffects(uint32 branch);
         void UpdateMasteryAuras(uint32 branch);
 
+        uint32 GetCharacterReputationGuildRep(uint32 guid);
         uint32 CalculateTalentsPoints() const;
 
         // Dual Spec
@@ -2667,6 +2680,7 @@ class Player : public Unit, public GridObject<Player>
         void _LoadInstanceTimeRestrictions(PreparedQueryResult result);
         void _LoadTalentBranchSpecs(PreparedQueryResult result);
         void _LoadCurrency(PreparedQueryResult result);
+        void _LoadConquestPointsWeekCap(PreparedQueryResult result);
 
         /*********************************************************/
         /***                   SAVE SYSTEM                     ***/
@@ -2688,6 +2702,7 @@ class Player : public Unit, public GridObject<Player>
         void _SaveTalents(SQLTransaction& trans);
         void _SaveTalentBranchSpecs(SQLTransaction& trans);
         void _SaveCurrency();
+        void _SaveConquestPointsWeekCap();
         void _SaveStats(SQLTransaction& trans);
         void _SaveInstanceTimeRestrictions(SQLTransaction& trans);
 
@@ -2726,6 +2741,9 @@ class Player : public Unit, public GridObject<Player>
         PlayerCurrenciesMap _currencies;
         uint32 _GetCurrencyWeekCap(const CurrencyTypesEntry* currency) const;
         uint32 _GetCurrencyTotalCap(const CurrencyTypesEntry* currency) const;
+
+        uint16 m_maxWeekRating[CP_SOURCE_MAX];
+        uint16 m_conquestPointsWeekCap[CP_SOURCE_MAX]; // without *PLAYER_CURRENCY_PRECISION!
 
         std::vector<Item*> m_itemUpdateQueue;
         bool _itemUpdateQueueBlocked;
