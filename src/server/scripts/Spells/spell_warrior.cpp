@@ -109,15 +109,23 @@ class spell_warr_bloodthirst : public SpellScriptLoader
                 if (Unit* caster = GetCaster())
                 {
                     int32 dmg = int32(GetHitDamage() * caster->GetTotalAttackPowerValue(BASE_ATTACK) / 100);
-                    int32 heal = int32(500);
                     SetHitDamage(dmg);
-                    caster->CastCustomSpell(caster, 23885, &heal, NULL, NULL, true);
                 }
+            }
+            
+            void HandleDummy(SpellEffIndex /*effect*/)
+            {
+               if (Unit* caster = GetCaster())
+               {
+                   int32 heal = GetEffectValue();
+                   caster->CastCustomSpell(caster, 23885, &heal, NULL, NULL, true);
+               }
             }
 
             void Register()
             {
                 OnEffectHitTarget += SpellEffectFn(spell_warr_bloodthirst::spell_warr_bloodthirst_SpellScript::CalculateDamage, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+                OnEffectHitTarget += SpellEffectFn(spell_warr_bloodthirst_SpellScript::HandleDummy, EFFECT_1, SPELL_EFFECT_DUMMY);
             }
         };
 

@@ -707,7 +707,7 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
                 amount = GetBase()->GetUnitOwner()->GetShapeshiftForm() == FORM_CAT ? amount : 0;
             break;
         case SPELL_AURA_MOUNTED:
-            {
+        {
                 Player *player = caster->ToPlayer();
                 if (player)
                 {
@@ -737,7 +737,39 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
                     return (int) spellId;
                 }
                 break;
+        }
+        case SPELL_AURA_MOD_RESISTANCE_EXCLUSIVE:
+        {
+            if (caster) 
+            {
+                int32 resist = caster->getLevel();
+                if (resist > 70 && resist < 81)
+                {
+                    resist += (resist - 70) * 5;
+                } 
+                else if (resist > 80 && resist <= 85)
+                {
+                    resist += ((resist - 70) * 5 + (resist - 80) * 7);
+                }
+                
+                switch (GetId())
+                {
+                    case 20043: // Aspect of the Wild
+                    case 8185:  // Elemental Resistance
+                    case 19891: // Resistance Aura
+                    case 79106: // Shadow Protection
+                        amount = resist;
+                        break;
+                    case 79060: // Mark of the Wild
+                    case 79061: // Mark of the Wild (Raid)
+                    case 79062: // Blessing of Kings
+                    case 79063: // Blessing of Kings (Raid)
+                        amount = resist / 2;
+                        break;
+                }
+                break;
             }
+        }
         default:
             break;
     }
@@ -5301,13 +5333,6 @@ void AuraEffect::HandleAuraDummy(AuraApplication const* aurApp, uint8 mode, bool
                         // final heal
                         int32 stack = GetBase()->GetStackAmount();
                         target->CastCustomSpell(target, 33778, &m_amount, &stack, NULL, true, NULL, this, GetCasterGUID());
-
-                        // restore mana
-                        if (caster)
-                        {
-                            int32 returnmana = CalculatePctU(caster->GetCreateMana(), GetSpellInfo()->ManaCostPercentage) * stack / 2;
-                            caster->CastCustomSpell(caster, 64372, &returnmana, NULL, NULL, true, NULL, this, GetCasterGUID());
-                        }
                     }
                     break;
                 case SPELLFAMILY_HUNTER:
@@ -5621,20 +5646,6 @@ void AuraEffect::HandleAuraDummy(AuraApplication const* aurApp, uint8 mode, bool
                         break;
                     }
                     target->RemoveAurasDueToSpell(spellId);
-                    break;
-                }
-                case 61336:                                 // Survival Instincts
-                {
-                    if (!(mode & AURA_EFFECT_HANDLE_REAL))
-                        break;
-
-                    if (apply)
-                    {
-                        int32 bp0 = int32(target->CountPctFromMaxHealth(GetAmount()));
-                        target->CastCustomSpell(target, 50322, &bp0, NULL, NULL, true);
-                    }
-                    else
-                        target-> RemoveAurasDueToSpell(50322);
                     break;
                 }
             }
@@ -6237,19 +6248,19 @@ void AuraEffect::HandlePeriodicDummyAuraTick(Unit* target, Unit* caster) const
                 // Frenzied Regeneration
                 case 22842:
                 {
-                    // Converts up to 10 rage per second into health for $d.  Each point of rage is converted into ${$m2/10}.1% of max health.
+                    // Converts up to 10 rage per second into health for $d.  Each point of rage is converted into ${$m2/10}.2% of max health.
                     // Should be manauser
                     if (target->getPowerType() != POWER_RAGE)
                         break;
+
                     uint32 rage = target->GetPower(POWER_RAGE);
                     // Nothing todo
-                    if (rage == 0)
+                    if (rage < 100)
                         break;
-                    int32 mod = (rage < 100) ? rage : 100;
-                    int32 points = target->CalculateSpellDamage(target, GetSpellInfo(), 1);
-                    int32 regen = target->GetMaxHealth() * (mod * points / 10) / 1000;
+
+                    int32 regen = (target->GetMaxHealth() * m_amount / 10000);
                     target->CastCustomSpell(target, 22845, &regen, 0, 0, true, 0, this);
-                    target->SetPower(POWER_RAGE, rage-mod);
+                    target->SetPower(POWER_RAGE, int32(rage - 100));
                     break;
                 }
             }

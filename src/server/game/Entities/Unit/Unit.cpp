@@ -5825,6 +5825,21 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
             }
             switch (dummySpell->Id)
             {
+                //Nether Vortex
+                case 86181:
+                case 86209:
+                {
+                    AuraMap const &slowAura = GetOwnedAuras();
+                    for (Unit::AuraMap::const_iterator itr = slowAura.begin(); itr != slowAura.end();)
+                    {
+                        if ((*itr).second->GetId() == 31589)
+                            break;
+                        else 
+                            itr++;
+                    }
+                    triggered_spell_id = 31589;
+                    break;
+                }
                 // Glyph of Polymorph
                 case 56375:
                 {
@@ -7985,6 +8000,29 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                 triggered_spell_id = 77616;
                 basepoints0 = procSpell->Id;
                 target = caster;
+            }
+            // Runic Empowerment
+            if(dummySpell->Id == 81229)
+            {
+                uint32 cooldownrunes[MAX_RUNES];
+                uint8 runescount = 0;
+
+                for (uint32 j = 0; j < MAX_RUNES; ++j)
+                {
+                    if (ToPlayer()->GetRuneCooldown(j))
+                    {
+                        cooldownrunes[runescount] = j;
+                        runescount++;
+                    }
+                }
+
+                if (runescount > 0)
+                {
+                    uint8 rndrune = urand(0,runescount-1);
+                    ToPlayer()->SetRuneCooldown(cooldownrunes[rndrune], 0);
+                    return true;
+                }
+                return false;
             }
             break;
         }
