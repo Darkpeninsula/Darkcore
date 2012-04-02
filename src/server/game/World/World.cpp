@@ -2837,9 +2837,9 @@ void World::InitRandomBGResetTime()
 
 void World::InitCurrencyResetTime()
 {
-    time_t wsTime = getWorldState(WS_CURRENCY_RESET_TIME);
+    time_t wsTime = uint64(sWorld->getWorldState(WS_CURRENCY_RESET_TIME));
     time_t curTime = time(NULL);
-    m_NextCurrencyReset = wsTime < curTime ? curTime : wsTime;
+    m_NextCurrencyReset = wsTime < curTime ? curTime : time_t(wsTime);
 }
 
 void World::ResetDailyQuests()
