@@ -745,10 +745,9 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
         }
         case SPELL_AURA_MOD_RESISTANCE_EXCLUSIVE:
         {
-            Player *player = caster->ToPlayer();
-            if (player)
+            if (caster)
             {
-                int32 resist = player->getLevel();
+                int32 resist = caster->getLevel();
                 if (resist > 70 && resist < 81)
                 {
                     resist += (resist - 70) * 5;
