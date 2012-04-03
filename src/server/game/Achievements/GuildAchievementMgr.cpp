@@ -273,6 +273,9 @@ void GuildAchievementMgr::CompletedAchievement(AchievementEntry const* achieveme
     if (achievement->flags & ACHIEVEMENT_FLAG_COUNTER || HasAchieved(achievement->ID))
         return;
 
+    if(!player)
+        return
+
     SendAchievementEarned(achievement);
     CompletedAchievementData& ca =  m_completedAchievements[achievement->ID];
     ca.date = time(NULL);

@@ -373,6 +373,9 @@ static const uint32 achievIdForDungeon[][4] =
 void AchievementMgrBase::UpdateAchievementCriteria(AchievementCriteriaTypes type, Player* player, uint32 miscValue1 /*= 0*/, uint32 miscValue2 /*= 0*/, Unit* unit /*= NULL*/)
 {
     sLog->outDebug(LOG_FILTER_ACHIEVEMENTSYS, "AchievementMgr::UpdateAchievementCriteria(%u, %u, %u)", type, miscValue1, miscValue2);
+    
+    if(!player)
+        return;
 
     // disable for gamemasters with GM-mode enabled
     if (player->isGameMaster())
