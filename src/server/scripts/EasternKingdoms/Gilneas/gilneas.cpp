@@ -273,10 +273,10 @@ public:
             doYell    = true;
             tYell     = DELAY_YELL_PRINCE_LIAM_GREYMANE;
         }
-        
+
         //There is NO phase shift here!!!!
-		
-		void DamageTaken(Unit * who, uint32 &Damage)
+
+        void DamageTaken(Unit * who, uint32 &Damage)
         {
             if (who->GetTypeId() == TYPEID_PLAYER)
             {
