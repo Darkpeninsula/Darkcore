@@ -26,11 +26,13 @@
 
 #define MAX_DESYNC 5.0f
 
-CreatureGroupInfoType   CreatureGroupMap;
-
-namespace FormationMgr
+FormationMgr::~FormationMgr()
 {
-void AddCreatureToGroup(uint32 groupId, Creature* member)
+    for (CreatureGroupInfoType::iterator itr = CreatureGroupMap.begin(); itr != CreatureGroupMap.end(); ++itr)
+        delete itr->second;
+}
+
+void FormationMgr::AddCreatureToGroup(uint32 groupId, Creature* member)
 {
     Map* map = member->FindMap();
     if (!map)
@@ -54,7 +56,7 @@ void AddCreatureToGroup(uint32 groupId, Creature* member)
     }
 }
 
-void RemoveCreatureFromGroup(CreatureGroup* group, Creature* member)
+void FormationMgr::RemoveCreatureFromGroup(CreatureGroup* group, Creature* member)
 {
     sLog->outDebug(LOG_FILTER_UNITS, "Deleting member pointer to GUID: %u from group %u", group->GetId(), member->GetDBTableGUIDLow());
     group->RemoveMember(member);
@@ -71,7 +73,7 @@ void RemoveCreatureFromGroup(CreatureGroup* group, Creature* member)
     }
 }
 
-void LoadCreatureFormations()
+void FormationMgr::LoadCreatureFormations()
 {
     uint32 oldMSTime = getMSTime();
 
@@ -98,7 +100,7 @@ void LoadCreatureFormations()
         fields = result->Fetch();
 
         //Load group member data
-        group_member                        = new FormationInfo;
+        group_member                        = new FormationInfo();
         group_member->leaderGUID            = fields[0].GetUInt32();
         uint32 memberGUID                   = fields[1].GetUInt32();
         group_member->groupAI               = fields[4].GetUInt8();
@@ -139,7 +141,6 @@ void LoadCreatureFormations()
     sLog->outString(">> Loaded %u creatures in formations in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
     sLog->outString();
 }
-} // Namespace
 
 void CreatureGroup::AddMember(Creature* member)
 {
@@ -152,7 +153,7 @@ void CreatureGroup::AddMember(Creature* member)
         m_leader = member;
     }
 
-    m_members[member] = CreatureGroupMap.find(member->GetDBTableGUIDLow())->second;
+    m_members[member] = sFormationMgr->CreatureGroupMap.find(member->GetDBTableGUIDLow())->second;
     member->SetFormation(this);
 }
 
@@ -167,7 +168,7 @@ void CreatureGroup::RemoveMember(Creature* member)
 
 void CreatureGroup::MemberAttackStart(Creature* member, Unit* target)
 {
-    uint8 groupAI = CreatureGroupMap[member->GetDBTableGUIDLow()]->groupAI;
+    uint8 groupAI = sFormationMgr->CreatureGroupMap[member->GetDBTableGUIDLow()]->groupAI;
     if (!groupAI)
         return;
 

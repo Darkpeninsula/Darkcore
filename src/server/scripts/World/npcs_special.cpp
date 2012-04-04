@@ -321,7 +321,7 @@ public:
 
     struct npc_chicken_cluckAI : public ScriptedAI
     {
-        npc_chicken_cluckAI(Creature* c) : ScriptedAI(c) {}
+        npc_chicken_cluckAI(Creature* creature) : ScriptedAI(creature) {}
 
         uint32 ResetFlagTimer;
 
@@ -416,7 +416,7 @@ public:
 
     struct npc_dancing_flamesAI : public ScriptedAI
     {
-        npc_dancing_flamesAI(Creature* c) : ScriptedAI(c) {}
+        npc_dancing_flamesAI(Creature* creature) : ScriptedAI(creature) {}
 
         bool Active;
         uint32 CanIteract;
@@ -571,7 +571,7 @@ public:
 
     struct npc_doctorAI : public ScriptedAI
     {
-        npc_doctorAI(Creature* c) : ScriptedAI(c) {}
+        npc_doctorAI(Creature* creature) : ScriptedAI(creature) {}
 
         uint64 PlayerGUID;
 
@@ -716,7 +716,7 @@ public:
 
     struct npc_injured_patientAI : public ScriptedAI
     {
-        npc_injured_patientAI(Creature* c) : ScriptedAI(c) {}
+        npc_injured_patientAI(Creature* creature) : ScriptedAI(creature) {}
 
         uint64 DoctorGUID;
         Location* Coord;
@@ -1121,7 +1121,7 @@ public:
 
     struct npc_guardianAI : public ScriptedAI
     {
-        npc_guardianAI(Creature* c) : ScriptedAI(c) {}
+        npc_guardianAI(Creature* creature) : ScriptedAI(creature) {}
 
         void Reset()
         {
@@ -1547,7 +1547,7 @@ public:
 
     struct npc_steam_tonkAI : public ScriptedAI
     {
-        npc_steam_tonkAI(Creature* c) : ScriptedAI(c) {}
+        npc_steam_tonkAI(Creature* creature) : ScriptedAI(creature) {}
 
         void Reset() {}
         void EnterCombat(Unit* /*who*/) {}
@@ -1580,7 +1580,7 @@ public:
 
     struct npc_tonk_mineAI : public ScriptedAI
     {
-        npc_tonk_mineAI(Creature* c) : ScriptedAI(c)
+        npc_tonk_mineAI(Creature* creature) : ScriptedAI(creature)
         {
             me->SetReactState(REACT_PASSIVE);
         }
@@ -1625,7 +1625,7 @@ public:
 
     struct npc_brewfest_revelerAI : public ScriptedAI
     {
-        npc_brewfest_revelerAI(Creature* c) : ScriptedAI(c) {}
+        npc_brewfest_revelerAI(Creature* creature) : ScriptedAI(creature) {}
         void ReceiveEmote(Player* player, uint32 emote)
         {
             if (!IsHolidayActive(HOLIDAY_BREWFEST))
@@ -1661,7 +1661,7 @@ class npc_winter_reveler : public CreatureScript
 
         struct npc_winter_revelerAI : public ScriptedAI
         {
-            npc_winter_revelerAI(Creature* c) : ScriptedAI(c) {}
+            npc_winter_revelerAI(Creature* creature) : ScriptedAI(creature) {}
 
             void ReceiveEmote(Player* player, uint32 emote)
             {
@@ -1707,7 +1707,7 @@ public:
 
     struct npc_snake_trap_serpentsAI : public ScriptedAI
     {
-        npc_snake_trap_serpentsAI(Creature* c) : ScriptedAI(c) {}
+        npc_snake_trap_serpentsAI(Creature* creature) : ScriptedAI(creature) {}
 
         uint32 SpellTimer;
         bool IsViper;
@@ -1822,7 +1822,7 @@ public:
 
     struct mob_mojoAI : public ScriptedAI
     {
-        mob_mojoAI(Creature* c) : ScriptedAI(c) {Reset();}
+        mob_mojoAI(Creature* creature) : ScriptedAI(creature) {Reset();}
 
         uint32 Hearts;
         uint64 VictimGUID;
@@ -1916,7 +1916,7 @@ public:
 
     struct npc_mirror_imageAI : CasterAI
     {
-        npc_mirror_imageAI(Creature* c) : CasterAI(c) {}
+        npc_mirror_imageAI(Creature* creature) : CasterAI(creature) {}
 
         void InitializeAI()
         {
@@ -1963,7 +1963,7 @@ public:
 
     struct npc_ebon_gargoyleAI : CasterAI
     {
-        npc_ebon_gargoyleAI(Creature* c) : CasterAI(c) {}
+        npc_ebon_gargoyleAI(Creature* creature) : CasterAI(creature) {}
 
         uint32 DespawnTimer;
 
@@ -2054,7 +2054,7 @@ public:
 
     struct npc_lightwellAI : public PassiveAI
     {
-        npc_lightwellAI(Creature* c) : PassiveAI(c) {}
+        npc_lightwellAI(Creature* creature) : PassiveAI(creature) {}
 
         void Reset()
         {

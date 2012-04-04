@@ -51,7 +51,7 @@ public:
 
     struct mob_webbed_creatureAI : public ScriptedAI
     {
-        mob_webbed_creatureAI(Creature* c) : ScriptedAI(c) {}
+        mob_webbed_creatureAI(Creature* creature) : ScriptedAI(creature) {}
 
         void Reset()
         {

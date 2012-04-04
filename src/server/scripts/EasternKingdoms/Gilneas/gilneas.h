@@ -17,7 +17,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #ifndef DEF_GILNEAS_H
 #define DEF_GILNEAS_H
 
@@ -55,8 +54,6 @@ enum QuestIds
 
 enum SpellIds
 {
-    SPELL_PHASE_2                                      = 59073,
-    SPELL_PHASE_4                                      = 59074,
     SPELL_ENRAGE                                       = 8599,
     SPELL_FROSTBOLT_VISUAL_ONLY                        = 74277 //Dummy spell, visual only
 };

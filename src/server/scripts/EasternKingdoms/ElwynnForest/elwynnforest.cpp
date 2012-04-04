@@ -54,7 +54,7 @@ public:
         uint32 lifeTimer;
         bool spellHit;
 
-        npc_henze_faulkAI(Creature *c) : ScriptedAI(c) {}
+        npc_henze_faulkAI(Creature* creature) : ScriptedAI(creature) {}
 
         void Reset()
         {
@@ -153,7 +153,7 @@ public:
 
     struct npc_stormwind_infantryAI : public ScriptedAI
     {
-        npc_stormwind_infantryAI(Creature *c) : ScriptedAI(c) {}
+        npc_stormwind_infantryAI(Creature* creature) : ScriptedAI(creature) {}
 
         uint32 uiSayNormalTimer;
         uint32 uiSayCombatTimer;
@@ -336,7 +336,7 @@ public:
 
     struct npc_brother_paxtonAI : public ScriptedAI
     {
-        npc_brother_paxtonAI(Creature *c) : ScriptedAI(c)
+        npc_brother_paxtonAI(Creature* creature) : ScriptedAI(creature)
         {
             me->GetMotionMaster()->MovePath(951, true);
         }
@@ -377,7 +377,7 @@ public:
 
     struct npc_blackrock_battle_worgAI : public ScriptedAI
     {
-        npc_blackrock_battle_worgAI(Creature *c) : ScriptedAI(c) {}
+        npc_blackrock_battle_worgAI(Creature* creature) : ScriptedAI(creature) {}
 
         uint32 Attack1HTimer;
         uint32 DamageCount;
@@ -457,7 +457,7 @@ public:
 
     struct npc_blackrock_spyAI : public ScriptedAI
     {
-        npc_blackrock_spyAI(Creature *c) : ScriptedAI(c)
+        npc_blackrock_spyAI(Creature* creature) : ScriptedAI(creature)
         {
             CastSpying();
         }
@@ -540,7 +540,7 @@ public:
 
     struct npc_blackrock_invaderAI : public ScriptedAI
     {
-        npc_blackrock_invaderAI(Creature *c) : ScriptedAI(c) {}
+        npc_blackrock_invaderAI(Creature* creature) : ScriptedAI(creature) {}
 
         void EnterCombat(Unit * who)
         {
@@ -573,7 +573,7 @@ public:
 
     struct npc_goblin_assassinAI : public ScriptedAI
     {
-        npc_goblin_assassinAI(Creature *c) : ScriptedAI(c)
+        npc_goblin_assassinAI(Creature* creature) : ScriptedAI(creature)
         {
             if (!me->isInCombat() && !me->HasAura(SPELL_SPYING))
                 DoCast(SPELL_SNEAKING);

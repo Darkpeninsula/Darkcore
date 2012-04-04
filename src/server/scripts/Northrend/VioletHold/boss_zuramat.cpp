@@ -64,9 +64,9 @@ public:
 
     struct boss_zuramatAI : public ScriptedAI
     {
-        boss_zuramatAI(Creature* c) : ScriptedAI(c)
+        boss_zuramatAI(Creature* creature) : ScriptedAI(creature)
         {
-            instance = c->GetInstanceScript();
+            instance = creature->GetInstanceScript();
         }
 
         InstanceScript* instance;

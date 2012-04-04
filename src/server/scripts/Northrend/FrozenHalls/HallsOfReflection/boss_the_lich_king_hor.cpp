@@ -77,7 +77,7 @@ public:
 
     struct boss_lich_king_horAI : public npc_escortAI
     {
-        boss_lich_king_horAI(Creature *creature) : npc_escortAI(creature)
+        boss_lich_king_horAI(Creature* creature) : npc_escortAI(creature)
         {
             instance = (InstanceScript*)creature->GetInstanceScript();
             Reset();
@@ -389,7 +389,7 @@ public:
 
     struct npc_raging_gnoulAI : public ScriptedAI
     {
-        npc_raging_gnoulAI(Creature *creature) : ScriptedAI(creature)
+        npc_raging_gnoulAI(Creature* creature) : ScriptedAI(creature)
         {
             instance = (InstanceScript*)creature->GetInstanceScript();
             me->setActive(true);
@@ -487,7 +487,7 @@ public:
 
     struct npc_risen_witch_doctorAI : public ScriptedAI
     {
-        npc_risen_witch_doctorAI(Creature *creature) : ScriptedAI(creature)
+        npc_risen_witch_doctorAI(Creature* creature) : ScriptedAI(creature)
         {
             instance = (InstanceScript*)creature->GetInstanceScript();
             me->setActive(true);
@@ -597,7 +597,7 @@ public:
 
     struct npc_abonAI : public ScriptedAI
     {
-        npc_abonAI(Creature *creature) : ScriptedAI(creature)
+        npc_abonAI(Creature* creature) : ScriptedAI(creature)
         {
             instance = (InstanceScript*)creature->GetInstanceScript();
             me->setActive(true);

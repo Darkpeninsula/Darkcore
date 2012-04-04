@@ -61,9 +61,9 @@ public:
 
     struct boss_rage_winterchillAI : public hyjal_trashAI
     {
-        boss_rage_winterchillAI(Creature* c) : hyjal_trashAI(c)
+        boss_rage_winterchillAI(Creature* creature) : hyjal_trashAI(creature)
         {
-            instance = c->GetInstanceScript();
+            instance = creature->GetInstanceScript();
             go = false;
             pos = 0;
         }

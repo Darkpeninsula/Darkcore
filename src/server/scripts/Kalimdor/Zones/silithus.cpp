@@ -484,14 +484,14 @@ class npc_anachronos_the_ancient : public CreatureScript
 public:
     npc_anachronos_the_ancient() : CreatureScript("npc_anachronos_the_ancient") { }
 
-    CreatureAI* GetAI(Creature* c) const
+    CreatureAI* GetAI(Creature* creature) const
     {
-        return new npc_anachronos_the_ancientAI(c);
+        return new npc_anachronos_the_ancientAI(creature);
     }
 
     struct npc_anachronos_the_ancientAI : public ScriptedAI
     {
-        npc_anachronos_the_ancientAI(Creature* c) : ScriptedAI(c) {}
+        npc_anachronos_the_ancientAI(Creature* creature) : ScriptedAI(creature) {}
 
         uint32 AnimationTimer;
         uint8 AnimationCount;
@@ -811,14 +811,14 @@ class mob_qiraj_war_spawn : public CreatureScript
 public:
     mob_qiraj_war_spawn() : CreatureScript("mob_qiraj_war_spawn") { }
 
-    CreatureAI* GetAI(Creature* c) const
+    CreatureAI* GetAI(Creature* creature) const
     {
-        return new mob_qiraj_war_spawnAI(c);
+        return new mob_qiraj_war_spawnAI(creature);
     }
 
     struct mob_qiraj_war_spawnAI : public ScriptedAI
     {
-        mob_qiraj_war_spawnAI(Creature* c) : ScriptedAI(c) {}
+        mob_qiraj_war_spawnAI(Creature* creature) : ScriptedAI(creature) {}
 
         uint64 MobGUID;
         uint64 PlayerGUID;
@@ -925,14 +925,14 @@ class npc_anachronos_quest_trigger : public CreatureScript
 public:
     npc_anachronos_quest_trigger() : CreatureScript("npc_anachronos_quest_trigger") { }
 
-    CreatureAI* GetAI(Creature* c) const
+    CreatureAI* GetAI(Creature* creature) const
     {
-        return new npc_anachronos_quest_triggerAI(c);
+        return new npc_anachronos_quest_triggerAI(creature);
     }
 
     struct npc_anachronos_quest_triggerAI : public ScriptedAI
     {
-        npc_anachronos_quest_triggerAI(Creature* c) : ScriptedAI(c) {}
+        npc_anachronos_quest_triggerAI(Creature* creature) : ScriptedAI(creature) {}
 
         uint64 PlayerGUID;
 

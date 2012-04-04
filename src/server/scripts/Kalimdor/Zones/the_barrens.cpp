@@ -233,9 +233,9 @@ public:
 
     struct npc_taskmaster_fizzuleAI : public ScriptedAI
     {
-        npc_taskmaster_fizzuleAI(Creature* c) : ScriptedAI(c)
+        npc_taskmaster_fizzuleAI(Creature* creature) : ScriptedAI(creature)
         {
-            factionNorm = c->getFaction();
+            factionNorm = creature->getFaction();
         }
 
         uint32 factionNorm;
@@ -348,7 +348,7 @@ public:
 
     struct npc_twiggy_flatheadAI : public ScriptedAI
     {
-        npc_twiggy_flatheadAI(Creature* c) : ScriptedAI(c) {}
+        npc_twiggy_flatheadAI(Creature* creature) : ScriptedAI(creature) {}
 
         bool EventInProgress;
         bool EventGrate;

@@ -68,7 +68,7 @@ public:
 
     struct npc_aeranasAI : public ScriptedAI
     {
-        npc_aeranasAI(Creature* c) : ScriptedAI(c) {}
+        npc_aeranasAI(Creature* creature) : ScriptedAI(creature) {}
 
         uint32 Faction_Timer;
         uint32 EnvelopingWinds_Timer;
@@ -402,7 +402,7 @@ public:
 
     struct npc_wounded_blood_elfAI : public npc_escortAI
     {
-        npc_wounded_blood_elfAI(Creature* c) : npc_escortAI(c) {}
+        npc_wounded_blood_elfAI(Creature* creature) : npc_escortAI(creature) {}
 
         void WaypointReached(uint32 i)
         {

@@ -69,7 +69,7 @@ public:
 
     struct boss_nexusprince_shaffarAI : public ScriptedAI
     {
-        boss_nexusprince_shaffarAI(Creature* c) : ScriptedAI(c), summons(me) { HasTaunted = false; }
+        boss_nexusprince_shaffarAI(Creature* creature) : ScriptedAI(creature), summons(me) { HasTaunted = false; }
 
         uint32 Blink_Timer;
         uint32 Beacon_Timer;
@@ -234,7 +234,7 @@ public:
 
     struct mob_ethereal_beaconAI : public ScriptedAI
     {
-        mob_ethereal_beaconAI(Creature* c) : ScriptedAI(c)
+        mob_ethereal_beaconAI(Creature* creature) : ScriptedAI(creature)
         {
         }
 
@@ -325,7 +325,7 @@ public:
 
     struct mob_ethereal_apprenticeAI : public ScriptedAI
     {
-        mob_ethereal_apprenticeAI(Creature* c) : ScriptedAI(c) {}
+        mob_ethereal_apprenticeAI(Creature* creature) : ScriptedAI(creature) {}
 
         uint32 Cast_Timer;
 

@@ -338,9 +338,9 @@ void OPvPCapturePointZM_GraveYard::SetBeaconState(uint32 controlling_faction)
     UpdateTowerState();
 }
 
-bool OPvPCapturePointZM_GraveYard::CanTalkTo(Player* player, Creature* c, GossipMenuItems const& /*gso*/)
+bool OPvPCapturePointZM_GraveYard::CanTalkTo(Player* player, Creature* creature, GossipMenuItems const& /*gso*/)
 {
-    uint64 guid = c->GetGUID();
+    uint64 guid = creature->GetGUID();
     std::map<uint64, uint32>::iterator itr = m_CreatureTypes.find(guid);
     if (itr != m_CreatureTypes.end())
     {
