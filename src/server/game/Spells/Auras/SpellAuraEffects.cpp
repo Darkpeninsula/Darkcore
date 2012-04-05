@@ -4928,29 +4928,6 @@ void AuraEffect::HandleAuraDummy(AuraApplication const* aurApp, uint8 mode, bool
             }
             switch (GetId())
             {
-                case 94315:  // Early Frost
-                {
-                    if (caster && GetEffIndex() == 0)
-                    {
-                        if (AuraEffect* aurEff = caster->GetDummyAuraEffect(SPELLFAMILY_MAGE, 189, 0))
-                        {
-                            uint32 spell_Id = 0;
-                            switch (aurEff->GetId())
-                            {
-                                case 83049:
-                                    spell_Id = 83162;
-                                    break;
-                                case 83050:
-                                    spell_Id = 83239;
-                                    break;
-                            }
-
-                            if(spell_Id && !caster->GetAura(spell_Id))
-                                caster->CastSpell(caster, spell_Id, true, NULL, aurEff);
-                        }
-                    }
-                    break;
-                }
                 case 1515:                                      // Tame beast
                     // FIX_ME: this is 2.0.12 threat effect replaced in 2.1.x by dummy aura, must be checked for correctness
                     if (caster && target->CanHaveThreatList())
