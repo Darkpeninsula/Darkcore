@@ -34,7 +34,7 @@
 
 #define _CLIENT_BUILD_REVISION "4.0.6a - 13623"
 
-#define _CLIENT_BUILD_REVISION_2 "4.0.6a - 13623 (c)DarkCore <http://www.darkpeninsula.eu>"  // DO NOT REMOVE OR ALTER OUR COPYRIGHTS!
+#define _CLIENT_BUILD_REVISION_2 "4.0.6a - 13623 (c)ProjectSkyfire <http://www.projectskyfire.org>"  // DO NOT REMOVE OR ALTER OUR COPYRIGHTS!
 
 #if PLATFORM == PLATFORM_WINDOWS
 # ifdef _WIN64
