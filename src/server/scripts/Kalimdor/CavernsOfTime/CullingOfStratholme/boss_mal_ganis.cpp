@@ -258,6 +258,16 @@ public:
 
                 // give achievement credit and LFG rewards to players. criteria use spell 58630 which doesn't exist, but it was created in spell_dbc
                 DoCast(me, SPELL_KILL_CREDIT);
+
+                Map* map = me->GetMap();
+
+                if(IsHeroic())
+                {
+                    Map::PlayerList const& PlayerList = map->GetPlayers();
+                    for (Map::PlayerList::const_iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr)
+                        if (Player* player = itr->getSource())
+                            player->ModifyCurrency(CURRENCY_TYPE_JUSTICE_POINTS, 1600);
+                }
             }
         }
 

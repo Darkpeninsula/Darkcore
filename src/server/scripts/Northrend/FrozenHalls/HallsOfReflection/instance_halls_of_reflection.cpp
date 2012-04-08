@@ -409,6 +409,14 @@ public:
                             DoCastSpellOnPlayers(SPELL_ACHIEV_CHECK);
                             DoStopTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_NOT_RETREATING_EVENT);
                         }*/
+
+                        if(instance->IsHeroic())
+                        {
+                            Map::PlayerList const& PlayerList = instance->GetPlayers();
+                            for (Map::PlayerList::const_iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr)
+                                if (Player* player = itr->getSource())
+                                    player->ModifyCurrency(CURRENCY_TYPE_JUSTICE_POINTS, 1600);
+                        }
                     }
                     break;
                 case DATA_SUMMONS:
