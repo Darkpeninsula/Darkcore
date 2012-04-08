@@ -156,19 +156,23 @@ public:
             if (m_pInstance)
                 m_pInstance->SetData(TYPE_VOLKHAN, DONE);
 
-            if (IsHeroic() && GolemsShattered < 5)
+            if (IsHeroic())
             {
-                AchievementEntry const* AchievShatterResistant = sAchievementStore.LookupEntry(ACHIEVEMENT_SHATTER_RESISTANT);
-                if (AchievShatterResistant)
+                Map* map = me->GetMap();
+                Map::PlayerList const &players = map->GetPlayers();
+
+                if(GolemsShattered < 5)
                 {
-                    Map* map = me->GetMap();
-                    if (map && map->IsDungeon())
-                    {
-                        Map::PlayerList const &players = map->GetPlayers();
-                        for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
-                            itr->getSource()->CompletedAchievement(AchievShatterResistant);
-                    }
+                    AchievementEntry const* AchievShatterResistant = sAchievementStore.LookupEntry(ACHIEVEMENT_SHATTER_RESISTANT);
+                    if (AchievShatterResistant)
+                        if (map && map->IsDungeon())
+                            for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+                                itr->getSource()->CompletedAchievement(AchievShatterResistant);
                 }
+
+                for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+                    if (Player* player = itr->getSource())
+                        player->ModifyCurrency(CURRENCY_TYPE_JUSTICE_POINTS, 1600);
             }
         }
 

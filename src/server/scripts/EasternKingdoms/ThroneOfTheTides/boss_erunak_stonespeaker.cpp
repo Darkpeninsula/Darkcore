@@ -248,7 +248,19 @@ public:
 
         void JustDied(Unit* /*killer*/)
         {
-            instance->SetData(DATA_MINDEBENDER_GHURSHA, DONE);
+            if(instance)
+            {
+                instance->SetData(DATA_MINDEBENDER_GHURSHA, DONE);
+                Map* map = me->GetMap();
+
+                if(IsHeroic())
+                {
+                    Map::PlayerList const& PlayerList = map->GetPlayers();
+                    for (Map::PlayerList::const_iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr)
+                        if (Player* player = itr->getSource())
+                            player->ModifyCurrency(CURRENCY_TYPE_JUSTICE_POINTS, 7000);
+                }
+            }
         }
     };
 };

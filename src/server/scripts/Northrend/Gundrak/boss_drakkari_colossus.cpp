@@ -132,6 +132,16 @@ class boss_drakkari_colossus : public CreatureScript
                 // Note: This should not be called, but before use SetBossState function we should use BossAI
                 //        in all the bosses of the instance
                 instance->SetData(DATA_DRAKKARI_COLOSSUS_EVENT, DONE);
+
+                Map* map = me->GetMap();
+
+                if(IsHeroic())
+                {
+                    Map::PlayerList const& PlayerList = map->GetPlayers();
+                    for (Map::PlayerList::const_iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr)
+                        if (Player* player = itr->getSource())
+                            player->ModifyCurrency(CURRENCY_TYPE_JUSTICE_POINTS, 1600);
+                }
             }
 
             void JustReachedHome()

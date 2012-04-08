@@ -113,7 +113,18 @@ class boss_elder_nadox : public CreatureScript
                 DoScriptText(SAY_SLAY_3, me); //SAY_SLAY_3 on death?
 
                 if (instance)
+                {
                     instance->SetData(DATA_ELDER_NADOX_EVENT, DONE);
+                    Map* map = me->GetMap();
+
+                    if(IsHeroic())
+                    {
+                        Map::PlayerList const& PlayerList = map->GetPlayers();
+                        for (Map::PlayerList::const_iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr)
+                            if (Player* player = itr->getSource())
+                                player->ModifyCurrency(CURRENCY_TYPE_JUSTICE_POINTS, 1600);
+                    }
+                }
             }
 
             void DoAction(int32 const action)
