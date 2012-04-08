@@ -103,19 +103,22 @@ void WorldSession::HandleAutostoreLootItemOpcode(WorldPacket & recv_data)
         loot = &creature->loot;
     }
 
-    if (isCurrency && loot)
+    if (loot)
     {
-        uint8 currencys = 0;
-        std::list<CurrencyLoot> temp = sObjectMgr->GetCurrencyLoot(objEntry, objType);
-        for (std::list<CurrencyLoot>::iterator i = temp.begin(); i != temp.end(); ++i)
+        if(isCurrency)
         {
-            if (currencys == lootSlot)
-                player->SetCurrency(i->CurrencyId, i->CurrencyAmount * 100);
-            ++currencys;
+            uint8 currencys = 0;
+            std::list<CurrencyLoot> temp = sObjectMgr->GetCurrencyLoot(objEntry, objType);
+            for (std::list<CurrencyLoot>::iterator i = temp.begin(); i != temp.end(); ++i)
+            {
+                if (currencys == lootSlot)
+                    player->SetCurrency(i->CurrencyId, i->CurrencyAmount * 100);
+                ++currencys;
+            }
         }
-    }
-    else if (loot)
-        player->StoreLootItem(lootSlot, loot);
+        else
+            player->StoreLootItem(lootSlot, loot);
+    }        
 }
 
 void WorldSession::HandleLootMoneyOpcode(WorldPacket & /*recv_data*/)
