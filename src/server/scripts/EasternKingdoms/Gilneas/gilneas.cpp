@@ -573,6 +573,9 @@ public:
             wx = x-cos(angle)*2;
             wy = y-sin(angle)*2;
 
+            if(player)
+                player->KilledMonsterCredit(35830, 0);
+
             if (spawnKind < 3)
             {
                 if (Creature* spawnedCreature = go->SummonCreature(NPC_FRIGHTENED_CITIZEN_1, x, y, z, angle, TEMPSUMMON_TIMED_DESPAWN, SUMMON1_TTL))
