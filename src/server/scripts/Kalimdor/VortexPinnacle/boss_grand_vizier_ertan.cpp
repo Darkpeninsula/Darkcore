@@ -69,12 +69,9 @@ public:
             if (PlList.isEmpty())
                 return;
 
-            if(IsHeroic())
-            {
-                for (Map::PlayerList::const_iterator itr = PlList.begin(); itr != PlList.end(); ++itr)
-                    if (Player* player = itr->getSource())
-                        player->ModifyCurrency(CURRENCY_TYPE_JUSTICE_POINTS, 7000);
-            }
+            for (Map::PlayerList::const_iterator i = PlList.begin(); i != PlList.end(); ++i)
+                if (Player* player = i->getSource())
+                    player->ModifyCurrency(395, DUNGEON_MODE(3000, 7000));
         }
 
         void UpdateAI(const uint32 diff)

@@ -142,15 +142,6 @@ public:
 
             // start achievement timer (kill Eregos within 20 min)
             instance->DoStartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_TIMED_START_EVENT);
-            Map* map = me->GetMap();
-
-            if(IsHeroic())
-            {
-                Map::PlayerList const& PlayerList = map->GetPlayers();
-                for (Map::PlayerList::const_iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr)
-                    if (Player* player = itr->getSource())
-                        player->ModifyCurrency(CURRENCY_TYPE_JUSTICE_POINTS, 1600);
-            }
         }
 
         void KilledUnit(Unit* /*victim*/)

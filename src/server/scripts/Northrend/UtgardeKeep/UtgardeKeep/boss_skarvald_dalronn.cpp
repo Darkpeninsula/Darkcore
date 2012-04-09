@@ -146,15 +146,6 @@ public:
                     }
                 }
             }
-            Map* map = me->GetMap();
-
-            if(IsHeroic())
-            {
-                Map::PlayerList const& PlayerList = map->GetPlayers();
-                for (Map::PlayerList::const_iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr)
-                    if (Player* player = itr->getSource())
-                        player->ModifyCurrency(CURRENCY_TYPE_JUSTICE_POINTS, 1600);
-            }
         }
 
         void KilledUnit(Unit* /*victim*/)
@@ -280,18 +271,7 @@ public:
                 AggroYell_Timer = 5000;
 
                 if (instance)
-                {
                     instance->SetData(DATA_SKARVALD_DALRONN_EVENT, IN_PROGRESS);
-                    Map* map = me->GetMap();
-
-                    if(IsHeroic())
-                    {
-                        Map::PlayerList const& PlayerList = map->GetPlayers();
-                        for (Map::PlayerList::const_iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr)
-                            if (Player* player = itr->getSource())
-                                player->ModifyCurrency(CURRENCY_TYPE_JUSTICE_POINTS, 1600);
-                    }
-                }
             }
         }
 

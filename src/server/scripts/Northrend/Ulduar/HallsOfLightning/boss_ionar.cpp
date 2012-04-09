@@ -137,18 +137,7 @@ public:
             lSparkList.DespawnAll();
 
             if (instance)
-            {
                 instance->SetData(TYPE_IONAR, DONE);
-                Map* map = me->GetMap();
-
-                if(IsHeroic())
-                {
-                    Map::PlayerList const& PlayerList = map->GetPlayers();
-                    for (Map::PlayerList::const_iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr)
-                        if (Player* player = itr->getSource())
-                            player->ModifyCurrency(CURRENCY_TYPE_JUSTICE_POINTS, 1600);
-                }
-            }
         }
 
         void KilledUnit(Unit* /*victim*/)

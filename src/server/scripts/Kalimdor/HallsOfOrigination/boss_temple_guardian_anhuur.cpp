@@ -188,16 +188,6 @@ class boss_temple_guardian_anhuur : public CreatureScript
                 GameObject* Bridge = me->FindNearestGameObject(GO_ANHUUR_BRIDGE, 200);
                 if (Bridge)
                     Bridge->SetGoState(GO_STATE_ACTIVE);
-
-                Map* map = me->GetMap();
-
-                if(IsHeroic())
-                {
-                    Map::PlayerList const& PlayerList = map->GetPlayers();
-                    for (Map::PlayerList::const_iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr)
-                        if (Player* player = itr->getSource())
-                            player->ModifyCurrency(CURRENCY_TYPE_JUSTICE_POINTS, 7000);
-                }
             }
 
             void SummonedCreatureDespawn(Creature* summon)
