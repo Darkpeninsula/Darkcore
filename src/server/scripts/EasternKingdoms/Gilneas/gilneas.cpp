@@ -601,7 +601,7 @@ public:
             if (tQuestCredit <= ((float)diff/8))
             {
                 opened = 0;
-                aPlayer->KilledMonsterCredit(35830, 0);
+                //aPlayer->KilledMonsterCredit(35830, 0);
                 if (spawnKind == 3)
                 {
                     if (Creature* spawnedCreature = go->SummonCreature(NPC_RAMPAGING_WORGEN_2, wx, wy, z, angle, TEMPSUMMON_TIMED_DESPAWN, SUMMON1_TTL))
