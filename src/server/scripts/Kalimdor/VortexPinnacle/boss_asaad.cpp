@@ -60,15 +60,6 @@ public:
         void JustDied(Unit* /*Killer*/)
         {
             instance->SetData(DATA_ASAAD, DONE);
-
-            Map::PlayerList const &PlList = me->GetMap()->GetPlayers();
-
-            if (PlList.isEmpty())
-                return;
-
-            for (Map::PlayerList::const_iterator i = PlList.begin(); i != PlList.end(); ++i)
-                if (Player* player = i->getSource())
-                    player->ModifyCurrency(395, DUNGEON_MODE(3000, 7000));
         }
 
         void UpdateAI(const uint32 diff)
