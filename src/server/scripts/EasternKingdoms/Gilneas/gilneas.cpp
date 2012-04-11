@@ -554,8 +554,8 @@ public:
 
     bool OnGossipHello(Player* player, GameObject* go)
     {
-        if(!player)
-            return;
+        if (!player)
+            return false;
 
         if (player->GetQuestStatus(QUEST_EVAC_MERC_SQUA) == QUEST_STATUS_INCOMPLETE && go->GetGoState() == GO_STATE_READY)
         {
