@@ -91,6 +91,11 @@ double rand_norm(void)
     return mtRand->randExc();
 }
 
+float rand_norm_f(void)
+{
+    return (float)mtRand->randExc();
+}
+
 double rand_chance(void)
 {
     return mtRand->randExc(100.0);

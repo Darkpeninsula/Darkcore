@@ -1273,7 +1273,7 @@ bool WorldObject::IsWithinLOSInMap(const WorldObject* obj) const
 
     float ox, oy, oz;
     obj->GetPosition(ox, oy, oz);
-    return(IsWithinLOS(ox, oy, oz));
+    return (IsWithinLOS(ox, oy, oz) && GetMap()->IsInDynLOS(GetPositionX(), GetPositionY(), GetPositionZ(), ox, oy, oz));
 }
 
 bool WorldObject::IsWithinLOS(float ox, float oy, float oz) const
@@ -1307,7 +1307,7 @@ bool WorldObject::IsWithinLOS(float ox, float oy, float oz) const
     }
 
     VMAP::IVMapManager *vMapManager = VMAP::VMapFactory::createOrGetVMapManager();
-    return vMapManager->isInLineOfSight(GetMapId(), x, y, z, ox, oy, oz);
+    return (vMapManager->isInLineOfSight(GetMapId(), x, y, z, ox, oy, oz) && GetMap()->IsInDynLOS(GetPositionX(), GetPositionY(), GetPositionZ(), ox, oy, oz));
 }
 
 bool WorldObject::GetDistanceOrder(WorldObject const* obj1, WorldObject const* obj2, bool is3D /* = true */) const
@@ -2523,7 +2523,7 @@ void WorldObject::GetNearPoint2D(float &x, float &y, float distance2d, float abs
 void WorldObject::GetNearPoint(WorldObject const* /*searcher*/, float &x, float &y, float &z, float searcher_size, float distance2d, float absAngle) const
 {
     GetNearPoint2D(x, y, distance2d+searcher_size, absAngle);
-    z = GetPositionZ();
+    const float init_z = z = GetPositionZ();
     UpdateAllowedPositionZ(x, y, z);
 
     /*
@@ -2539,8 +2539,10 @@ void WorldObject::GetNearPoint(WorldObject const* /*searcher*/, float &x, float 
     float first_y = y;
     bool first_los_conflict = false;                        // first point LOS problems
 
+    const float dist = distance2d + searcher_bounding_radius + GetObjectBoundingRadius();
+
     // prepare selector for work
-    ObjectPosSelector selector(GetPositionX(), GetPositionY(), GetObjectSize(), distance2d+searcher_size);
+    ObjectPosSelector selector(GetPositionX(), GetPositionY(), dist, searcher_bounding_radius);
 
     // adding used positions around object
     {
@@ -2564,7 +2566,7 @@ void WorldObject::GetNearPoint(WorldObject const* /*searcher*/, float &x, float 
     {
         UpdateGroundPositionZ(x, y, z);                       // update to LOS height if available
 
-        if (IsWithinLOS(x, y, z))
+        if (fabs(init_z - z) < dist && IsWithinLOS(x, y, z))
             return;
 
         first_los_conflict = true;                          // first point have LOS problems
@@ -2579,7 +2581,7 @@ void WorldObject::GetNearPoint(WorldObject const* /*searcher*/, float &x, float 
         z = GetPositionZ();
         UpdateGroundPositionZ(x, y, z);                       // update to LOS height if available
 
-        if (IsWithinLOS(x, y, z))
+        if (fabs(init_z - z) < dist && IsWithinLOS(x, y, z))
             return;
     }
 
@@ -2593,7 +2595,7 @@ void WorldObject::GetNearPoint(WorldObject const* /*searcher*/, float &x, float 
         z = GetPositionZ();
         UpdateGroundPositionZ(x, y, z);                       // update to LOS height if available
 
-        if (IsWithinLOS(x, y, z))
+        if (fabs(init_z - z) < dist && IsWithinLOS(x, y, z))
             return;
     }
 
@@ -2675,8 +2677,17 @@ void WorldObject::MovePositionToFirstCollision(Position &pos, float dist, float 
         // move back a bit
         destx -= CONTACT_DISTANCE * cos(angle);
         desty -= CONTACT_DISTANCE * sin(angle);
-        dist = sqrt((pos.m_positionX - destx)*(pos.m_positionX - destx) + (pos.m_positionY - desty)*(pos.m_positionY - desty));
     }
+
+    while (!GetMap()->IsInDynLOS(pos.m_positionX, pos.m_positionY, pos.m_positionZ, destx, desty, destz))
+    {
+        destx -= 2.0f * cos(angle);
+        desty -= 2.0f * sin(angle);
+        col = true;
+    }
+
+    if (col)
+        dist = sqrt((pos.m_positionX - destx)*(pos.m_positionX - destx) + (pos.m_positionY - desty)*(pos.m_positionY - desty));
 
     float step = dist/10.0f;
 
