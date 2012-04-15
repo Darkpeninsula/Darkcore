@@ -110,11 +110,11 @@ void SystemMgr::LoadScriptTextsCustom()
         Field* fields = result->Fetch();
         StringTextData temp;
 
-        int32 iId              = fields[0].GetInt32();
+        int32 iId           = fields[0].GetInt32();
         temp.SoundId        = fields[1].GetUInt32();
-        temp.Type           = fields[2].GetUInt32();
-        temp.Language       = fields[3].GetUInt32();
-        temp.Emote          = fields[4].GetUInt32();
+        temp.Type           = fields[2].GetUInt8();
+        temp.Language       = fields[3].GetUInt8();
+        temp.Emote          = fields[4].GetUInt16();
 
         if (iId >= 0)
         {
