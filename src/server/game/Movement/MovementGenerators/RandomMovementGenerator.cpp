@@ -41,13 +41,8 @@ void RandomMovementGenerator<Creature>::SetRandomLocation(Creature &creature)
     float X, Y, Z, ori;
     creature.GetHomePosition(X, Y, Z, ori);
 
-    const float angle = rand_norm_f() * (M_PI_F*2.0f);
-    const float range = rand_norm_f() * dist;
-
-    // For 2D/3D system selection
-    float destX = X + range * cos(angle);
-    float destY = Y + range * sin(angle);
-    float destZ = creature.GetPositionZ();
+    const float angle = (float)rand_norm() * static_cast<float>(M_PI*2);
+    const float range = (float)rand_norm() * dist;
     creature.UpdateAllowedPositionZ(X, Y, Z);
 
     Movement::MoveSplineInit init(creature);
@@ -64,7 +59,7 @@ void RandomMovementGenerator<Creature>::SetRandomLocation(Creature &creature)
 
     //Call for creature group update
     if (creature.GetFormation() && creature.GetFormation()->getLeader() == &creature)
-        creature.GetFormation()->LeaderMoveTo(destX, destY, destZ);
+        creature.GetFormation()->LeaderMoveTo(X, Y, Z);
 }
 
 template<>

@@ -40,7 +40,7 @@ void ConfusedMovementGenerator<T>::Initialize(T &unit)
 
     unit.StopMoving();
     unit.SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_CONFUSED);
-    unit.AddUnitState(UNIT_STAT_CONFUSED|UNIT_STAT_CONFUSED_MOVE);
+    unit.AddUnitState(UNIT_STATE_CONFUSED|UNIT_STATE_CONFUSED_MOVE);
 }
 
 template<class T>
@@ -72,10 +72,10 @@ bool ConfusedMovementGenerator<T>::Update(T &unit, const uint32 &diff)
         if (i_nextMoveTime.Passed() )
         {
             // start moving
-            unit.AddUnitState(UNIT_STAT_CONFUSED_MOVE);
+            unit.AddUnitState(UNIT_STATE_CONFUSED_MOVE);
 
-            float x = i_x + 10.0f*(rand_norm_f() - 0.5f);
-            float y = i_y + 10.0f*(rand_norm_f() - 0.5f);
+            float x = i_x + 10.0f*((float)rand_norm() - 0.5f);
+            float y = i_y + 10.0f*((float)rand_norm() - 0.5f);
             float z = i_z;
 
             unit.UpdateAllowedPositionZ(x, y, z);
@@ -99,11 +99,11 @@ bool ConfusedMovementGenerator<T>::Update(T &unit, const uint32 &diff)
     return true;
 }
 
-template<>
+template<class T>
 void ConfusedMovementGenerator<T>::Finalize(T &unit)
 {
     unit.RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_CONFUSED);
-    unit.ClearUnitState(UNIT_STAT_CONFUSED|UNIT_STAT_CONFUSED_MOVE);
+    unit.ClearUnitState(UNIT_STATE_CONFUSED|UNIT_STATE_CONFUSED_MOVE);
     unit.StopMoving();
 }
 

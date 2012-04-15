@@ -66,6 +66,7 @@ bool FleeingMovementGenerator<T>::_getPoint(T &owner, float &x, float &y, float 
     if (!&owner)
         return false;
 
+	float dist_from_caster, angle_to_caster;
     if (Unit* fright = ObjectAccessor::GetUnit(owner, i_frightGUID))
     {
         dist_from_caster = fright->GetDistance(&owner);
@@ -134,15 +135,8 @@ void FleeingMovementGenerator<Player>::Finalize(Player &owner)
         return;
 
     owner.RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_FLEEING);
-    owner.ClearUnitState(UNIT_STAT_FLEEING|UNIT_STAT_FLEEING_MOVE);
-    owner.StopMoving();
-}
-
-template<>
-void FleeingMovementGenerator<Player>::Finalize(Player &owner)
-{
-    owner.RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_FLEEING);
     owner.ClearUnitState(UNIT_STATE_FLEEING|UNIT_STATE_FLEEING_MOVE);
+    owner.StopMoving();
 }
 
 template<>

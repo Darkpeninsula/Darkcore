@@ -77,7 +77,6 @@ inline uint32 secsToTimeBitFields(time_t secs)
  * With an FPU, there is usually no difference in performance between float and double. */
  double rand_norm(void);
 
- float rand_norm_f(void);
 /* Return a random double from 0.0 to 99.9999999999999. Floats support only 7 valid decimal digits.
  * A double supports up to 15 valid decimal digits and is used internaly (RAND32_MAX has 10 digits).
  * With an FPU, there is usually no difference in performance between float and double. */

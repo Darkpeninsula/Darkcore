@@ -41,7 +41,6 @@ BattlegroundDS::BattlegroundDS()
     _StartMessageIds[BG_STARTING_EVENT_FOURTH]    = LANG_ARENA_HAS_BEGUN;
 
     m_knockback = 5000;
-    m_knockbackCheck = true;
 }
 
 BattlegroundDS::~BattlegroundDS() {}
@@ -55,12 +54,12 @@ void BattlegroundDS::PostUpdateImpl(uint32 diff)
                 Player* player = ObjectAccessor::FindPlayer(itr->first);
                 if (player && player->isAlive() && player->GetPositionX() < 1260 && player->GetPositionY() >755 && player->GetPositionY() < 775 && player->GetPositionZ() > 13)
                 {
-                    KnockBackPlayer(player, 6.15f, 50.00f, 5.00f);
+                    player->KnockBackWithAngle(6.15f, 50.00f, 5.00f);
                     player->RemoveAurasDueToSpell(48018);
                 }
                 if (player && player->isAlive() && player->GetPositionX() > 1330 && player->GetPositionY() >805 && player->GetPositionY() < 825 && player->GetPositionZ() > 13)
                 {
-                    KnockBackPlayer(player, 3.10f, 50.00f, 5.00f);
+                    player->KnockBackWithAngle(3.10f, 50.00f, 5.00f);
                     player->RemoveAurasDueToSpell(48018);
                 }
             }
@@ -168,7 +167,6 @@ void BattlegroundDS::StartingEventOpenDoors()
     m_dynamicLOSid = GetBgMap()->AddDynLOSObject(1291.56f, 790.837f, BG_DS_WATERFALL_RADIUS);
 
     m_knockback = 5000;
-    m_knockbackCheck = true;
 }
 
 void BattlegroundDS::AddPlayer(Player* player)
@@ -242,7 +240,6 @@ void BattlegroundDS::Reset()
     //call parent's class reset
     Battleground::Reset();
     m_knockback = 5000;
-    m_knockbackCheck = true;
 }
 
 bool BattlegroundDS::SetupBattleground()
@@ -261,21 +258,4 @@ bool BattlegroundDS::SetupBattleground()
         return false;
     }
     return true;
-}
-
-void BattlegroundDS::KnockBackPlayer(Unit *player, float angle, float horizontalSpeed, float verticalSpeed)
-{
-    if (player->GetTypeId() == TYPEID_PLAYER)
-    {
-        WorldPacket data(SMSG_MOVE_KNOCK_BACK, 8+4+4+4+4+2);   // this needs checked for cataclysm!
-        data.append(player->GetPackGUID());
-        data << uint32(0);
-        data << float(cos(angle));
-        data << float(sin(angle));
-        data << float(horizontalSpeed);
-        data << float(-verticalSpeed);
-        ((Player*)player)->GetSession()->SendPacket(&data);
-    }
-    else
-        sLog->outError("The target of KnockBackPlayer must be a player !");
 }

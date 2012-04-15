@@ -78,15 +78,15 @@ void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T &owner)
     */
     
     //We don't update Mob Movement, if the difference between New destination and last destination is < BothObjectSize
-    float  bothObjectSize = i_target->GetObjectBoundingRadius() + owner.GetObjectBoundingRadius() + CONTACT_DISTANCE;
-    if( i_destinationHolder.HasDestination() && i_destinationHolder.GetDestinationDiff(x,y,z) < bothObjectSize )
-        return;
+    //float  bothObjectSize = i_target->GetObjectSize() + owner.GetObjectSize() + CONTACT_DISTANCE;
+    //if( i_destinationHolder.HasDestination() && i_destinationHolder.GetDestinationDiff(x,y,z) < bothObjectSize )
+    //    return;
 
     if (!i_path)
         i_path = new PathFinderMovementGenerator(&owner);
 
     // allow pets following their master to cheat while generating paths
-    bool forceDest = (owner.GetTypeId() == TYPEID_UNIT && ((Creature*)&owner)->isPet() && owner.HasUnitState(UNIT_STAT_FOLLOW));
+    bool forceDest = (owner.GetTypeId() == TYPEID_UNIT && ((Creature*)&owner)->isPet() && owner.HasUnitState(UNIT_STATE_FOLLOW));
     i_path->calculate(x, y, z, forceDest);
     if (i_path->getPathType() & PATHFIND_NOPATH)
         return;

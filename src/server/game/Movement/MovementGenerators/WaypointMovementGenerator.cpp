@@ -197,7 +197,6 @@ uint32 FlightPathMovementGenerator::GetPathAtMapEnd() const
 void FlightPathMovementGenerator::Initialize(Player &player)
 {
     Reset(player);
-    InitEndGridInfo();
 }
 
 void FlightPathMovementGenerator::Finalize(Player& player)
@@ -248,15 +247,12 @@ bool FlightPathMovementGenerator::Update(Player &player, const uint32& diff)
         bool departureEvent = true;
         do
         {
-            DoEventIfAny(player, (*i_path)[i_currentNode], departureEvent);
+            DoEventIfAny(player,(*i_path)[i_currentNode],departureEvent);
             if (pointId == i_currentNode)
                 break;
-            if (i_currentNode == _preloadTargetNode)
-                PreloadEndGrid();
             i_currentNode += (uint32)departureEvent;
             departureEvent = !departureEvent;
-        }
-        while (true);
+        } while(true);
     }
 
     return i_currentNode < (i_path->size()-1);
@@ -294,28 +290,3 @@ bool FlightPathMovementGenerator::GetResetPosition(Player&, float& x, float& y, 
     return true;
 }
 
-void FlightPathMovementGenerator::InitEndGridInfo()
-{
-    /*! Storage to preload flightmaster grid at end of flight. For multi-stop flights, this will
-       be reinitialized for each flightmaster at the end of each spline (or stop) in the flight. */
-    uint32 nodeCount = (*i_path).size();        //! Number of nodes in path.
-    _endMapId = (*i_path)[nodeCount - 1].mapid; //! MapId of last node
-    _preloadTargetNode = nodeCount - 3;
-    _endGridX = (*i_path)[nodeCount - 1].x;
-    _endGridY = (*i_path)[nodeCount - 1].y;
-}
-
-void FlightPathMovementGenerator::PreloadEndGrid()
-{
-    // used to preload the final grid where the flightmaster is
-    Map* endMap = sMapMgr->FindBaseNonInstanceMap(_endMapId);
-
-    // Load the grid
-    if (endMap)
-    {
-        sLog->outDetail("Preloading rid (%f, %f) for map %u at node index %u/%u", _endGridX, _endGridY, _endMapId, _preloadTargetNode, (uint32)(i_path->size()-1));
-        endMap->LoadGrid(_endGridX, _endGridY);
-    }
-    else
-        sLog->outDetail("Unable to determine map to preload flightmaster grid");
-}
