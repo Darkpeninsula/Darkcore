@@ -135,15 +135,6 @@ public PathMovementBase<Player, TaxiPathNodeList const*>
         void DoEventIfAny(Player& player, TaxiPathNodeEntry const& node, bool departure);
 
         bool GetResetPosition(Player&, float& x, float& y, float& z);
-
-        void InitEndGridInfo();
-        void PreloadEndGrid();
-
-    private:
-        float _endGridX;                //! X coord of last node location
-        float _endGridY;                //! Y coord of last node location
-        uint32 _endMapId;               //! map Id of last node location
-        uint32 _preloadTargetNode;      //! node index where preloading starts
 };
 #endif
 

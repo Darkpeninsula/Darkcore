@@ -25,6 +25,7 @@
 #include "FollowerReference.h"
 #include "Timer.h"
 #include "Unit.h"
+#include "PathFinderMovementGenerator.h"
 
 class TargetedMovementGeneratorBase
 {
@@ -43,14 +44,19 @@ class TargetedMovementGeneratorMedium
         TargetedMovementGeneratorMedium(Unit &target, float offset, float angle) :
             TargetedMovementGeneratorBase(target), i_recheckDistance(0),
             i_offset(offset), i_angle(angle),
-            i_recalculateTravel(false), i_targetReached(false)
+            i_recalculateTravel(false), i_targetReached(false), i_path(NULL)
         {
         }
-        ~TargetedMovementGeneratorMedium() {}
+        ~TargetedMovementGeneratorMedium() { delete i_path; }
 
     public:
         bool Update(T &, const uint32 &);
         Unit* GetTarget() const { return i_target.getTarget(); }
+
+        bool IsReachable() const
+        {
+            return (i_path) ? (i_path->getPathType() & PATHFIND_NORMAL) : true;
+        }
 
         void unitSpeedChanged() { i_recalculateTravel=true; }
         void UpdateFinalDistance(float fDistance);
@@ -63,6 +69,7 @@ class TargetedMovementGeneratorMedium
         float i_angle;
         bool i_recalculateTravel : 1;
         bool i_targetReached : 1;
+        PathFinderMovementGenerator* i_path;
 };
 
 template<class T>

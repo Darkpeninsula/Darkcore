@@ -41,18 +41,26 @@ void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T &owner)
 
     float x, y, z;
 
-    if (!i_offset)
+    if (i_offset && i_target->IsWithinDistInMap(&owner,2*i_offset))
+    {
+        if (!owner.movespline->Finalized())
+            return;
+
+        owner.GetPosition(x, y, z);
+    }
+    else if (!i_offset)
     {
         if (i_target->IsWithinMeleeRange(&owner))
             return;
 
-        // to nearest random contact position
-        i_target->GetRandomContactPoint(&owner, x, y, z, 0, MELEE_RANGE - 0.5f);
+         // to nearest random contact position
+         i_target->GetRandomContactPoint(&owner, x, y, z, 0, MELEE_RANGE - 0.5f);
     }
     else
     {
         if (i_target->IsWithinDistInMap(&owner, i_offset + 1.0f))
             return;
+        
         // to at i_offset distance from target and i_angle from target facing
         i_target->GetClosePoint(x, y, z, owner.GetObjectSize(), i_offset, i_angle);
     }
@@ -67,19 +75,33 @@ void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T &owner)
         we will calculate a new contact point each update loop, but will never move to it.
         The system will freeze.
         ralf
-
-        //We don't update Mob Movement, if the difference between New destination and last destination is < BothObjectSize
-        float  bothObjectSize = i_target->GetObjectBoundingRadius() + owner.GetObjectBoundingRadius() + CONTACT_DISTANCE;
-        if ( i_destinationHolder.HasDestination() && i_destinationHolder.GetDestinationDiff(x, y, z) < bothObjectSize )
-            return;
     */
+    
+    //We don't update Mob Movement, if the difference between New destination and last destination is < BothObjectSize
+    float  bothObjectSize = i_target->GetObjectBoundingRadius() + owner.GetObjectBoundingRadius() + CONTACT_DISTANCE;
+    if( i_destinationHolder.HasDestination() && i_destinationHolder.GetDestinationDiff(x,y,z) < bothObjectSize )
+        return;
+
+    if (!i_path)
+        i_path = new PathFinderMovementGenerator(&owner);
+
+    // allow pets following their master to cheat while generating paths
+    bool forceDest = (owner.GetTypeId() == TYPEID_UNIT && ((Creature*)&owner)->isPet() && owner.HasUnitState(UNIT_STAT_FOLLOW));
+    i_path->calculate(x, y, z, forceDest);
+    if (i_path->getPathType() & PATHFIND_NOPATH)
+        return;
 
     D::_addUnitStateMove(owner);
     i_targetReached = false;
     i_recalculateTravel = false;
 
     Movement::MoveSplineInit init(owner);
-    init.MoveTo(x, y, z);
+
+    if (!i_target->IsInWater())
+        init.MovebyPath(i_path->getPath());
+    else 
+        init.MoveTo(i_target->GetPositionX(),i_target->GetPositionY(),i_target->GetPositionZ(),false,false);
+
     init.SetWalk(((D*)this)->EnableWalking());
     init.Launch();
 }

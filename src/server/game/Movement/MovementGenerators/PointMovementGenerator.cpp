@@ -122,11 +122,11 @@ void EffectMovementGenerator::Finalize(Unit &unit)
     if (((Creature&)unit).AI())
         ((Creature&)unit).AI()->MovementInform(EFFECT_MOTION_TYPE, m_Id);
     // Need restore previous movement since we have no proper states system
-    //if (unit.isAlive() && !unit.HasUnitState(UNIT_STATE_CONFUSED|UNIT_STATE_FLEEING))
-    //{
-    //    if (Unit * victim = unit.getVictim())
-    //        unit.GetMotionMaster()->MoveChase(victim);
-    //    else
-    //        unit.GetMotionMaster()->Initialize();
-    //}
+    if (unit.isAlive() && !unit.HasUnitState(UNIT_STATE_CONFUSED|UNIT_STATE_FLEEING))
+    {
+        if (Unit * victim = unit.getVictim())
+            unit.GetMotionMaster()->MoveChase(victim);
+        else
+            unit.GetMotionMaster()->Initialize();
+    }
 }

@@ -30,6 +30,7 @@ struct PathNode
     PathNode(float _x, float _y, float _z): x(_x), y(_y), z(_z) { }
     float x, y, z;
 };
+
 template<typename PathElem, typename PathNode = PathElem>
 
 class Path

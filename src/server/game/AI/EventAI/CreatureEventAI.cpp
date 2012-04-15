@@ -474,15 +474,15 @@ void CreatureEventAI::ProcessAction(CreatureEventAI_Action const& action, uint32
                         !CanCast(target, tSpell, (action.cast.castFlags & CAST_TRIGGERED)))
                     {
                         //Melee current victim if flag not set
-                        if (!(action.cast.castFlags & CAST_NO_MELEE_IF_OOM))
+                        switch(me->GetMotionMaster()->GetCurrentMovementGeneratorType())
                         {
-                            if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == CHASE_MOTION_TYPE)
-                            {
+                            case CHASE_MOTION_TYPE:
+                            case FOLLOW_MOTION_TYPE:
                                 m_AttackDistance = 0.0f;
                                 m_AttackAngle = 0.0f;
 
-                                me->GetMotionMaster()->MoveChase(me->getVictim(), m_AttackDistance, m_AttackAngle);
-                            }
+                                me->GetMotionMaster()->Clear(false);
+                                break;
                         }
                     }
                     else
