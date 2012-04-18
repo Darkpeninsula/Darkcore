@@ -7399,9 +7399,11 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                 case 51563:
                 case 51564:
                 {
-                    target = this;
-                    triggered_spell_id = 53390;
-                    break;
+                    int32 bp1 = dummySpell->Effects[EFFECT_0].CalcValue();
+                    int32 bp0 = -(bp1);
+                    
+                    CastCustomSpell(this, 53390, &bp0, &bp1, NULL, true, NULL, triggeredByAura);
+                    return true;
                 }
                 // Windfury Weapon (Passive) 1-5 Ranks
                 case 33757:
@@ -7688,7 +7690,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                 if (GetTypeId() != TYPEID_PLAYER  || !victim || !victim->isAlive() || !castItem || !castItem->IsEquipped())
                     return false;
 
-                float fire_onhit = float(CalculatePctF(dummySpell->Effects[EFFECT_0]. CalcValue(), 1.0f));
+                float fire_onhit = float(CalculatePctF(dummySpell->Effects[EFFECT_0].CalcValue(), 1.0f));
 
                 float add_spellpower = (float)(SpellBaseDamageBonus(SPELL_SCHOOL_MASK_FIRE)
                                      + SpellBaseDamageBonusForVictim(SPELL_SCHOOL_MASK_FIRE, victim));
