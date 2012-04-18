@@ -753,32 +753,23 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                         if (AuraEffect const* aurEff = unitTarget->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_ROGUE, 0x10000, 0, 0, m_caster->GetGUID()))
                         {
                             // count consumed deadly poison doses at target
-                            bool needConsume = true;
+                            int32 consumeChance = 100;
                             uint32 spellId = aurEff->GetId();
                             uint32 doses = aurEff->GetBase()->GetStackAmount();
+
                             if (doses > combo)
-                                doses = combo;
+                                combo = doses;
+
                             // Master Poisoner
-                            Unit::AuraEffectList const& auraList = m_caster->ToPlayer()->GetAuraEffectsByType(SPELL_AURA_MOD_AURA_DURATION_BY_DISPEL_NOT_STACK);
-                            for (Unit::AuraEffectList::const_iterator iter = auraList.begin(); iter != auraList.end(); ++iter)
-                            {
-                                if ((*iter)->GetSpellInfo()->SpellFamilyName == SPELLFAMILY_ROGUE && (*iter)->GetSpellInfo()->SpellIconID == 1960)
-                                {
-                                    uint32 chance = (*iter)->GetSpellInfo()->Effects[EFFECT_2].CalcValue(m_caster);
+                            if (AuraEffect* aurEff2 = caster->GetAuraEffect(SPELL_AURA_MOD_AURA_DURATION_BY_DISPEL_NOT_STACK, SPELLFAMILY_ROGUE, 1960, 0))
+                                consumeChance -= int32(aurEff2->GetAmount());
 
-                                    if (chance && roll_chance_i(chance))
-                                        needConsume = false;
+                            if (roll_chance_i(consumeChance))
+                                unitTarget->RemoveAurasDueToSpell(spellId);
 
-                                    break;
-                                }
-                            }
-
-                            if (needConsume)
-                                for (uint32 i = 0; i < doses; ++i)
-                                    unitTarget->RemoveAuraFromStack(spellId);
-                            damage *= doses;
-                            damage += int32(((Player*)m_caster)->GetTotalAttackPowerValue(BASE_ATTACK) * 0.09f * doses);
+                            damage += int32(m_caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.09f * 1 + (damage * combo));
                         }
+
                         // Eviscerate and Envenom Bonus Damage (item set effect)
                         if (m_caster->HasAura(37169))
                             damage += ((Player*)m_caster)->GetComboPoints()*40;
