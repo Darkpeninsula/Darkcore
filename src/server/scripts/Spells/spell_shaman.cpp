@@ -554,6 +554,7 @@ class spell_sha_healing_rain : public SpellScriptLoader
 
 void AddSC_shaman_spell_scripts()
 {
+    new spell_sha_earthquake();
     new spell_sha_astral_shift();
     new spell_sha_fire_nova();
     new spell_sha_earthbind_totem();
