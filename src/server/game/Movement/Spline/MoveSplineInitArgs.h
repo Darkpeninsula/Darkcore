@@ -17,12 +17,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #ifndef DARKCORE_MOVESPLINEINIT_ARGS_H
 #define DARKCORE_MOVESPLINEINIT_ARGS_H
 
 #include "MoveSplineFlag.h"
 #include <G3D/Vector3.h>
+
+using G3D::Vector3;
 
 namespace Movement
 {

@@ -31,7 +31,7 @@
 PathFinderMovementGenerator::PathFinderMovementGenerator(const Unit* owner) :
     m_polyLength(0), m_type(PATHFIND_BLANK),
     m_useStraightPath(false), m_forceDestination(false), m_pointPathLimit(MAX_POINT_PATH_LENGTH),
-    m_sourceUnit(owner), m_navMesh(NULL), m_navMeshQuery(NULL)
+    m_sourceUnit(owner), m_navMesh(NULL), m_navMeshLock(NULL), m_navMeshQuery(NULL)
 {
     sLog->outDebug(LOG_FILTER_MAPS, "++ PathFinderMovementGenerator::PathFinderMovementGenerator for %u \n", m_sourceUnit->GetGUIDLow());
 
@@ -40,6 +40,7 @@ PathFinderMovementGenerator::PathFinderMovementGenerator(const Unit* owner) :
     {
         MMAP::MMapManager* mmap = MMAP::MMapFactory::createOrGetMMapManager();
         m_navMesh = mmap->GetNavMesh(mapId);
+        m_navMeshLock = mmap->GetNavMeshLock(mapId);
         m_navMeshQuery = mmap->GetNavMeshQuery(mapId, m_sourceUnit->GetInstanceId());
     }
 
@@ -53,6 +54,10 @@ PathFinderMovementGenerator::~PathFinderMovementGenerator()
 
 bool PathFinderMovementGenerator::calculate(float destX, float destY, float destZ, bool forceDest)
 {
+    if (!Darkcore::IsValidMapCoord(destX, destY, destZ) ||
+        !Darkcore::IsValidMapCoord(m_sourceUnit->GetPositionX(), m_sourceUnit->GetPositionY(), m_sourceUnit->GetPositionZ()))
+        return false;
+
     Vector3 oldDest = getEndPosition();
     Vector3 dest(destX, destY, destZ);
     setEndPosition(dest);
@@ -93,7 +98,9 @@ bool PathFinderMovementGenerator::calculate(float destX, float destY, float dest
     else
     {
         // target moved, so we need to update the poly path
+        m_navMeshLock->acquire_read();
         BuildPolyPath(start, dest);
+        m_navMeshLock->release();
         return true;
     }
 }
@@ -349,7 +356,7 @@ void PathFinderMovementGenerator::BuildPolyPath(const Vector3 &startPos, const V
             sLog->outError("%u's Path Build failed: 0 length path", m_sourceUnit->GetGUIDLow());
         }
 
-        sLog->outDebug(LOG_FILTER_MAPS, "++  m_polyLength=%u prefixPolyLength=%u suffixPolyLength=%u \n",m_polyLength, prefixPolyLength, suffixPolyLength);
+        sLog->outDebug(LOG_FILTER_MAPS, "++  m_polyLength=%u prefixPolyLength=%u suffixPolyLength=%u \n", m_polyLength, prefixPolyLength, suffixPolyLength);
 
         // new path = prefix + suffix - overlap
         m_polyLength = prefixPolyLength + suffixPolyLength - 1;
@@ -545,11 +552,21 @@ NavTerrain PathFinderMovementGenerator::getNavTerrain(float x, float y, float z)
 
 bool PathFinderMovementGenerator::HaveTile(const Vector3 &p) const
 {
+    bool haveTiles;
     int tx, ty;
     float point[VERTEX_SIZE] = {p.y, p.z, p.x};
 
+    // check if the start and end point have a mmtile loaded
     m_navMesh->calcTileLoc(point, &tx, &ty);
-    return (m_navMesh->getTileAt(tx, ty) != NULL);
+    haveTiles = m_navMesh->getTileAt(tx, ty) != 0;
+
+    if (haveTiles)
+    {
+        m_navMesh->calcTileLoc(point, &tx, &ty);
+        haveTiles = m_navMesh->getTileAt(tx, ty) != 0;
+    }
+
+    return haveTiles;
 }
 
 uint32 PathFinderMovementGenerator::fixupCorridor(dtPolyRef* path, uint32 npath, uint32 maxPath,
@@ -739,7 +756,7 @@ dtStatus PathFinderMovementGenerator::findSmoothPath(const float* startPos, cons
                 // Move position at the other side of the off-mesh link.
                 dtVcopy(iterPos, endPos);
                 m_navMeshQuery->getPolyHeight(polys[0], iterPos, &iterPos[1]);
-                iterPos[1] += 0.2f;
+                iterPos[1] += 0.5f;
             }
         }
 

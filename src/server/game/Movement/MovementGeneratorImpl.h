@@ -17,7 +17,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #ifndef DARKCORE_MOVEMENTGENERATOR_IMPL_H
 #define DARKCORE_MOVEMENTGENERATOR_IMPL_H
 

@@ -17,7 +17,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #include "MoveSplineInit.h"
 #include "MoveSpline.h"
 #include "MovementPacketBuilder.h"
@@ -52,7 +51,8 @@ namespace Movement
         return MOVE_RUN;
     }
 
-    void MoveSplineInit::Launch()
+    // void MoveSplineInit::Launch()
+    int32 MoveSplineInit::Launch()
     {
         MoveSpline& move_spline = *unit.movespline;
 
@@ -84,7 +84,7 @@ namespace Movement
             args.velocity = unit.GetSpeed(SelectSpeedType(moveFlags));
 
         if (!args.Validate())
-            return;
+            return 0;
 
         if (moveFlags & MOVEMENTFLAG_ROOT)
             moveFlags &= ~MOVEMENTFLAG_MASK_MOVING;
@@ -96,6 +96,8 @@ namespace Movement
         data.append(unit.GetPackGUID());
         PacketBuilder::WriteMonsterMove(move_spline, data);
         unit.SendMessageToSet(&data, true);
+
+        return move_spline.Duration();
     }
 
     MoveSplineInit::MoveSplineInit(Unit& m) : unit(m)

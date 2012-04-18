@@ -17,14 +17,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #ifndef DARKCORE_CONFUSEDGENERATOR_H
 #define DARKCORE_CONFUSEDGENERATOR_H
 
 #include "MovementGenerator.h"
 #include "Timer.h"
 
-#define MAX_CONF_WAYPOINTS 24
+// #define MAX_CONF_WAYPOINTS 24
 
 template<class T>
 class ConfusedMovementGenerator
@@ -40,7 +39,10 @@ class ConfusedMovementGenerator
 
         MovementGeneratorType GetMovementGeneratorType() { return CONFUSED_MOTION_TYPE; }
     private:
+    //    void _InitSpecific(T &, bool &, bool &);
         TimeTracker i_nextMoveTime;
+      //  float i_waypoints[MAX_CONF_WAYPOINTS+1][3];
+      //  uint32 i_nextMove;
         float i_x, i_y, i_z;
 };
 #endif

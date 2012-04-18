@@ -17,7 +17,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #ifndef DARKCORE_WAYPOINTMANAGER_H
 #define DARKCORE_WAYPOINTMANAGER_H
 

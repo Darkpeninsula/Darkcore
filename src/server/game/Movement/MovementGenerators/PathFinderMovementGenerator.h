@@ -20,6 +20,8 @@
 #ifndef _PATH_INFO_H
 #define _PATH_INFO_H
 
+#include <ace/RW_Mutex.h>
+
 #include "SharedDefines.h"
 #include "DetourNavMesh.h"
 #include "DetourNavMeshQuery.h"
@@ -92,6 +94,7 @@ class PathFinderMovementGenerator
 
         const Unit* const       m_sourceUnit;       // the unit that is moving
         const dtNavMesh*        m_navMesh;          // the nav mesh
+        ACE_RW_Mutex*           m_navMeshLock;
         const dtNavMeshQuery*   m_navMeshQuery;     // the nav mesh query used to find the path
 
         dtQueryFilter m_filter;                     // use single filter for all movements, update it when needed

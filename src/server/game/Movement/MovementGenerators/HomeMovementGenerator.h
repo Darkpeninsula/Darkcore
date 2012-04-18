@@ -17,7 +17,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #ifndef DARKCORE_HOMEMOVEMENTGENERATOR_H
 #define DARKCORE_HOMEMOVEMENTGENERATOR_H
 

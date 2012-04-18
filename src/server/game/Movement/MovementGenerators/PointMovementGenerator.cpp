@@ -17,7 +17,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #include "PointMovementGenerator.h"
 #include "Errors.h"
 #include "Creature.h"
@@ -36,7 +35,7 @@ void PointMovementGenerator<T>::Initialize(T &unit)
 
     unit.AddUnitState(UNIT_STATE_ROAMING|UNIT_STATE_ROAMING_MOVE);
     Movement::MoveSplineInit init(unit);
-    init.MoveTo(i_x, i_y, i_z);
+    init.MoveTo(i_x, i_y, i_z, m_generatePath);
     if (speed > 0.0f)
         init.SetVelocity(speed);
     init.Launch();
@@ -122,11 +121,11 @@ void EffectMovementGenerator::Finalize(Unit &unit)
     if (((Creature&)unit).AI())
         ((Creature&)unit).AI()->MovementInform(EFFECT_MOTION_TYPE, m_Id);
     // Need restore previous movement since we have no proper states system
-    if (unit.isAlive() && !unit.HasUnitState(UNIT_STATE_CONFUSED|UNIT_STATE_FLEEING))
-    {
-        if (Unit * victim = unit.getVictim())
-            unit.GetMotionMaster()->MoveChase(victim);
-        else
-            unit.GetMotionMaster()->Initialize();
-    }
+    //if (unit.isAlive() && !unit.HasUnitState(UNIT_STATE_CONFUSED|UNIT_STATE_FLEEING))
+    //{
+    //    if (Unit * victim = unit.getVictim())
+    //        unit.GetMotionMaster()->MoveChase(victim);
+    //    else
+    //        unit.GetMotionMaster()->Initialize();
+    //}
 }

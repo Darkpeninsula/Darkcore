@@ -19,7 +19,6 @@
 
 #include "MMapFactory.h"
 #include "World.h"
-#include "Config.h"
 #include <set>
 
 namespace MMAP

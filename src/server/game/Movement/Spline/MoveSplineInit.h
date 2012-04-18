@@ -17,10 +17,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #ifndef DARKCORE_MOVESPLINEINIT_H
 #define DARKCORE_MOVESPLINEINIT_H
 
+#include "MoveSplineInit.h"
 #include "MoveSplineInitArgs.h"
 #include "PathFinderMovementGenerator.h"
 
@@ -45,8 +45,9 @@ namespace Movement
         explicit MoveSplineInit(Unit& m);
 
         /*  Final pass of initialization that launches spline movement.
-         */
-        void Launch();
+        * @return duration - estimated travel time
+        */
+        int32 Launch();
 
         /* Adds movement by parabolic trajectory
          * @param amplitude  - the maximum height of parabola, value could be negative and positive
@@ -75,6 +76,9 @@ namespace Movement
 
         /* Initializes simple A to B mition, A is current unit's position, B is destination
          */
+        // void MoveTo(const Vector3& destination);
+        //void MoveTo(float x, float y, float z);
+
         void MoveTo(const Vector3& destination, bool generatePath = false, bool forceDestination = false);
         void MoveTo(float x, float y, float z, bool generatePath = false, bool forceDestination = false);
 
@@ -138,12 +142,16 @@ namespace Movement
 
     inline void MoveSplineInit::MoveTo(float x, float y, float z, bool generatePath, bool forceDestination)
     {
-        Vector3 v(x,y,z);
+        Vector3 v(x, y, z);
+        MoveTo(v);
         MoveTo(v, generatePath, forceDestination);
     }
 
     inline void MoveSplineInit::MoveTo(const Vector3& dest, bool generatePath, bool forceDestination)
     {
+       //  args.path_Idx_offset = 0;
+       //  args.path.resize(2);
+       //  args.path[1] = dest;
         if (generatePath)
         {
             PathFinderMovementGenerator path(&unit);
@@ -156,7 +164,7 @@ namespace Movement
             args.path.resize(2);
             args.path[1] = dest;
         }
-    }
+     }
 
     inline void MoveSplineInit::SetParabolic(float amplitude, float time_shift)
     {

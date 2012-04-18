@@ -17,7 +17,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #include "MovementPacketBuilder.h"
 #include "MoveSpline.h"
 #include "WorldPacket.h"

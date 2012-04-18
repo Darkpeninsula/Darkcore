@@ -17,17 +17,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #ifndef _WORLDMODEL_H
 #define _WORLDMODEL_H
+
+#include "BoundingIntervalHierarchy.h"
+#include "Define.h"
 
 #include <G3D/HashTrait.h>
 #include <G3D/Vector3.h>
 #include <G3D/AABox.h>
 #include <G3D/Ray.h>
-#include "BoundingIntervalHierarchy.h"
-
-#include "Define.h"
 
 namespace VMAP
 {
@@ -96,12 +95,13 @@ namespace VMAP
             uint32 GetWmoID() const { return iGroupWMOID; }
         protected:
             G3D::AABox iBound;
-            uint32 iMogpFlags;// 0x8 outdor; 0x2000 indoor
+            uint32 iMogpFlags;// 0x8 outdoor; 0x2000 indoor
             uint32 iGroupWMOID;
             std::vector<Vector3> vertices;
             std::vector<MeshTriangle> triangles;
             BIH meshTree;
             WmoLiquid* iLiquid;
+
         public:
             void getMeshData(std::vector<Vector3> &vertices, std::vector<MeshTriangle> &triangles, WmoLiquid* &liquid);
     };
@@ -123,6 +123,7 @@ namespace VMAP
             uint32 RootWMOID;
             std::vector<GroupModel> groupModels;
             BIH groupTree;
+
         public:
             void getGroupModels(std::vector<GroupModel> &groupModels);
     };

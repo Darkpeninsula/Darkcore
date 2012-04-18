@@ -17,7 +17,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 //Basic headers
 #include "WaypointMovementGenerator.h"
 //Extended headers
@@ -114,7 +113,7 @@ bool WaypointMovementGenerator<Creature>::StartMove(Creature &creature)
     creature.AddUnitState(UNIT_STATE_ROAMING_MOVE);
 
     Movement::MoveSplineInit init(creature);
-    init.MoveTo(node->x, node->y, node->z);
+    init.MoveTo(node->x, node->y, node->z, true);
 
     if (node->orientation != 100 && node->delay != 0)
         init.SetFacing(node->orientation);
@@ -247,12 +246,12 @@ bool FlightPathMovementGenerator::Update(Player &player, const uint32& diff)
         bool departureEvent = true;
         do
         {
-            DoEventIfAny(player,(*i_path)[i_currentNode],departureEvent);
+            DoEventIfAny(player, (*i_path)[i_currentNode], departureEvent);
             if (pointId == i_currentNode)
                 break;
             i_currentNode += (uint32)departureEvent;
             departureEvent = !departureEvent;
-        } while(true);
+        } while (true);
     }
 
     return i_currentNode < (i_path->size()-1);
@@ -289,4 +288,3 @@ bool FlightPathMovementGenerator::GetResetPosition(Player&, float& x, float& y, 
     x = node.x; y = node.y; z = node.z;
     return true;
 }
-

@@ -17,7 +17,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #include "MoveSplineFlag.h"
 
 #include <math.h>

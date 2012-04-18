@@ -17,7 +17,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 namespace Movement
 {
 template<typename length_type> void Spline<length_type>::evaluate_percent( float t, Vector3 & c ) const
