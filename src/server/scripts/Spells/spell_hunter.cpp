@@ -598,12 +598,12 @@ public:
 
         void HandleDummy(SpellEffIndex /*effIndex*/)
         {
-            if (Unit* caster = GetUnitOwner())
+            if (Unit* caster = GetCaster())
             {
                 if (Unit* pet = caster->GetGuardianPet())
                 {
                     int32 basepoints0 = int32((849 + (caster->GetTotalAttackPowerValue(RANGED_ATTACK) * 0.516))*1);
-                    pet->CastCustomSpell(pet->getVictim(), HUNTER_SPELL_KILL_COMMAND_TRIGGER, &basepoint0, NULL, NULL, true);
+                    pet->CastCustomSpell(pet->getVictim(), HUNTER_SPELL_KILL_COMMAND_TRIGGER, &basepoints0, NULL, NULL, true);
                 }
             }
         }

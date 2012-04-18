@@ -159,7 +159,7 @@ class spell_dk_anti_magic_shell_self : public SpellScriptLoader
 
             void CalculateAmount(AuraEffect const* /*aurEff*/, int32 & amount, bool & /*canBeRecalculated*/)
             {
-                amount = std::min(CalculatePctN(dmgInfo.GetDamage(), absorbPct), GetTarget()->CountPctFromMaxHealth(hpPct));
+                amount = GetCaster()->CountPctFromMaxHealth(absorbPct);
             }
 
             void Absorb(AuraEffect* /*aurEff*/, DamageInfo & dmgInfo, uint32 & absorbAmount)

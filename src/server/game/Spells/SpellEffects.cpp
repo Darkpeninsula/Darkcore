@@ -761,7 +761,7 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                                 combo = doses;
 
                             // Master Poisoner
-                            if (AuraEffect* aurEff2 = caster->GetAuraEffect(SPELL_AURA_MOD_AURA_DURATION_BY_DISPEL_NOT_STACK, SPELLFAMILY_ROGUE, 1960, 0))
+                            if (AuraEffect* aurEff2 = m_caster->GetAuraEffect(SPELL_AURA_MOD_AURA_DURATION_BY_DISPEL_NOT_STACK, SPELLFAMILY_ROGUE, 1960, 0))
                                 consumeChance -= int32(aurEff2->GetAmount());
 
                             if (roll_chance_i(consumeChance))

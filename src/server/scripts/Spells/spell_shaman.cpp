@@ -63,25 +63,25 @@ class spell_sha_earthquake : public SpellScriptLoader
         {
             PrepareSpellScript(spell_sha_earthquake_SpellScript);
 
-            uint32 chance;
+            int32 chance;
 
-			bool Validate(SpellEntry const* /*spellInfo*/)
+            bool Validate(SpellInfo const* /*spellEntry*/)
             {
                 if (!sSpellStore.LookupEntry(SHAMAN_SPELL_EARTHQUAKE_KNOCKDOWN))
                     return false;
                 return true;
             }
-            
+
             bool Load()
             {
                 chance = GetSpellInfo()->Effects[EFFECT_1].CalcValue(GetCaster());
                 return true;
             }
 
-            void HandleScriptEffect()
+            void HandleScriptEffect(SpellEffIndex /*effIndex*/)
             {
-				if (roll_chance_i(chance))
-				    GetCaster()->CastSpell(GetHitUnit(), SHAMAN_SPELL_EARTHQUAKE_KNOCKDOWN, true);
+                if (roll_chance_i(chance))
+                    GetCaster()->CastSpell(GetHitUnit(), SHAMAN_SPELL_EARTHQUAKE_KNOCKDOWN, true);
             }
 
             void Register()
@@ -89,7 +89,7 @@ class spell_sha_earthquake : public SpellScriptLoader
                 OnEffectHitTarget += SpellEffectFn(spell_sha_earthquake_SpellScript::HandleScriptEffect, EFFECT_1, SPELL_EFFECT_SCRIPT_EFFECT);
             }
         };
-        
+
         SpellScript* GetSpellScript() const
         {
             return new spell_sha_earthquake_SpellScript();
