@@ -785,10 +785,7 @@ namespace Pathfinding
             printf("%s Building Recast Heightfield...          \r", tileString);
             iv.heightfield = rcAllocHeightfield();
             if (!iv.heightfield || !rcCreateHeightfield(&context, *iv.heightfield, config.width, config.height, config.bmin, config.bmax, config.cs, config.ch))
-            {
-                printf("%s Failed building heightfield!            \n", tileString);
                 continue;
-            }
 
             printf("%s Rasterizing triangles...                   \r", tileString);
 
@@ -812,10 +809,7 @@ namespace Pathfinding
             printf("%s Compacting heightfield...               \r", tileString);
             iv.compactHeightfield = rcAllocCompactHeightfield();
             if (!iv.compactHeightfield || !rcBuildCompactHeightfield(&context, config.walkableHeight, config.walkableClimb, *iv.heightfield, *iv.compactHeightfield))
-            {
-                printf("%s Failed compacting heightfield!            \n", tileString);
                 continue;
-            }
 
             if (!m_debugOutput)
             {
@@ -826,57 +820,36 @@ namespace Pathfinding
             // build polymesh intermediates
             printf("%s Eroding walkable area width...          \r", tileString);
             if (!rcErodeWalkableArea(&context, config.walkableRadius, *iv.compactHeightfield))
-            {
-                printf("%s Failed eroding area!                    \n", tileString);
                 continue;
-            }
 
             printf("%s Smoothing area boundaries...          \r", tileString);
             if (!rcMedianFilterWalkableArea(&context, *iv.compactHeightfield))
-            {
-                printf("%s Failed median filter!                    \n", tileString);
                 continue;
-            }
 
             printf("%s Building distance field...              \r", tileString);
             if (!rcBuildDistanceField(&context, *iv.compactHeightfield))
-            {
-                printf("%s Failed building distance field!         \n", tileString);
                 continue;
-            }
 
             // bottleneck is here
             printf("%s Building regions...                     \r", tileString);
             if (!rcBuildRegions(&context, *iv.compactHeightfield, config.borderSize, config.minRegionArea, config.mergeRegionArea))
-            {
-                printf("%s Failed building regions!                \n", tileString);
                 continue;
-            }
 
             printf("%s Building contours...                    \r", tileString);
             iv.contours = rcAllocContourSet();
             if (!iv.contours || !rcBuildContours(&context, *iv.compactHeightfield, config.maxSimplificationError, config.maxEdgeLen, *iv.contours))
-            {
-                printf("%s Failed building contours!               \n", tileString);
                 continue;
-            }
 
             // build polymesh
             printf("%s Building polymesh...                    \r", tileString);
             iv.polyMesh = rcAllocPolyMesh();
             if (!iv.polyMesh || !rcBuildPolyMesh(&context, *iv.contours, config.maxVertsPerPoly, *iv.polyMesh))
-            {
-                printf("%s Failed building polymesh!               \n", tileString);
                 continue;
-            }
 
             printf("%s Building polymesh detail...             \r", tileString);
             iv.polyMeshDetail = rcAllocPolyMeshDetail();
             if (!iv.polyMeshDetail || !rcBuildPolyMeshDetail(&context, *iv.polyMesh, *iv.compactHeightfield, config.detailSampleDist, config.detailSampleMaxError, *iv.polyMeshDetail))
-            {
-                printf("%s Failed building polymesh detail!        \n", tileString);
                 continue;
-            }
 
             if (!m_debugOutput)
             {
@@ -897,10 +870,7 @@ namespace Pathfinding
 
             // polymesh vertex indices are stored with ushorts in detour, can't have more than 65535
             if (iv.polyMesh->nverts >= 0xffff)
-            {
-                printf("%s Too many vertices!                      \n", tileString);
                 continue;
-            }
 
             printf("%s Setting polys as walkable...            \r", tileString);
             for (int i = 0; i < iv.polyMesh->npolys; ++i)
@@ -939,37 +909,19 @@ namespace Pathfinding
             // these values are checked within dtCreateNavMeshData - handle them here
             // so we have a clear error message
             if (params.nvp > DT_VERTS_PER_POLYGON)
-            {
-                printf("%s Invalid verts-per-polygon value!        \n", tileString);
                 continue;
-            }
             if (params.vertCount >= 0xffff)
-            {
-                printf("%s Too many vertices!                      \n", tileString);
                 continue;
-            }
             if (!params.vertCount || !params.verts)
-            {
-                printf("%s No vertices to build tile!              \n", tileString);
                 continue;
-            }
             if (!params.polyCount || !params.polys)
-            {
-                printf("%s No polygons to build tile!              \n", tileString);
                 continue;
-            }
             if (!params.detailMeshes || !params.detailVerts || !params.detailTris)
-            {
-                printf("%s No detail mesh to build tile!           \n", tileString);
                 continue;
-            }
 
             printf("%s Building navmesh tile...                \r", tileString);
             if (!dtCreateNavMeshData(&params, &navData, &navDataSize))
-            {
-                printf("%s Failed building navmesh tile!           \n", tileString);
                 continue;
-            }
 
             dtTileRef tileRef = 0;
             printf("%s Adding tile to navmesh...                \r", tileString);
@@ -977,10 +929,7 @@ namespace Pathfinding
             // is removed via removeTile()
             dtStatus dtResult = navMesh->addTile(navData, navDataSize, DT_TILE_FREE_DATA, 0, &tileRef);
             if (!tileRef || dtResult != DT_SUCCESS)
-            {
-                printf("% Failed adding tile to navmesh!           \n", tileString);
                 continue;
-            }
 
             // file output
             char fileName[255];
@@ -988,9 +937,6 @@ namespace Pathfinding
             FILE* file = fopen(fileName, "wb");
             if (!file)
             {
-                char message[1024];
-                sprintf(message, "Failed to open %s for writing!\n", fileName);
-                perror(message);
                 navMesh->removeTile(tileRef, NULL, NULL);
                 continue;
             }
