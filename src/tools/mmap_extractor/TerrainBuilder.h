@@ -22,9 +22,6 @@
 
 #include "PathCommon.h"
 #include "Map.h"
-#include "SharedDefines.h"
-
-#include "WorldModel.h"
 
 #include "G3D/Array.h"
 #include "G3D/Vector3.h"
@@ -32,7 +29,7 @@
 
 using namespace Darkcore;
 
-namespace MMAP
+namespace Pathfinding
 {
     enum Spot
     {
@@ -54,16 +51,11 @@ namespace MMAP
     static const int V8_SIZE = 128;
     static const int V8_SIZE_SQ = V8_SIZE*V8_SIZE;
     static const float GRID_SIZE = 533.33333f;
-    static const float GRID_PART_SIZE = GRID_SIZE/V8_SIZE;
+    static const float GRID_PART_SIZE = (float)GRID_SIZE/V8_SIZE;
 
-    // see contrib/extractor/system.cpp, CONF_use_minHeight
+    // see src/Tools/extractor/system.cpp, CONF_use_minHeight
     static const float INVALID_MAP_LIQ_HEIGHT = -500.f;
     static const float INVALID_MAP_LIQ_HEIGHT_MAX = 5000.0f;
-
-    // see following files:
-    // contrib/extractor/system.cpp
-    // src/game/Map.cpp
-    static char const* MAP_VERSION_MAGIC = "v1.2";
 
     struct MeshData
     {
@@ -73,41 +65,40 @@ namespace MMAP
         G3D::Array<float> liquidVerts;
         G3D::Array<int> liquidTris;
         G3D::Array<uint8> liquidType;
+    };
 
-        // offmesh connection data
-        G3D::Array<float> offMeshConnections;   // [p0y,p0z,p0x,p1y,p1z,p1x] - per connection
-        G3D::Array<float> offMeshConnectionRads;
-        G3D::Array<unsigned char> offMeshConnectionDirs;
-        G3D::Array<unsigned char> offMeshConnectionsAreas;
-        G3D::Array<unsigned short> offMeshConnectionsFlags;
+    // see also src/server/game/Movement/PathFinder.h
+    enum NavTerrain
+    {
+        NAV_GROUND  = 0x01,
+        NAV_MAGMA   = 0x02,
+        NAV_SLIME   = 0x04,
+        NAV_WATER   = 0x08,
+        NAV_UNUSED1 = 0x10,
+        NAV_UNUSED2 = 0x20,
+        NAV_UNUSED3 = 0x40,
+        NAV_UNUSED4 = 0x80
+        // we only have 8 bits
     };
 
     class TerrainBuilder
     {
         public:
-            TerrainBuilder(bool skipLiquid);
+            TerrainBuilder(bool skipLiquid, bool hiRes);
             ~TerrainBuilder();
 
             void loadMap(uint32 mapID, uint32 tileX, uint32 tileY, MeshData &meshData);
-            bool loadVMap(uint32 mapID, uint32 tileX, uint32 tileY, MeshData &meshData);
-            void loadOffMeshConnections(uint32 mapID, uint32 tileX, uint32 tileY, MeshData &meshData, const char* offMeshFilePath);
-
             bool usesLiquids() { return !m_skipLiquid; }
-
-            // vert and triangle methods
-            static void transform(vector<G3D::Vector3> &original, vector<G3D::Vector3> &transformed,
-                float scale, G3D::Matrix3 &rotation, G3D::Vector3 &position);
-            static void copyVertices(vector<G3D::Vector3> &source, G3D::Array<float> &dest);
-            static void copyIndices(vector<VMAP::MeshTriangle> &source, G3D::Array<int> &dest, int offest, bool flip);
-            static void copyIndices(G3D::Array<int> &src, G3D::Array<int> &dest, int offset);
-            static void cleanVertices(G3D::Array<float> &verts, G3D::Array<int> &tris);
         private:
+
             /// Loads a portion of a map's terrain
             bool loadMap(uint32 mapID, uint32 tileX, uint32 tileY, MeshData &meshData, Spot portion);
 
             /// Sets loop variables for selecting only certain parts of a map's terrain
             void getLoopVars(Spot portion, int &loopStart, int &loopEnd, int &loopInc);
 
+            /// Controls map tessellation
+            bool m_hiResHeightMaps;
             /// Controls whether liquids are loaded
             bool m_skipLiquid;
 
