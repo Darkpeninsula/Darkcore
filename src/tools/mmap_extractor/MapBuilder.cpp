@@ -941,7 +941,7 @@ namespace Pathfinding
                 continue;
             }
 
-            printf("%s Writing to file...                      \n", tileString);
+            printf("%s Writing to file...                      \r", tileString);
             // should write navDataSize first... for now, just use ftell to find length when reading
             MmapTileHeader header;
             header.usesLiquids = m_terrainBuilder->usesLiquids();
