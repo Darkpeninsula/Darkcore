@@ -87,7 +87,7 @@ public:
     }
 };
 
-// 50462 - Anti-Magic Shell (on raid member)
+// 50462 - Anti-Magic Zone
 class spell_dk_anti_magic_shell_raid : public SpellScriptLoader
 {
     public:
@@ -107,8 +107,7 @@ class spell_dk_anti_magic_shell_raid : public SpellScriptLoader
 
             void CalculateAmount(AuraEffect const* /*aurEff*/, int32 & amount, bool & /*canBeRecalculated*/)
             {
-                // TODO: this should absorb limited amount of damage, but no info on calculation formula
-                amount = -1;
+                amount += int32(10000 + 2 * GetCaster()->GetTotalAttackPowerValue(BASE_ATTACK));
             }
 
             void Absorb(AuraEffect* /*aurEff*/, DamageInfo & dmgInfo, uint32 & absorbAmount)
@@ -129,7 +128,7 @@ class spell_dk_anti_magic_shell_raid : public SpellScriptLoader
         }
 };
 
-// 48707 - Anti-Magic Shell (on self)
+// 48707 - Anti-Magic Shell
 class spell_dk_anti_magic_shell_self : public SpellScriptLoader
 {
     public:
@@ -160,8 +159,7 @@ class spell_dk_anti_magic_shell_self : public SpellScriptLoader
 
             void CalculateAmount(AuraEffect const* /*aurEff*/, int32 & amount, bool & /*canBeRecalculated*/)
             {
-                // Set absorbtion amount to unlimited
-                amount = -1;
+                amount = std::min(CalculatePctN(dmgInfo.GetDamage(), absorbPct), GetTarget()->CountPctFromMaxHealth(hpPct));
             }
 
             void Absorb(AuraEffect* /*aurEff*/, DamageInfo & dmgInfo, uint32 & absorbAmount)
