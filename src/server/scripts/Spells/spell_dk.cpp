@@ -87,68 +87,20 @@ public:
     }
 };
 
-// 50462 - Anti-Magic Zone
-class spell_dk_anti_magic_shell_raid : public SpellScriptLoader
+// 48707 - Anti-Magic Shell
+class spell_dk_anti_magic_shell : public SpellScriptLoader
 {
     public:
-        spell_dk_anti_magic_shell_raid() : SpellScriptLoader("spell_dk_anti_magic_shell_raid") { }
+        spell_dk_anti_magic_shell() : SpellScriptLoader("spell_dk_anti_magic_shell") { }
 
-        class spell_dk_anti_magic_shell_raid_AuraScript : public AuraScript
+        class spell_dk_anti_magic_shell_AuraScript : public AuraScript
         {
-            PrepareAuraScript(spell_dk_anti_magic_shell_raid_AuraScript);
+            PrepareAuraScript(spell_dk_anti_magic_shell_AuraScript);
 
             uint32 absorbPct;
-
             bool Load()
             {
                 absorbPct = GetSpellInfo()->Effects[EFFECT_0].CalcValue(GetCaster());
-                return true;
-            }
-
-            void CalculateAmount(AuraEffect const* /*aurEff*/, int32 & amount, bool & /*canBeRecalculated*/)
-            {
-                amount += int32(10000 + 2 * GetCaster()->GetTotalAttackPowerValue(BASE_ATTACK));
-            }
-
-            void Absorb(AuraEffect* /*aurEff*/, DamageInfo & dmgInfo, uint32 & absorbAmount)
-            {
-                 absorbAmount = CalculatePctN(dmgInfo.GetDamage(), absorbPct);
-            }
-
-            void Register()
-            {
-                 DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_dk_anti_magic_shell_raid_AuraScript::CalculateAmount, EFFECT_0, SPELL_AURA_SCHOOL_ABSORB);
-                 OnEffectAbsorb += AuraEffectAbsorbFn(spell_dk_anti_magic_shell_raid_AuraScript::Absorb, EFFECT_0);
-            }
-        };
-
-        AuraScript* GetAuraScript() const
-        {
-            return new spell_dk_anti_magic_shell_raid_AuraScript();
-        }
-};
-
-// 48707 - Anti-Magic Shell
-class spell_dk_anti_magic_shell_self : public SpellScriptLoader
-{
-    public:
-        spell_dk_anti_magic_shell_self() : SpellScriptLoader("spell_dk_anti_magic_shell_self") { }
-
-        class spell_dk_anti_magic_shell_self_AuraScript : public AuraScript
-        {
-            PrepareAuraScript(spell_dk_anti_magic_shell_self_AuraScript);
-
-            uint32 absorbPct, hpPct;
-            bool Load()
-            {
-                absorbPct = GetSpellInfo()->Effects[EFFECT_0].CalcValue(GetCaster());
-                if (GetCaster()->HasSpell(49224))
-                    absorbPct += 8;
-                if (GetCaster()->HasSpell(49610))
-                    absorbPct += 16;
-                if (GetCaster()->HasSpell(49611))
-                    absorbPct += 25;
-                hpPct = GetSpellInfo()->Effects[EFFECT_1].CalcValue(GetCaster());
                 return true;
             }
 
@@ -164,7 +116,7 @@ class spell_dk_anti_magic_shell_self : public SpellScriptLoader
 
             void Absorb(AuraEffect* /*aurEff*/, DamageInfo & dmgInfo, uint32 & absorbAmount)
             {
-                absorbAmount = std::min(CalculatePctN(dmgInfo.GetDamage(), absorbPct), GetTarget()->CountPctFromMaxHealth(hpPct));
+                absorbAmount = CalculatePctN(dmgInfo.GetDamage(), absorbPct);
             }
 
             void Trigger(AuraEffect* aurEff, DamageInfo & /*dmgInfo*/, uint32 & absorbAmount)
@@ -178,15 +130,15 @@ class spell_dk_anti_magic_shell_self : public SpellScriptLoader
 
             void Register()
             {
-                 DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_dk_anti_magic_shell_self_AuraScript::CalculateAmount, EFFECT_0, SPELL_AURA_SCHOOL_ABSORB);
-                 OnEffectAbsorb += AuraEffectAbsorbFn(spell_dk_anti_magic_shell_self_AuraScript::Absorb, EFFECT_0);
-                 AfterEffectAbsorb += AuraEffectAbsorbFn(spell_dk_anti_magic_shell_self_AuraScript::Trigger, EFFECT_0);
+                 DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_dk_anti_magic_shell_AuraScript::CalculateAmount, EFFECT_0, SPELL_AURA_SCHOOL_ABSORB);
+                 OnEffectAbsorb += AuraEffectAbsorbFn(spell_dk_anti_magic_shell_AuraScript::Absorb, EFFECT_0);
+                 AfterEffectAbsorb += AuraEffectAbsorbFn(spell_dk_anti_magic_shell_AuraScript::Trigger, EFFECT_0);
             }
         };
 
         AuraScript* GetAuraScript() const
         {
-            return new spell_dk_anti_magic_shell_self_AuraScript();
+            return new spell_dk_anti_magic_shell_AuraScript();
         }
 };
 
@@ -215,13 +167,8 @@ class spell_dk_anti_magic_zone : public SpellScriptLoader
 
             void CalculateAmount(AuraEffect const* /*aurEff*/, int32 & amount, bool & /*canBeRecalculated*/)
             {
-                SpellInfo const* talentSpell = sSpellMgr->GetSpellInfo(DK_SPELL_ANTI_MAGIC_SHELL_TALENT);
-                amount = talentSpell->Effects[EFFECT_0].CalcValue(GetCaster());
-                if (Unit* caster = GetCaster())
-                {
-                    if (Player* player = caster->ToPlayer())
-                        amount += int32(2 * player->GetTotalAttackPowerValue(BASE_ATTACK));
-                }
+                if (Unit* caster = GetCaster()->GetOwner())
+                    amount = int32(10000  + 2 * caster->GetTotalAttackPowerValue(BASE_ATTACK));
             }
 
             void Absorb(AuraEffect* /*aurEff*/, DamageInfo & dmgInfo, uint32 & absorbAmount)
@@ -586,8 +533,7 @@ class spell_dk_chains_of_ice : public SpellScriptLoader
 void AddSC_deathknight_spell_scripts()
 {
     new spell_dk_necrotic_strike();
-    new spell_dk_anti_magic_shell_raid();
-    new spell_dk_anti_magic_shell_self();
+    new spell_dk_anti_magic_shell();
     new spell_dk_anti_magic_zone();
     new spell_dk_death_gate();
     new spell_dk_death_pact();
