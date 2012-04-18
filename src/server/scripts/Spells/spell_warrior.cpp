@@ -376,16 +376,20 @@ class spell_warr_thunderclap : public SpellScriptLoader
                     // Check for Blood and Thunder
                     if (Unit* caster = GetCaster())
                     {
-                        if (caster->HasAura(84615) || (caster->HasAura(84614) && roll_chance_i(50))) // Blood and Thunder rank 1 & 2
+                        // Blood and Thunder rank 1 & 2
+                        if (AuraEffect const * aurEff = caster->GetDummyAuraEffect(SPELLFAMILY_WARRIOR, 5057, 0))
                         {
-                            if (Unit* target = GetHitUnit())
+                            if (roll_chance_i(aurEff->GetAmount()))
                             {
-                                if (target->HasAura(94009)) // If the target has Rend
+                                if (Unit* target = GetHitUnit())
                                 {
-                                    CheckAgain = false;
-                                    for (std::list<Unit*>::iterator itr = targetList.begin(); itr != targetList.end(); ++itr)
-                                        if (Unit* curTrg = (*itr))
-                                            caster->CastSpell(curTrg, 94009, true);
+                                    if (target->HasAura(94009, caster->GetGUID())) // If the target has Rend
+                                    {
+                                        CheckAgain = false;
+                                        for (std::list<Unit*>::iterator itr = targetList.begin(); itr != targetList.end(); ++itr)
+                                            if (Unit* curTrg = (*itr))
+                                                caster->CastSpell(curTrg, 94009, true);
+                                    }
                                 }
                             }
                         }
