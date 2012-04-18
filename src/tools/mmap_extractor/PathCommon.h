@@ -35,6 +35,8 @@ using namespace std;
 
 namespace Pathfinding
 {
+    static int titleCount = 0;
+
     inline bool matchWildcardFilter(const char* filter, const char* str)
     {
         if(!filter || !str)

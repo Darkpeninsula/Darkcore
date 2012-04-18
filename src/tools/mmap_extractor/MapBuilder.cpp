@@ -221,7 +221,8 @@ namespace Pathfinding
         // more data storage
         G3D::Array<float> allVerts;
         G3D::Array<int> allTris;
-        char tileString[10];
+        char tileString[100];
+        titleCount = 1;
 
         // now start building mmtiles for each tile
         printf("We have %i tiles.                          \n", (unsigned int)tiles->size());
@@ -234,7 +235,7 @@ namespace Pathfinding
 
             // unpack tile coords
             StaticMapTree::unpackTileID((*it), tileX, tileY);
-            sprintf(tileString, "[%02u,%02u]: ", tileX, tileY);
+            sprintf(tileString, "[Title: %i] ", titleCount);
 
             // get heightmap data
             printf("%s Loading heightmap...                           \r", tileString);
@@ -344,8 +345,8 @@ namespace Pathfinding
 
         G3D::Array<float> allVerts;
         G3D::Array<int> allTris;
-        char tileString[10];
-        sprintf(tileString, "[%02u,%02u]: ", tileX, tileY);
+        char tileString[100];
+        sprintf(tileString, "[Title: %i] ", titleCount);
 
         do
         {
@@ -545,8 +546,6 @@ namespace Pathfinding
 
     void MapBuilder::unloadVMap(uint32 mapID, uint32 tileX, uint32 tileY)
     {
-        printf("Unloading vmap...                       \r");
-
         m_vmapManager->unloadMap(mapID, tileX, tileY);
     }
 
@@ -718,8 +717,8 @@ namespace Pathfinding
                                       dtNavMesh* navMesh)
     {
         // console output
-        char tileString[10];
-        sprintf(tileString, "[%02i,%02i]: ", tileX, tileY);
+        char tileString[100];
+        sprintf(tileString, "[Title: %i] ", titleCount);
 
         float cellSize = .5f;       // larger number => less voxels => faster build time
                                     // too large, and tight spaces won't be pathable.
@@ -951,11 +950,7 @@ namespace Pathfinding
             }
             if (!params.vertCount || !params.verts)
             {
-                // occurs mostly when adjacent tiles have models
-                // loaded but those models don't span into this tile
-
-                // message is an annoyance
-                //printf("%s No vertices to build tile!              \n", tileString);
+                printf("%s No vertices to build tile!              \n", tileString);
                 continue;
             }
             if (!params.polyCount || !params.polys)
@@ -977,7 +972,7 @@ namespace Pathfinding
             }
 
             dtTileRef tileRef = 0;
-            printf("% Adding tile to navmesh...                \r", tileString);
+            printf("%s Adding tile to navmesh...                \r", tileString);
             // DT_TILE_FREE_DATA tells detour to unallocate memory when the tile
             // is removed via removeTile()
             dtStatus dtResult = navMesh->addTile(navData, navDataSize, DT_TILE_FREE_DATA, 0, &tileRef);
@@ -1000,7 +995,7 @@ namespace Pathfinding
                 continue;
             }
 
-            printf("%s Writing to file...                      \r", tileString);
+            printf("%s Writing to file...                      \n", tileString);
             // should write navDataSize first... for now, just use ftell to find length when reading
             MmapTileHeader header;
             header.usesLiquids = m_terrainBuilder->usesLiquids();
@@ -1012,6 +1007,7 @@ namespace Pathfinding
 
             // now that tile is written to disk, we can unload it
             navMesh->removeTile(tileRef, 0, 0);
+            titleCount++;
         }while(0);
 
         if (m_debugOutput)
@@ -1065,8 +1061,8 @@ namespace Pathfinding
     {
         generateRealObj(mapID, tileX, tileY, meshData);
 
-        char tileString[25];
-        sprintf(tileString, "[%02u,%02u]: ", tileX, tileY);
+        char tileString[100];
+        sprintf(tileString, "[Title: %i] ", titleCount);
         printf("%s Writing debug output...                       \r", tileString);
 
         char objFileName[255];
@@ -1156,10 +1152,10 @@ namespace Pathfinding
     void MapBuilder::writeIV(uint32 mapID, uint32 tileX, uint32 tileY, IntermediateValues iv)
     {
         char fileName[255];
-        char tileString[25];
+        char tileString[100];
         FILE* file;
 
-        sprintf(tileString, "[%02u,%02u]: ", tileX, tileY);
+        sprintf(tileString, "[Title: %i] ", titleCount);
 
         printf("%s Writing debug output...                       \r", tileString);
 
