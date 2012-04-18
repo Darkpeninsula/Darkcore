@@ -563,7 +563,7 @@ public:
     }
 };
 
-// 34026 Kill comamnd
+// 34026 Kill Command
 class spell_hun_kill_command : public SpellScriptLoader
 {
 public:
@@ -598,12 +598,14 @@ public:
 
         void HandleDummy(SpellEffIndex /*effIndex*/)
         {
-            Unit* pet = GetCaster()->GetGuardianPet();
-
-            if (!pet)
-                return;
-
-            pet->CastSpell(pet->getVictim(), HUNTER_SPELL_KILL_COMMAND_TRIGGER, true);
+            if (Unit* caster = GetUnitOwner())
+            {
+                if (Unit* pet = caster->GetGuardianPet())
+                {
+                    int32 basepoints0 = int32((849 + (caster->GetTotalAttackPowerValue(RANGED_ATTACK) * 0.516))*1);
+                    pet->CastCustomSpell(pet->getVictim(), HUNTER_SPELL_KILL_COMMAND_TRIGGER, &basepoint0, NULL, NULL, true);
+                }
+            }
         }
 
         void Register()
