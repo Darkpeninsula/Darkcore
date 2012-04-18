@@ -2043,6 +2043,20 @@ void Spell::EffectTriggerSpell(SpellEffIndex effIndex)
                     pet->CastSpell(pet, 28305, true);
                 return;
             }
+            // Faerie Fire
+            case 91565:
+            {
+                // Feral Agression
+                if (AuraEffect const * aurEff = m_caster->GetDummyAuraEffect(SPELLFAMILY_DRUID, 960, 0))
+                { 
+                    uint8 count = uint8(aurEff->GetAmount() - 1);
+                    while(count)
+                    {
+                        m_caster->CastSpell(unitTarget, 91565, true);
+                        count--;
+                    }
+                }
+            }
         }
     }
 
