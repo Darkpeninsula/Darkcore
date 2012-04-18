@@ -49,6 +49,51 @@ enum ShamanSpells
 
     SHAMAN_TOTEM_SPELL_TOTEMIC_WRATH        = 77746,
     SHAMAN_TOTEM_SPELL_TOTEMIC_WRATH_AURA   = 77747,
+
+    SHAMAN_SPELL_EARTHQUAKE_KNOCKDOWN       = 77505,
+};
+
+// 77478 - Earthquake
+class spell_sha_earthquake : public SpellScriptLoader
+{
+    public:
+        spell_sha_earthquake() : SpellScriptLoader("spell_sha_earthquake") { }
+
+        class spell_sha_earthquake_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_sha_earthquake_SpellScript);
+
+            uint32 chance;
+
+			bool Validate(SpellEntry const* /*spellInfo*/)
+            {
+                if (!sSpellStore.LookupEntry(SHAMAN_SPELL_EARTHQUAKE_KNOCKDOWN))
+                    return false;
+                return true;
+            }
+            
+            bool Load()
+            {
+                chance = GetSpellInfo()->Effects[EFFECT_1].CalcValue(GetCaster());
+                return true;
+            }
+
+            void HandleScriptEffect()
+            {
+				if (roll_chance_i(chance))
+				    GetCaster()->CastSpell(GetHitUnit(), SHAMAN_SPELL_EARTHQUAKE_KNOCKDOWN, true);
+            }
+
+            void Register()
+            {
+                OnEffectHitTarget += SpellEffectFn(spell_sha_earthquake_SpellScript::HandleScriptEffect, EFFECT_1, SPELL_EFFECT_SCRIPT_EFFECT);
+            }
+        };
+        
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_sha_earthquake_SpellScript();
+        }
 };
 
 // 73680 Unleash Elements
