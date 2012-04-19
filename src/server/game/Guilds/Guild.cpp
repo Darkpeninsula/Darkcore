@@ -1564,7 +1564,10 @@ void Guild::HandleQuery(WorldSession* session)
     data << uint32(_GetRanksSize());                                                // Something new in WotLK
 
     session->SendPacket(&data);
-    HandleRoster(session);
+
+    if(session->GetPlayer() && session->GetPlayer()->GetGuildId() == GetId()) 
+        HandleRoster(session);
+
     sLog->outDebug(LOG_FILTER_GUILD, "WORLD: Sent (SMSG_GUILD_QUERY_RESPONSE)");
 }
 
