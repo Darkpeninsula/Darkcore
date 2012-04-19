@@ -1788,21 +1788,6 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
                 m_caster->CastCustomSpell(m_caster, 45470, &bp, NULL, NULL, false);
                 return;
             }
-            // Death Coil
-            if (m_spellInfo->SpellFamilyFlags[0] & SPELLFAMILYFLAG_DK_DEATH_COIL)
-            {
-                if (m_caster->IsFriendlyTo(unitTarget))
-                {
-                    bp = int32(985 + damage) * 3.5;
-                    m_caster->CastCustomSpell(unitTarget, 47633, &bp, NULL, NULL, true);
-                }
-                else
-                {
-                    bp = 985 + damage;
-                    m_caster->CastCustomSpell(unitTarget, 47632, &bp, NULL, NULL, true);
-                }
-                return;
-            }
             switch (m_spellInfo->Id)
             {
                 case 49020: // Obliterate
