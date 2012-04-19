@@ -186,9 +186,11 @@ class spell_warr_cleave : public SpellScriptLoader
 
             void CalculateDamage(SpellEffIndex effect)
             {
-                // Formula: 6 + AttackPower * 0.45
                 if (Unit* caster = GetCaster())
-                    SetHitDamage(int32(6 + caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.45f));
+                {
+                    int32 dmg = int32(GetHitDamage() + caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.45f);
+                    SetHitDamage(dmg);
+                }
             }
 
             void Register()
@@ -217,9 +219,11 @@ class spell_warr_intercept_triggered : public SpellScriptLoader
 
             void CalculateDamage(SpellEffIndex effect)
             {
-                // Formula: 1 + AttackPower * 0.12
                 if (Unit* caster = GetCaster())
-                    SetHitDamage(int32(1 + caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.12f));
+                {
+                    int32 dmg = int32(GetHitDamage() + caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.12f);
+                    SetHitDamage(dmg);
+                }
             }
 
             void Register()
@@ -294,9 +298,11 @@ class spell_warr_heroic_strike : public SpellScriptLoader
 
             void CalculateDamage(SpellEffIndex effect)
             {
-                // Formula: 8 + AttackPower * 60 / 100
                 if (Unit* caster = GetCaster())
-                    SetHitDamage(int32(8 + caster->GetTotalAttackPowerValue(BASE_ATTACK) * 60 / 100));
+                {
+                    int32 dmg = int32(GetHitDamage() + caster->GetTotalAttackPowerValue(BASE_ATTACK) * 60 / 100);
+                    SetHitDamage(dmg);
+                }
             }
 
             void Register()
@@ -324,11 +330,10 @@ class spell_warr_shockwave : public SpellScriptLoader
 
             void CalculateDamage(SpellEffIndex effect)
             {
-                // Formula: [Effect2BasePoints] / 100 * AttackPower
                 if (Unit* caster = GetCaster())
                 {
-                    int32 bp2 = caster->CalculateSpellDamage(GetHitUnit(), GetSpellInfo(), EFFECT_2);
-                    SetHitDamage(int32(bp2 / 100 * caster->GetTotalAttackPowerValue(BASE_ATTACK)));
+                    int32 dmg = int32(75 / 100 * caster->GetTotalAttackPowerValue(BASE_ATTACK));
+                    SetHitDamage(dmg);
                 }
             }
 
