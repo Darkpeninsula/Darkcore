@@ -105,10 +105,9 @@ class spell_warr_bloodthirst : public SpellScriptLoader
 
             void CalculateDamage(SpellEffIndex /*effect*/)
             {
-                // Formula: AttackPower * BasePoints / 100
                 if (Unit* caster = GetCaster())
                 {
-                    int32 dmg = int32(GetHitDamage() * caster->GetTotalAttackPowerValue(BASE_ATTACK) / 100);
+                    int32 dmg = int32(caster->GetTotalAttackPowerValue(BASE_ATTACK) * 80 / 100);
                     SetHitDamage(dmg);
                 }
             }
@@ -148,9 +147,11 @@ class spell_warr_victory_rush : public SpellScriptLoader
 
             void CalculateDamage(SpellEffIndex effect)
             {
-                // Formula: AttackPower * BasePoints / 100
                 if (Unit* caster = GetCaster())
-                    SetHitDamage(int32(GetHitDamage() * caster->GetTotalAttackPowerValue(BASE_ATTACK) / 100));
+                {
+                    int32 dmg = int32(caster->GetTotalAttackPowerValue(BASE_ATTACK) * 56 / 100);
+                    SetHitDamage(dmg);
+                }
             }
 
             void HandleAfterHit()
