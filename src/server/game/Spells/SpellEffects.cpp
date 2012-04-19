@@ -1563,56 +1563,75 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
                 m_caster->CastSpell(unitTarget, damage, true);
                 return;
             }
-            //Wild mushroom: detonate
-            if(m_spellInfo->Id == 88751)
+            switch (m_spellInfo->Id)
             {
-                std::list<Creature*> templist;
-
-                CellCoord pair(Darkcore::ComputeCellCoord(m_caster->GetPositionX(), m_caster->GetPositionY()));
-                Cell cell(pair);
-                cell.SetNoCreate();
-
-                Darkcore::AllFriendlyCreaturesInGrid check(m_caster);
-                Darkcore::CreatureListSearcher<Darkcore::AllFriendlyCreaturesInGrid> searcher(m_caster, templist, check);
-
-                TypeContainerVisitor<Darkcore::CreatureListSearcher<Darkcore::AllFriendlyCreaturesInGrid>, GridTypeMapContainer> cSearcher(searcher);
-
-                cell.Visit(pair, cSearcher, *(m_caster->GetMap()), *m_caster, m_caster->GetGridActivationRange());
-
-                if (!templist.empty())
-                    for (std::list<Creature*>::const_iterator itr = templist.begin(); itr != templist.end(); ++itr)
+                case 88751: //Wild mushroom: detonate
+                {
+                    std::list<Creature*> templist;
+                    
+                    CellCoord pair(Darkcore::ComputeCellCoord(m_caster->GetPositionX(), m_caster->GetPositionY()));
+                    Cell cell(pair);
+                    cell.SetNoCreate();
+                    
+                    Darkcore::AllFriendlyCreaturesInGrid check(m_caster);
+                    Darkcore::CreatureListSearcher<Darkcore::AllFriendlyCreaturesInGrid> searcher(m_caster, templist, check);
+                    
+                    TypeContainerVisitor<Darkcore::CreatureListSearcher<Darkcore::AllFriendlyCreaturesInGrid>, GridTypeMapContainer> cSearcher(searcher);
+                    cell.Visit(pair, cSearcher, *(m_caster->GetMap()), *m_caster, m_caster->GetGridActivationRange());
+                    
+                    if (!templist.empty())
                     {
-                        //You cannot detonate other people's mushrooms
-                        if((*itr)->GetOwner() != m_caster)
-                            continue;
-                        // Find all the enemies
-                        std::list<Unit*> targets;
-                        Darkcore::AnyUnfriendlyUnitInObjectRangeCheck u_check((*itr), (*itr), 6.0f);
-                        Darkcore::UnitListSearcher<Darkcore::AnyUnfriendlyUnitInObjectRangeCheck> searcher((*itr), targets, u_check);
-                        (*itr)->VisitNearbyObject(6.0f, searcher);
-                        for (std::list<Unit*>::const_iterator iter = targets.begin(); iter != targets.end(); ++iter)
+                        for (std::list<Creature*>::const_iterator itr = templist.begin(); itr != templist.end(); ++itr)
                         {
-                            //Damage spell
-                            (*itr)->CastSpell((*iter), 88747, true);
-                            //Suicide spell
-                            (*itr)->CastSpell((*itr), 92853, true);
-                            (*itr)->DisappearAndDie();
+                            //You cannot detonate other people's mushrooms
+                            if((*itr)->GetOwner() != m_caster)
+                                continue;
+                            
+                            // Find all the enemies
+                            std::list<Unit*> targets;
+                            Darkcore::AnyUnfriendlyUnitInObjectRangeCheck u_check((*itr), (*itr), 6.0f);
+                            Darkcore::UnitListSearcher<Darkcore::AnyUnfriendlyUnitInObjectRangeCheck> searcher((*itr), targets, u_check);
+                            (*itr)->VisitNearbyObject(6.0f, searcher);
+                            
+                            for (std::list<Unit*>::const_iterator iter = targets.begin(); iter != targets.end(); ++iter)
+                            {
+                                //Damage spell
+                                (*itr)->CastSpell((*iter), 88747, true);
+
+                                //Suicide spell
+                                (*itr)->CastSpell((*itr), 92853, true);
+                                (*itr)->DisappearAndDie();
+                            }
+                        }
+                        templist.clear();
+                    }
+                    break;
+                }
+                case 80964: // Skull Bash (Bear Form)
+                case 80965: // Skull Bash (Cat Form)
+                {
+                    if (AuraEffect const* aurEff = m_caster->GetAuraEffect(SPELL_AURA_ADD_FLAT_MODIFIER, SPELLFAMILY_DRUID, 473, 1))
+                    {
+                        switch(aurEff->GetId())
+                        {
+                            case 16940: // Brutal Impact (Rank 1)
+                            {
+                                m_caster->CastSpell(unitTarget, 82364 ,true);
+                                break;
+                            }
+                            case 16940: // Brutal Impact (Rank 2)
+                            {
+                                m_caster->CastSpell(unitTarget, 82365 ,true);
+                                break;
+                            }
                         }
                     }
-                    templist.clear();
-            }
-            if(m_spellInfo->Id == 1126)
-            {
-                if (m_caster->GetTypeId() == TYPEID_PLAYER)
-                {
-                    std::list<Unit*> PartyMembers;
-                    m_caster->GetPartyMembers(PartyMembers);
-                    if(PartyMembers.size() > 1)
-                        m_caster->CastSpell(unitTarget, 79061, true); // Mark of the Wild (Raid)
-                    else
-                        m_caster->CastSpell(unitTarget, 79060, true); // Mark of the Wild (Caster)
+
+                    // Skull Bash
+                    m_caster->CastSpell(unitTarget, 93983 ,true);
+                    m_caster->CastSpell(unitTarget, 93985 ,true);
+                    break; 
                 }
-                break;
             }
             break;
         }
@@ -1630,8 +1649,7 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
 
             switch (m_spellInfo->Id)
             {
-               // Guardian of Ancient Kings
-                case 86150:
+                case 86150: // Guardian of Ancient Kings
                 {
                     if (m_caster->ToPlayer()->HasSpell(20473)) // Holy Shock
                         m_caster->CastSpell(m_caster, 86669, true);
