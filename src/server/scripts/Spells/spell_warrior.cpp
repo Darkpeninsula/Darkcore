@@ -105,10 +105,16 @@ class spell_warr_bloodthirst : public SpellScriptLoader
 
             void CalculateDamage(SpellEffIndex /*effect*/)
             {
-                if (Unit* caster = GetCaster())
+                int32 damage = GetHitDamage();
+                if (Unit* target = GetHitUnit())
                 {
-                    int32 dmg = int32(caster->GetTotalAttackPowerValue(BASE_ATTACK) * 80 / 100);
-                    SetHitDamage(dmg);
+                    if (Unit* caster = GetCaster())
+                    {
+                        damage += CalculatePctN(GetCaster()->GetTotalAttackPowerValue(BASE_ATTACK), 80);
+                        
+                        int32 dmg = caster->SpellDamageBonus(target, GetSpellInfo(), damage, SPELL_DIRECT_DAMAGE);
+                        SetHitDamage(dmg);
+                    }
                 }
             }
             
@@ -147,10 +153,16 @@ class spell_warr_victory_rush : public SpellScriptLoader
 
             void CalculateDamage(SpellEffIndex effect)
             {
-                if (Unit* caster = GetCaster())
+                int32 damage = GetHitDamage();
+                if (Unit* target = GetHitUnit())
                 {
-                    int32 dmg = int32(caster->GetTotalAttackPowerValue(BASE_ATTACK) * 56 / 100);
-                    SetHitDamage(dmg);
+                    if (Unit* caster = GetCaster())
+                    {
+                        damage += CalculatePctN(GetCaster()->GetTotalAttackPowerValue(BASE_ATTACK), 56);
+                        
+                        int32 dmg = caster->SpellDamageBonus(target, GetSpellInfo(), damage, SPELL_DIRECT_DAMAGE);
+                        SetHitDamage(dmg);
+                    }
                 }
             }
 
@@ -186,10 +198,16 @@ class spell_warr_cleave : public SpellScriptLoader
 
             void CalculateDamage(SpellEffIndex effect)
             {
-                if (Unit* caster = GetCaster())
+                int32 damage = GetHitDamage();
+                if (Unit* target = GetHitUnit())
                 {
-                    int32 dmg = int32(GetHitDamage() + caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.45f);
-                    SetHitDamage(dmg);
+                    if (Unit* caster = GetCaster())
+                    {
+                        damage += CalculatePctN(GetCaster()->GetTotalAttackPowerValue(BASE_ATTACK), 46);
+                        
+                        int32 dmg = caster->SpellDamageBonus(target, GetSpellInfo(), damage, SPELL_DIRECT_DAMAGE);
+                        SetHitDamage(dmg);
+                    }
                 }
             }
 
@@ -219,10 +237,16 @@ class spell_warr_intercept_triggered : public SpellScriptLoader
 
             void CalculateDamage(SpellEffIndex effect)
             {
-                if (Unit* caster = GetCaster())
+                int32 damage = GetHitDamage();
+                if (Unit* target = GetHitUnit())
                 {
-                    int32 dmg = int32(GetHitDamage() + caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.12f);
-                    SetHitDamage(dmg);
+                    if (Unit* caster = GetCaster())
+                    {
+                        damage += CalculatePctN(GetCaster()->GetTotalAttackPowerValue(BASE_ATTACK), 12);
+                        
+                        int32 dmg = caster->SpellDamageBonus(target, GetSpellInfo(), damage, SPELL_DIRECT_DAMAGE);
+                        SetHitDamage(dmg);
+                    }
                 }
             }
 
@@ -298,10 +322,16 @@ class spell_warr_heroic_strike : public SpellScriptLoader
 
             void CalculateDamage(SpellEffIndex effect)
             {
-                if (Unit* caster = GetCaster())
+                int32 damage = GetHitDamage();
+                if (Unit* target = GetHitUnit())
                 {
-                    int32 dmg = int32(GetHitDamage() + caster->GetTotalAttackPowerValue(BASE_ATTACK) * 60 / 100);
-                    SetHitDamage(dmg);
+                    if (Unit* caster = GetCaster())
+                    {
+                        damage += CalculatePctN(GetCaster()->GetTotalAttackPowerValue(BASE_ATTACK), 60);
+                        
+                        int32 dmg = caster->SpellDamageBonus(target, GetSpellInfo(), damage, SPELL_DIRECT_DAMAGE);
+                        SetHitDamage(dmg);
+                    }
                 }
             }
 
@@ -330,10 +360,16 @@ class spell_warr_shockwave : public SpellScriptLoader
 
             void CalculateDamage(SpellEffIndex effect)
             {
-                if (Unit* caster = GetCaster())
+                int32 damage = GetHitDamage();
+                if (Unit* target = GetHitUnit())
                 {
-                    int32 dmg = int32(75 / 100 * caster->GetTotalAttackPowerValue(BASE_ATTACK));
-                    SetHitDamage(dmg);
+                    if (Unit* caster = GetCaster())
+                    {
+                        damage += CalculatePctN(GetCaster()->GetTotalAttackPowerValue(BASE_ATTACK), 75);
+                        
+                        int32 dmg = caster->SpellDamageBonus(target, GetSpellInfo(), damage, SPELL_DIRECT_DAMAGE);
+                        SetHitDamage(dmg);
+                    }
                 }
             }
 
