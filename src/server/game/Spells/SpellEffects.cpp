@@ -1619,7 +1619,7 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
                                 m_caster->CastSpell(unitTarget, 82364 ,true);
                                 break;
                             }
-                            case 16940: // Brutal Impact (Rank 2)
+                            case 16941: // Brutal Impact (Rank 2)
                             {
                                 m_caster->CastSpell(unitTarget, 82365 ,true);
                                 break;
