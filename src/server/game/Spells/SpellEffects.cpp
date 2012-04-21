@@ -753,32 +753,23 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                         if (AuraEffect const* aurEff = unitTarget->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_ROGUE, 0x10000, 0, 0, m_caster->GetGUID()))
                         {
                             // count consumed deadly poison doses at target
-                            bool needConsume = true;
+                            int32 consumeChance = 100;
                             uint32 spellId = aurEff->GetId();
                             uint32 doses = aurEff->GetBase()->GetStackAmount();
+
                             if (doses > combo)
-                                doses = combo;
+                                combo = doses;
+
                             // Master Poisoner
-                            Unit::AuraEffectList const& auraList = m_caster->ToPlayer()->GetAuraEffectsByType(SPELL_AURA_MOD_AURA_DURATION_BY_DISPEL_NOT_STACK);
-                            for (Unit::AuraEffectList::const_iterator iter = auraList.begin(); iter != auraList.end(); ++iter)
-                            {
-                                if ((*iter)->GetSpellInfo()->SpellFamilyName == SPELLFAMILY_ROGUE && (*iter)->GetSpellInfo()->SpellIconID == 1960)
-                                {
-                                    uint32 chance = (*iter)->GetSpellInfo()->Effects[EFFECT_2].CalcValue(m_caster);
+                            if (AuraEffect* aurEff2 = m_caster->GetAuraEffect(SPELL_AURA_MOD_AURA_DURATION_BY_DISPEL_NOT_STACK, SPELLFAMILY_ROGUE, 1960, 0))
+                                consumeChance -= int32(aurEff2->GetAmount());
 
-                                    if (chance && roll_chance_i(chance))
-                                        needConsume = false;
+                            if (roll_chance_i(consumeChance))
+                                unitTarget->RemoveAurasDueToSpell(spellId);
 
-                                    break;
-                                }
-                            }
-
-                            if (needConsume)
-                                for (uint32 i = 0; i < doses; ++i)
-                                    unitTarget->RemoveAuraFromStack(spellId);
-                            damage *= doses;
-                            damage += int32(((Player*)m_caster)->GetTotalAttackPowerValue(BASE_ATTACK) * 0.09f * doses);
+                            damage += int32(m_caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.09f * 1 + (damage * combo));
                         }
+
                         // Eviscerate and Envenom Bonus Damage (item set effect)
                         if (m_caster->HasAura(37169))
                             damage += ((Player*)m_caster)->GetComboPoints()*40;
@@ -858,7 +849,7 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                                 spellId = 83239;
                                 break;
                         }
-                        
+
                         if(spellId && !m_caster->HasAura(spellId))
                             m_caster->CastSpell(m_caster, spellId, true);
                     }
@@ -1572,56 +1563,75 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
                 m_caster->CastSpell(unitTarget, damage, true);
                 return;
             }
-            //Wild mushroom: detonate
-            if(m_spellInfo->Id == 88751)
+            switch (m_spellInfo->Id)
             {
-                std::list<Creature*> templist;
-
-                CellCoord pair(Darkcore::ComputeCellCoord(m_caster->GetPositionX(), m_caster->GetPositionY()));
-                Cell cell(pair);
-                cell.SetNoCreate();
-
-                Darkcore::AllFriendlyCreaturesInGrid check(m_caster);
-                Darkcore::CreatureListSearcher<Darkcore::AllFriendlyCreaturesInGrid> searcher(m_caster, templist, check);
-
-                TypeContainerVisitor<Darkcore::CreatureListSearcher<Darkcore::AllFriendlyCreaturesInGrid>, GridTypeMapContainer> cSearcher(searcher);
-
-                cell.Visit(pair, cSearcher, *(m_caster->GetMap()), *m_caster, m_caster->GetGridActivationRange());
-
-                if (!templist.empty())
-                    for (std::list<Creature*>::const_iterator itr = templist.begin(); itr != templist.end(); ++itr)
+                case 88751: //Wild mushroom: detonate
+                {
+                    std::list<Creature*> templist;
+                    
+                    CellCoord pair(Darkcore::ComputeCellCoord(m_caster->GetPositionX(), m_caster->GetPositionY()));
+                    Cell cell(pair);
+                    cell.SetNoCreate();
+                    
+                    Darkcore::AllFriendlyCreaturesInGrid check(m_caster);
+                    Darkcore::CreatureListSearcher<Darkcore::AllFriendlyCreaturesInGrid> searcher(m_caster, templist, check);
+                    
+                    TypeContainerVisitor<Darkcore::CreatureListSearcher<Darkcore::AllFriendlyCreaturesInGrid>, GridTypeMapContainer> cSearcher(searcher);
+                    cell.Visit(pair, cSearcher, *(m_caster->GetMap()), *m_caster, m_caster->GetGridActivationRange());
+                    
+                    if (!templist.empty())
                     {
-                        //You cannot detonate other people's mushrooms
-                        if((*itr)->GetOwner() != m_caster)
-                            continue;
-                        // Find all the enemies
-                        std::list<Unit*> targets;
-                        Darkcore::AnyUnfriendlyUnitInObjectRangeCheck u_check((*itr), (*itr), 6.0f);
-                        Darkcore::UnitListSearcher<Darkcore::AnyUnfriendlyUnitInObjectRangeCheck> searcher((*itr), targets, u_check);
-                        (*itr)->VisitNearbyObject(6.0f, searcher);
-                        for (std::list<Unit*>::const_iterator iter = targets.begin(); iter != targets.end(); ++iter)
+                        for (std::list<Creature*>::const_iterator itr = templist.begin(); itr != templist.end(); ++itr)
                         {
-                            //Damage spell
-                            (*itr)->CastSpell((*iter), 88747, true);
-                            //Suicide spell
-                            (*itr)->CastSpell((*itr), 92853, true);
-                            (*itr)->DisappearAndDie();
+                            //You cannot detonate other people's mushrooms
+                            if((*itr)->GetOwner() != m_caster)
+                                continue;
+                            
+                            // Find all the enemies
+                            std::list<Unit*> targets;
+                            Darkcore::AnyUnfriendlyUnitInObjectRangeCheck u_check((*itr), (*itr), 6.0f);
+                            Darkcore::UnitListSearcher<Darkcore::AnyUnfriendlyUnitInObjectRangeCheck> searcher((*itr), targets, u_check);
+                            (*itr)->VisitNearbyObject(6.0f, searcher);
+                            
+                            for (std::list<Unit*>::const_iterator iter = targets.begin(); iter != targets.end(); ++iter)
+                            {
+                                //Damage spell
+                                (*itr)->CastSpell((*iter), 88747, true);
+
+                                //Suicide spell
+                                (*itr)->CastSpell((*itr), 92853, true);
+                                (*itr)->DisappearAndDie();
+                            }
+                        }
+                        templist.clear();
+                    }
+                    break;
+                }
+                case 80964: // Skull Bash (Bear Form)
+                case 80965: // Skull Bash (Cat Form)
+                {
+                    if (AuraEffect const* aurEff = m_caster->GetAuraEffect(SPELL_AURA_ADD_FLAT_MODIFIER, SPELLFAMILY_DRUID, 473, 1))
+                    {
+                        switch(aurEff->GetId())
+                        {
+                            case 16940: // Brutal Impact (Rank 1)
+                            {
+                                m_caster->CastSpell(unitTarget, 82364 ,true);
+                                break;
+                            }
+                            case 16941: // Brutal Impact (Rank 2)
+                            {
+                                m_caster->CastSpell(unitTarget, 82365 ,true);
+                                break;
+                            }
                         }
                     }
-                    templist.clear();
-            }
-            if(m_spellInfo->Id == 1126)
-            {
-                if (m_caster->GetTypeId() == TYPEID_PLAYER)
-                {
-                    std::list<Unit*> PartyMembers;
-                    m_caster->GetPartyMembers(PartyMembers);
-                    if(PartyMembers.size() > 1)
-                        m_caster->CastSpell(unitTarget, 79061, true); // Mark of the Wild (Raid)
-                    else
-                        m_caster->CastSpell(unitTarget, 79060, true); // Mark of the Wild (Caster)
+
+                    // Skull Bash
+                    m_caster->CastSpell(unitTarget, 93983 ,true);
+                    m_caster->CastSpell(unitTarget, 93985 ,true);
+                    break; 
                 }
-                break;
             }
             break;
         }
@@ -1639,8 +1649,7 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
 
             switch (m_spellInfo->Id)
             {
-               // Guardian of Ancient Kings
-                case 86150:
+                case 86150: // Guardian of Ancient Kings
                 {
                     if (m_caster->ToPlayer()->HasSpell(20473)) // Holy Shock
                         m_caster->CastSpell(m_caster, 86669, true);
@@ -1649,41 +1658,6 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
                     if (m_caster->ToPlayer()->HasSpell(31935)) // Avenger's shield
                         m_caster->CastSpell(m_caster, 86659, true);
                     return;
-                }
-                case 19740: // Blessing of Might
-                {
-                    if (m_caster->GetTypeId() == TYPEID_PLAYER)
-                    {
-                        std::list<Unit*> PartyMembers;
-                        m_caster->GetPartyMembers(PartyMembers);
-
-                        if (PartyMembers.size() > 1)
-                            m_caster->CastSpell(unitTarget, 79102, true); // Blessing of Might (Raid)
-                        else
-                            m_caster->CastSpell(unitTarget, 79101, true); // Blessing of Might (Caster)
-                    }
-                    break;
-                }
-                case 20217: // Blessing of Kings
-                {
-                    if (m_caster->GetTypeId() == TYPEID_PLAYER)
-                    {
-                        std::list<Unit*> PartyMembers;
-                        m_caster->GetPartyMembers(PartyMembers);
-                        bool Continue = false;
-                        uint32 player = 0;
-                        for (std::list<Unit*>::iterator itr = PartyMembers.begin(); itr != PartyMembers.end(); ++itr) // If caster is in party with a player
-                        {
-                            ++player;
-                            if (Continue == false && player > 1)
-                                Continue = true;
-                        }
-                        if (Continue == true)
-                            m_caster->CastSpell(unitTarget, 79063, true); // Blessing of Kings (Raid)
-                        else
-                            m_caster->CastSpell(unitTarget, 79062, true); // Blessing of Kings (Caster)
-                    }
-                    break;
                 }
                 case 31789: // Righteous Defense (step 1)
                 {
@@ -1788,10 +1762,7 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
             // Death strike
             if (m_spellInfo->SpellFamilyFlags[0] & SPELLFAMILYFLAG_DK_DEATH_STRIKE)
             {
-                if(((m_caster->GetDamageTakenInPastSecs(5) * 15) / 100) > m_caster->CountPctFromMaxHealth(damage))
-                    bp = ((m_caster->GetDamageTakenInPastSecs(5) * 15) / 100);
-                else
-                    bp = m_caster->CountPctFromMaxHealth(damage);
+                bp = std::min<int32>(m_caster->CountPctFromMaxHealth(damage), CalculatePctN(m_caster->GetDamageTakenInPastSecs(5), 15));
 
                 // Improved Death Strike
                 if (AuraEffect const* aurEff = m_caster->GetAuraEffect(SPELL_AURA_ADD_PCT_MODIFIER, SPELLFAMILY_DEATHKNIGHT, 2751, 0))
@@ -1801,24 +1772,20 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
                 if (AuraEffect const* aurEff = m_caster->GetAuraEffect(96279, 0))
                     if (bp < int32(m_caster->CountPctFromMaxHealth(aurEff->GetAmount())))
                         if (m_caster->HasAura(48265) || m_caster->HasAura(48266)) // Only in frost/unholy presence
-                            bp = m_caster->CountPctFromMaxHealth(aurEff->GetAmount());
+                            bp += m_caster->CountPctFromMaxHealth(aurEff->GetAmount());
+
+                // Blood Shield
+                if (AuraEffect const* aurEff = m_caster->GetAuraEffect(77513, 1))
+                {
+                    // Blood Presence
+                    if (m_caster->HasAura(48263))
+                    {
+                        int32 shield = CalculatePctN(bp, int32(aurEff->GetAmount() * m_caster->ToPlayer()->GetMasteryPoints()));
+                        m_caster->CastCustomSpell(m_caster, 77535, &shield, NULL, NULL, false);
+                    }
+                }
 
                 m_caster->CastCustomSpell(m_caster, 45470, &bp, NULL, NULL, false);
-                return;
-            }
-            // Death Coil
-            if (m_spellInfo->SpellFamilyFlags[0] & SPELLFAMILYFLAG_DK_DEATH_COIL)
-            {
-                if (m_caster->IsFriendlyTo(unitTarget))
-                {
-                    bp = int32(985 + damage) * 3.5;
-                    m_caster->CastCustomSpell(unitTarget, 47633, &bp, NULL, NULL, true);
-                }
-                else
-                {
-                    bp = 985 + damage;
-                    m_caster->CastCustomSpell(unitTarget, 47632, &bp, NULL, NULL, true);
-                }
                 return;
             }
             switch (m_spellInfo->Id)
@@ -1872,6 +1839,17 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
                     // Remove cooldown - summon spellls have category
                     m_caster->ToPlayer()->RemoveSpellCooldown(52150, true);
                     m_caster->ToPlayer()->RemoveSpellCooldown(46585, true);
+                    break;
+                }
+            }
+            break;
+        case SPELLFAMILY_WARLOCK:
+            switch (m_spellInfo->Id)
+            {
+                case 19028: // Soul Link
+                {
+                    if(Pet* pet =  m_caster->ToPlayer()->GetPet())
+                        pet->AddAura(25228, pet);
                     break;
                 }
             }
@@ -2034,6 +2012,20 @@ void Spell::EffectTriggerSpell(SpellEffIndex effIndex)
                 if (Unit* pet = unitTarget->GetGuardianPet())
                     pet->CastSpell(pet, 28305, true);
                 return;
+            }
+            // Faerie Fire
+            case 91565:
+            {
+                // Feral Agression
+                if (AuraEffect const * aurEff = m_caster->GetDummyAuraEffect(SPELLFAMILY_DRUID, 960, 0))
+                { 
+                    uint8 count = uint8(aurEff->GetAmount() - 1);
+                    while(count)
+                    {
+                        m_caster->CastSpell(unitTarget, 91565, true);
+                        count--;
+                    }
+                }
             }
         }
     }

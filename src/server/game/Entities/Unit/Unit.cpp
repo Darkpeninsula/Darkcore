@@ -6736,7 +6736,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                 {
                     // "refresh your Slice and Dice duration to its 5 combo point maximum"
                     // lookup Slice and Dice
-                    if (AuraEffect const* aur = GetAuraEffect(SPELL_AURA_MOD_MELEE_HASTE, SPELLFAMILY_ROGUE, 0x40000, 0, 0))
+                    if (AuraEffect const* aur = GetAuraEffect(SPELL_AURA_MOD_MELEE_ATTACK_SPEED, SPELLFAMILY_ROGUE, 0x40000, 0, 0))
                     {
                         aur->GetBase()->SetDuration(aur->GetSpellInfo()->GetMaxDuration(), true);
                         return true;
@@ -7399,9 +7399,11 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                 case 51563:
                 case 51564:
                 {
-                    target = this;
-                    triggered_spell_id = 53390;
-                    break;
+                    int32 bp1 = dummySpell->Effects[EFFECT_0].CalcValue();
+                    int32 bp0 = -(bp1);
+                    
+                    CastCustomSpell(this, 53390, &bp0, &bp1, NULL, true, NULL, triggeredByAura);
+                    return true;
                 }
                 // Windfury Weapon (Passive) 1-5 Ranks
                 case 33757:
@@ -7688,7 +7690,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                 if (GetTypeId() != TYPEID_PLAYER  || !victim || !victim->isAlive() || !castItem || !castItem->IsEquipped())
                     return false;
 
-                float fire_onhit = float(CalculatePctF(dummySpell->Effects[EFFECT_0]. CalcValue(), 1.0f));
+                float fire_onhit = float(CalculatePctF(dummySpell->Effects[EFFECT_0].CalcValue(), 1.0f));
 
                 float add_spellpower = (float)(SpellBaseDamageBonus(SPELL_SCHOOL_MASK_FIRE)
                                      + SpellBaseDamageBonusForVictim(SPELL_SCHOOL_MASK_FIRE, victim));
@@ -7825,7 +7827,6 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                         ToPlayer()->RemoveSpellCooldown(spell);
 
                     CastSpell(target, spell, true, castItem, triggeredByAura);
-                    aurEff->GetBase()->DropCharge();
                     return true;
                 }
                 return false;
@@ -11336,62 +11337,6 @@ uint32 Unit::SpellHealingBonus(Unit* victim, SpellInfo const* spellProto, uint32
     for (AuraEffectList::const_iterator i = mHealingDonePct.begin(); i != mHealingDonePct.end(); ++i)
         AddPctN(DoneTotalMod, (*i)->GetAmount());
 
-    // done scripted mod (take it from owner)
-    Unit* owner = GetOwner() ? GetOwner() : this;
-    AuraEffectList const& mOverrideClassScript= owner->GetAuraEffectsByType(SPELL_AURA_OVERRIDE_CLASS_SCRIPTS);
-    for (AuraEffectList::const_iterator i = mOverrideClassScript.begin(); i != mOverrideClassScript.end(); ++i)
-    {
-        if (!(*i)->IsAffectingSpell(spellProto))
-            continue;
-        switch ((*i)->GetMiscValue())
-        {
-            case 4415: // Increased Rejuvenation Healing
-            case 4953:
-            case 3736: // Hateful Totem of the Third Wind / Increased Lesser Healing Wave / LK Arena (4/5/6) Totem of the Third Wind / Savage Totem of the Third Wind
-                DoneTotal += (*i)->GetAmount();
-                break;
-            case   21: // Test of Faith
-            case 6935:
-            case 6918:
-                if (victim->HealthBelowPct(50))
-                    AddPctN(DoneTotalMod, (*i)->GetAmount());
-                break;
-            case 7798: // Glyph of Regrowth
-            {
-                if (victim->GetAuraEffect(SPELL_AURA_PERIODIC_HEAL, SPELLFAMILY_DRUID, 0x40, 0, 0))
-                    AddPctN(DoneTotalMod, (*i)->GetAmount());
-                break;
-            }
-            case 8477: // Nourish Heal Boost
-            {
-                int32 stepPercent = (*i)->GetAmount();
-                int32 modPercent = 0;
-                AuraApplicationMap const& victimAuras = victim->GetAppliedAuras();
-                for (AuraApplicationMap::const_iterator itr = victimAuras.begin(); itr != victimAuras.end(); ++itr)
-                {
-                    Aura const* aura = itr->second->GetBase();
-                    if (aura->GetCasterGUID() != GetGUID())
-                        continue;
-                    SpellInfo const* m_spell = aura->GetSpellInfo();
-                    if (m_spell->SpellFamilyName != SPELLFAMILY_DRUID ||
-                        !(m_spell->SpellFamilyFlags[1] & 0x00000010 || m_spell->SpellFamilyFlags[0] & 0x50))
-                        continue;
-                    modPercent += stepPercent * aura->GetStackAmount();
-                }
-                AddPctN(DoneTotalMod, modPercent);
-                break;
-            }
-            case 7871: // Glyph of Lesser Healing Wave
-            {
-                if (victim->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_SHAMAN, 0 , 0x00000400, 0, GetGUID()))
-                    AddPctN(DoneTotalMod, (*i)->GetAmount());
-                break;
-            }
-            default:
-                break;
-        }
-    }
-
     // Taken/Done fixed damage bonus auras
     int32 DoneAdvertisedBenefit  = SpellBaseHealingBonus(spellProto->GetSchoolMask());
     int32 TakenAdvertisedBenefit = SpellBaseHealingBonusForVictim(spellProto->GetSchoolMask(), victim);
@@ -11860,45 +11805,6 @@ void Unit::MeleeDamageBonus(Unit* victim, uint32 *pdamage, WeaponAttackType attT
     for (AuraEffectList::const_iterator i = mDamageDoneVersusAurastate.begin(); i != mDamageDoneVersusAurastate.end(); ++i)
         if (victim->HasAuraState(AuraStateType((*i)->GetMiscValue())))
             AddPctN(DoneTotalMod, (*i)->GetAmount());
-
-    // done scripted mod (take it from owner)
-    Unit* owner = GetOwner() ? GetOwner() : this;
-    AuraEffectList const& mOverrideClassScript = owner->GetAuraEffectsByType(SPELL_AURA_OVERRIDE_CLASS_SCRIPTS);
-    for (AuraEffectList::const_iterator i = mOverrideClassScript.begin(); i != mOverrideClassScript.end(); ++i)
-    {
-        if (!(*i)->IsAffectingSpell(spellProto))
-            continue;
-
-        switch ((*i)->GetMiscValue())
-        {
-            // Tundra Stalker
-            // Merciless Combat
-            case 7277:
-            {
-                // Merciless Combat
-                if ((*i)->GetSpellInfo()->SpellIconID == 2656)
-                {
-                    if (!victim->HealthAbovePct(35))
-                        AddPctN(DoneTotalMod, (*i)->GetAmount());
-                }
-                // Tundra Stalker
-                else
-                {
-                    // Frost Fever (target debuff)
-                    if (victim->HasAura(55095))
-                        AddPctN(DoneTotalMod, (*i)->GetAmount());
-                }
-                break;
-            }
-            // Rage of Rivendare
-            case 7293:
-            {
-                if (victim->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_DEATHKNIGHT, 0, 0x02000000, 0))
-                    AddPctF(DoneTotalMod, (*i)->GetSpellInfo()->GetRank() * 2.0f);
-                break;
-            }
-        }
-    }
 
     // Custom scripted damage
     if (spellProto)

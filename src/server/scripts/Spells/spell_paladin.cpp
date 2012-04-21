@@ -120,6 +120,84 @@ public:
     }
 };
 
+// 19740 Blessing of Might
+class spell_pall_bless_of_might : public SpellScriptLoader
+{
+    public:
+        spell_pall_bless_of_might() : SpellScriptLoader("spell_pall_bless_of_might") { }
+
+        class spell_pall_bless_of_might_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_pall_bless_of_might_SpellScript);
+
+            void HandleDummy(SpellEffIndex /*effIndex*/)
+            {
+                if (Unit* caster = GetCaster())
+                {
+                    if (caster->GetTypeId() != TYPEID_PLAYER)
+                        return;
+
+                    std::list<Unit*> PartyMembers;
+                    caster->GetPartyMembers(PartyMembers);
+
+                    if (PartyMembers.size() > 1)
+                        caster->CastSpell(GetHitUnit(), 79102, true);// Blessing of Kings (Raid)
+                    else
+                        caster->CastSpell(GetHitUnit(), 79101, true); // Blessing of Kings (Caster)
+                }
+            }
+
+            void Register()
+            {
+                OnEffectHitTarget += SpellEffectFn(spell_pall_bless_of_might_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_pall_bless_of_might_SpellScript;
+        }
+};
+
+// 20217 Blessing of King
+class spell_pall_bless_of_king : public SpellScriptLoader
+{
+    public:
+        spell_pall_bless_of_king() : SpellScriptLoader("spell_pall_bless_of_king") { }
+
+        class spell_pall_bless_of_king_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_pall_bless_of_king_SpellScript);
+
+            void HandleDummy(SpellEffIndex /*effIndex*/)
+            {
+                if (Unit* caster = GetCaster())
+                {
+                    if (caster->GetTypeId() != TYPEID_PLAYER)
+                        return;
+
+                    std::list<Unit*> PartyMembers;
+                    caster->GetPartyMembers(PartyMembers);
+
+                    if (PartyMembers.size() > 1)
+                        caster->CastSpell(GetHitUnit(), 79063, true);// Blessing of Kings (Raid)
+                    else
+                        caster->CastSpell(GetHitUnit(), 79062, true); // Blessing of Kings (Caster)
+                }
+            }
+
+            void Register()
+            {
+                OnEffectHitTarget += SpellEffectFn(spell_pall_bless_of_king_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_pall_bless_of_king_SpellScript;
+        }
+};
+
 class spell_pal_blessing_of_faith : public SpellScriptLoader
 {
 public:
@@ -290,10 +368,23 @@ public:
                     caster->CastSpell(unitTarget, sSpellMgr->GetSpellWithRank(PALADIN_SPELL_HOLY_SHOCK_R1_DAMAGE, rank), true, 0);
             }
         }
-
+        
+        SpellCastResult CheckCast()
+        {
+            if (Player* target = GetTargetUnit()->ToPlayer())
+            {
+                Player* caster = GetCaster()->ToPlayer();
+                if (caster->GetTeam() != target->GetTeam() && !caster->IsValidAttackTarget(target))
+                {
+                    return SPELL_FAILED_BAD_TARGETS;
+                }
+            }
+            return SPELL_CAST_OK;
+        }
         void Register()
         {
             // add dummy effect spell handler to Holy Shock
+            OnCheckCast += SpellCheckCastFn(spell_pal_holy_shock_SpellScript::CheckCast);
             OnEffectHitTarget += SpellEffectFn(spell_pal_holy_shock_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
         }
     };
@@ -556,6 +647,8 @@ class spell_pal_selfless_healer : public SpellScriptLoader
 void AddSC_paladin_spell_scripts()
 {
     new spell_pal_ardent_defender();
+    new spell_pall_bless_of_might();
+    new spell_pall_bless_of_king();
     new spell_pal_blessing_of_faith();
     new spell_pal_blessing_of_sanctuary();
     new spell_pal_guarded_by_the_light();

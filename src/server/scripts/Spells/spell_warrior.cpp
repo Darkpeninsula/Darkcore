@@ -105,11 +105,16 @@ class spell_warr_bloodthirst : public SpellScriptLoader
 
             void CalculateDamage(SpellEffIndex /*effect*/)
             {
-                // Formula: AttackPower * BasePoints / 100
-                if (Unit* caster = GetCaster())
+                int32 damage = GetHitDamage();
+                if (Unit* target = GetHitUnit())
                 {
-                    int32 dmg = int32(GetHitDamage() * caster->GetTotalAttackPowerValue(BASE_ATTACK) / 100);
-                    SetHitDamage(dmg);
+                    if (Unit* caster = GetCaster())
+                    {
+                        damage += CalculatePctN(caster->GetTotalAttackPowerValue(BASE_ATTACK), 80);
+                        
+                        int32 dmg = caster->SpellDamageBonus(target, GetSpellInfo(), damage, SPELL_DIRECT_DAMAGE);
+                        SetHitDamage(dmg);
+                    }
                 }
             }
             
@@ -148,9 +153,17 @@ class spell_warr_victory_rush : public SpellScriptLoader
 
             void CalculateDamage(SpellEffIndex effect)
             {
-                // Formula: AttackPower * BasePoints / 100
-                if (Unit* caster = GetCaster())
-                    SetHitDamage(int32(GetHitDamage() * caster->GetTotalAttackPowerValue(BASE_ATTACK) / 100));
+                int32 damage = GetHitDamage();
+                if (Unit* target = GetHitUnit())
+                {
+                    if (Unit* caster = GetCaster())
+                    {
+                        damage += CalculatePctN(caster->GetTotalAttackPowerValue(BASE_ATTACK), 56);
+                        
+                        int32 dmg = caster->SpellDamageBonus(target, GetSpellInfo(), damage, SPELL_DIRECT_DAMAGE);
+                        SetHitDamage(dmg);
+                    }
+                }
             }
 
             void HandleAfterHit()
@@ -185,9 +198,17 @@ class spell_warr_cleave : public SpellScriptLoader
 
             void CalculateDamage(SpellEffIndex effect)
             {
-                // Formula: 6 + AttackPower * 0.45
-                if (Unit* caster = GetCaster())
-                    SetHitDamage(int32(6 + caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.45f));
+                int32 damage = GetHitDamage();
+                if (Unit* target = GetHitUnit())
+                {
+                    if (Unit* caster = GetCaster())
+                    {
+                        damage += CalculatePctN(caster->GetTotalAttackPowerValue(BASE_ATTACK), 46);
+                        
+                        int32 dmg = caster->SpellDamageBonus(target, GetSpellInfo(), damage, SPELL_DIRECT_DAMAGE);
+                        SetHitDamage(dmg);
+                    }
+                }
             }
 
             void Register()
@@ -216,9 +237,17 @@ class spell_warr_intercept_triggered : public SpellScriptLoader
 
             void CalculateDamage(SpellEffIndex effect)
             {
-                // Formula: 1 + AttackPower * 0.12
-                if (Unit* caster = GetCaster())
-                    SetHitDamage(int32(1 + caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.12f));
+                int32 damage = GetHitDamage();
+                if (Unit* target = GetHitUnit())
+                {
+                    if (Unit* caster = GetCaster())
+                    {
+                        damage += CalculatePctN(caster->GetTotalAttackPowerValue(BASE_ATTACK), 12);
+                        
+                        int32 dmg = caster->SpellDamageBonus(target, GetSpellInfo(), damage, SPELL_DIRECT_DAMAGE);
+                        SetHitDamage(dmg);
+                    }
+                }
             }
 
             void Register()
@@ -293,9 +322,17 @@ class spell_warr_heroic_strike : public SpellScriptLoader
 
             void CalculateDamage(SpellEffIndex effect)
             {
-                // Formula: 8 + AttackPower * 60 / 100
-                if (Unit* caster = GetCaster())
-                    SetHitDamage(int32(8 + caster->GetTotalAttackPowerValue(BASE_ATTACK) * 60 / 100));
+                int32 damage = GetHitDamage();
+                if (Unit* target = GetHitUnit())
+                {
+                    if (Unit* caster = GetCaster())
+                    {
+                        damage += CalculatePctN(caster->GetTotalAttackPowerValue(BASE_ATTACK), 60);
+                        
+                        int32 dmg = caster->SpellDamageBonus(target, GetSpellInfo(), damage, SPELL_DIRECT_DAMAGE);
+                        SetHitDamage(dmg);
+                    }
+                }
             }
 
             void Register()
@@ -323,11 +360,16 @@ class spell_warr_shockwave : public SpellScriptLoader
 
             void CalculateDamage(SpellEffIndex effect)
             {
-                // Formula: [Effect2BasePoints] / 100 * AttackPower
-                if (Unit* caster = GetCaster())
+                int32 damage = GetHitDamage();
+                if (Unit* target = GetHitUnit())
                 {
-                    int32 bp2 = caster->CalculateSpellDamage(GetHitUnit(), GetSpellInfo(), EFFECT_2);
-                    SetHitDamage(int32(bp2 / 100 * caster->GetTotalAttackPowerValue(BASE_ATTACK)));
+                    if (Unit* caster = GetCaster())
+                    {
+                        damage += CalculatePctN(caster->GetTotalAttackPowerValue(BASE_ATTACK), 75);
+                        
+                        int32 dmg = caster->SpellDamageBonus(target, GetSpellInfo(), damage, SPELL_DIRECT_DAMAGE);
+                        SetHitDamage(dmg);
+                    }
                 }
             }
 
@@ -376,16 +418,20 @@ class spell_warr_thunderclap : public SpellScriptLoader
                     // Check for Blood and Thunder
                     if (Unit* caster = GetCaster())
                     {
-                        if (caster->HasAura(84615) || (caster->HasAura(84614) && roll_chance_i(50))) // Blood and Thunder rank 1 & 2
+                        // Blood and Thunder rank 1 & 2
+                        if (AuraEffect const * aurEff = caster->GetDummyAuraEffect(SPELLFAMILY_WARRIOR, 5057, 0))
                         {
-                            if (Unit* target = GetHitUnit())
+                            if (roll_chance_i(aurEff->GetAmount()))
                             {
-                                if (target->HasAura(94009)) // If the target has Rend
+                                if (Unit* target = GetHitUnit())
                                 {
-                                    CheckAgain = false;
-                                    for (std::list<Unit*>::iterator itr = targetList.begin(); itr != targetList.end(); ++itr)
-                                        if (Unit* curTrg = (*itr))
-                                            caster->CastSpell(curTrg, 94009, true);
+                                    if (target->HasAura(94009, caster->GetGUID())) // If the target has Rend
+                                    {
+                                        CheckAgain = false;
+                                        for (std::list<Unit*>::iterator itr = targetList.begin(); itr != targetList.end(); ++itr)
+                                            if (Unit* curTrg = (*itr))
+                                                caster->CastSpell(curTrg, 94009, true);
+                                    }
                                 }
                             }
                         }

@@ -736,7 +736,7 @@ enum Opcodes
     CMSG_INSPECT_HONOR_STATS                         = 0x00E93, // 4.0.6a 13623
     SMSG_INSPECT_HONOR_STATS                         = 0x0005E, // 4.0.6a 13623
     CMSG_BATTLEMASTER_HELLO                          = 0x06D57, // 4.0.3a 13329 - 403
-    CMSG_MOVE_START_SWIM_CHEAT                       = 0x026C0, // 4.0.6a 13623
+    CMSG_MOVE_START_SWIM_CHEAT                       = 0x100F2, // 4.0.6a 13623
     CMSG_MOVE_STOP_SWIM_CHEAT                        = 0x06988, // 4.0.6a 13623
     SMSG_FORCE_WALK_SPEED_CHANGE                     = 0x068E8, // 4.0.6a 13623
     CMSG_FORCE_WALK_SPEED_CHANGE_ACK                 = 0x078CC, // 4.0.6a 13623
@@ -1077,7 +1077,7 @@ enum Opcodes
     CMSG_ACCEPT_LEVEL_GRANT                          = 0x0B5CC, // 4.0.6a 13623
     SMSG_REFER_A_FRIEND_FAILURE                      = 0x07F7C, // 4.0.6a 13623
     SMSG_SPLINE_MOVE_SET_FLYING                      = 0x05D54, // 4.0.3a 13329 - 403
-    SMSG_SPLINE_MOVE_UNSET_FLYING                    = 0x07688, // 4.0.6a 13623
+    SMSG_SPLINE_MOVE_UNSET_FLYING                    = 0x0257D, // 4.0.6a 13623
     SMSG_SUMMON_CANCEL                               = 0x070A8, // 4.0.6a 13623
     CMSG_CHANGE_PERSONAL_ARENA_RATING                = 0x101B2, // Unknown opcode ID
     CMSG_ALTER_APPEARANCE                            = 0x034A4, // 4.0.6a 13623
