@@ -147,6 +147,7 @@ class ThreatContainer
     private:
         std::list<HostileReference*> iThreatList;
         bool iDirty;
+        bool m_lastTargetIsValid;
     protected:
         friend class ThreatManager;
 
@@ -157,7 +158,7 @@ class ThreatContainer
         // Sort the list if necessary
         void update();
     public:
-        ThreatContainer() { iDirty = false; }
+        ThreatContainer() { iDirty = false; m_lastTargetIsValid = false; }
         ~ThreatContainer() { clearReferences(); }
 
         HostileReference* addThreat(Unit* victim, float threat);
@@ -177,6 +178,9 @@ class ThreatContainer
         HostileReference* getReferenceByTarget(Unit* victim);
 
         std::list<HostileReference*>& getThreatList() { return iThreatList; }
+
+        HostileReference* selectNextVictim2(Creature* pAttacker, HostileReference* pCurrentVictim);
+        bool isLastTargetValid() const;
 };
 
 //=================================================
@@ -247,6 +251,7 @@ class ThreatManager
         std::list<HostileReference*>& getOfflieThreatList() { return iThreatOfflineContainer.getThreatList(); }
         ThreatContainer& getOnlineContainer() { return iThreatContainer; }
         ThreatContainer& getOfflineContainer() { return iThreatOfflineContainer; }
+        bool isLastTargetValid() const;
     private:
         void _addThreat(Unit* victim, float threat);
 

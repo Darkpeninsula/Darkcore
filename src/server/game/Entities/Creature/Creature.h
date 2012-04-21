@@ -439,6 +439,19 @@ private:
     }
 };
 
+struct ReachableStruct
+{
+    uint32  lastCheck;
+    bool    reachable;
+    ReachableStruct()
+    {
+        lastCheck = 0;
+        reachable = false;
+    }
+};
+
+typedef std::map <uint32, ReachableStruct> ReachableTab;
+
 class Creature : public Unit, public GridObject<Creature>, public MapCreature
 {
     public:
@@ -515,7 +528,14 @@ class Creature : public Unit, public GridObject<Creature>, public MapCreature
 
         uint8 getLevelForTarget(WorldObject const* target) const; // overwrite Unit::getLevelForTarget for boss level support
 
+        bool CanReach(Unit* pVictim);
+        bool CanReachWithSpellAttack(Unit *pVictim);
+
+        bool IsInPreEvadeMode() const;
         bool IsInEvadeMode() const { return HasUnitState(UNIT_STATE_EVADE); }
+
+        void EnterPreEvadeMode();
+        void ExitPreEvadeMode() { m_preEvadeMode = false; }
 
         bool AIM_Initialize(CreatureAI* ai = NULL);
         void Motion_Initialize();
@@ -742,6 +762,10 @@ class Creature : public Unit, public GridObject<Creature>, public MapCreature
         MovementGeneratorType _defaultMovementType;
         uint32 _DBTableGuid;                               ///< For new or temporary creatures is 0 for saved it is lowguid
         uint32 _equipmentId;
+
+        ReachableTab  m_reachableTab;                      // to avoid too much call of PathFinding
+        bool m_preEvadeMode;                               // cannot reach any enemies
+        time_t m_preEvadeTimer;                            // preEvade timer 26 sec
 
         bool _AlreadyCallAssistance;
         bool _AlreadySearchedAssistance;

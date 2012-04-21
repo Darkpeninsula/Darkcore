@@ -319,7 +319,7 @@ void ThreatContainer::update()
 // return the next best victim
 // could be the current victim
 
-HostileReference* ThreatContainer::selectNextVictim(Creature* attacker, HostileReference* currentVictim)
+HostileReference* ThreatContainer::selectNextVictim2(Creature* attacker, HostileReference* currentVictim)
 {
     HostileReference* currentRef = NULL;
     bool found = false;
@@ -357,28 +357,30 @@ HostileReference* ThreatContainer::selectNextVictim(Creature* attacker, HostileR
 
         if (attacker->canCreatureAttack(target))           // skip non attackable currently targets
         {
-            if (currentVictim)                              // select 1.3/1.1 better target in comparison current target
+            bool isReacheable = attacker->CanReach(target);
+            if (isReacheable)
             {
-                // list sorted and and we check current target, then this is best case
-                if (currentVictim == currentRef || currentRef->getThreat() <= 1.1f * currentVictim->getThreat())
+                if (currentVictim)                              // select 1.3/1.1 better target in comparison current target
                 {
-                    currentRef = currentVictim;            // for second case
+                    // list sorted and and we check current target, then this is best case
+                    if (currentVictim == currentRef || currentRef->getThreat() <= 1.1f * currentVictim->getThreat())
+                    {
+                        currentRef = currentVictim;            // for second case
+                        found = true;
+                        break;
+                    }
+
+                    if (currentRef->getThreat() > 1.3f * currentVictim->getThreat() || (currentRef->getThreat() > 1.1f * currentVictim->getThreat() && attacker->IsWithinMeleeRange(target)))
+                    {                                           //implement 110% threat rule for targets in melee range
+                        found = true;                           //and 130% rule for targets in ranged distances
+                        break;                                  //for selecting alive targets
+                    }
+                }
+                else                                            // select any
+                {
                     found = true;
                     break;
                 }
-
-                if (currentRef->getThreat() > 1.3f * currentVictim->getThreat() ||
-                    (currentRef->getThreat() > 1.1f * currentVictim->getThreat() &&
-                    attacker->IsWithinMeleeRange(target)))
-                {                                           //implement 110% threat rule for targets in melee range
-                    found = true;                           //and 130% rule for targets in ranged distances
-                    break;                                  //for selecting alive targets
-                }
-            }
-            else                                            // select any
-            {
-                found = true;
-                break;
             }
         }
         ++iter;
@@ -390,11 +392,69 @@ HostileReference* ThreatContainer::selectNextVictim(Creature* attacker, HostileR
 }
 
 //============================================================
+// return the next best victim
+// could be the current victim
+
+HostileReference* ThreatContainer::selectNextVictim(Creature* attacker, HostileReference* currentVictim)
+{
+    HostileReference* currentRef = NULL;
+    HostileReference* secondaryChoice = NULL;
+    HostileReference* result = currentVictim;
+    m_lastTargetIsValid = false;
+    bool secondChoiceTargetsFound = false;
+
+
+    std::list<HostileReference*> &threatList = getThreatList();
+
+    for (std::list<HostileReference*>::iterator itr = threatList.begin(); itr != threatList.end(); ++itr)
+    {
+        currentRef = (*itr);
+
+        Unit* target = currentRef->getTarget();
+        ASSERT(target);                             // if the ref has status online the target must be there!
+
+        if (((attacker->CanReachWithSpellAttack(target)) || attacker->CanReach(target)))
+        {
+            if (!secondChoiceTargetsFound && (target->IsImmunedToDamage(attacker->GetMeleeDamageSchoolMask()) || target->HasNegativeAuraWithInterruptFlag(AURA_INTERRUPT_FLAG_TAKE_DAMAGE)))
+            {
+                secondChoiceTargetsFound = true;
+                secondaryChoice = currentRef;
+                continue;
+            }
+
+            result = currentRef;
+            m_lastTargetIsValid = true;
+            secondChoiceTargetsFound = false;
+            break;
+        }
+    }
+
+    if (secondChoiceTargetsFound)
+    {
+        result = secondaryChoice;
+        m_lastTargetIsValid = true;
+    }
+    return result;
+}
+
+bool ThreatContainer::isLastTargetValid() const
+{
+    return m_lastTargetIsValid;
+}
+
+//============================================================
 //=================== ThreatManager ==========================
 //============================================================
 
 ThreatManager::ThreatManager(Unit* owner) : iCurrentVictim(NULL), iOwner(owner), iUpdateTimer(THREAT_UPDATE_INTERVAL)
 {
+}
+
+//============================================================
+
+bool ThreatManager::isLastTargetValid() const
+{
+    return iThreatContainer.isLastTargetValid();
 }
 
 //============================================================

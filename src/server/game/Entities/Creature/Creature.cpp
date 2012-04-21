@@ -451,6 +451,26 @@ void Creature::Update(uint32 diff)
             RemoveUnitMovementFlag(MOVEMENTFLAG_SWIMMING);
     }
 
+    // delete all reachable info ha more than 500ms old
+    ReachableTab::iterator itr = m_reachableTab.begin();
+    while (itr!=m_reachableTab.end())
+    {
+        if ((itr->second.lastCheck += diff) < 500)
+            ++itr;
+        else
+            m_reachableTab.erase(itr++);
+    }
+
+    if (m_preEvadeMode)
+    {
+        time_t now= time(NULL);
+        if ((now - m_preEvadeTimer) > 26)
+        {
+            AI()->EnterEvadeMode();
+            m_preEvadeMode = false;
+        }
+    }
+
     switch (_deathState)
     {
         case JUST_ALIVED:
@@ -529,12 +549,15 @@ void Creature::Update(uint32 diff)
                 IsAIEnabled = true;
             }
 
-            if (!IsInEvadeMode() && IsAIEnabled)
+            if(!IsInEvadeMode() || IsInPreEvadeMode())
             {
-                // do not allow the AI to be changed during update
-                _AI_locked = true;
-                i_AI->UpdateAI(diff);
-                _AI_locked = false;
+                if(IsAIEnabled)
+                {
+                    // do not allow the AI to be changed during update
+                    _AI_locked = true;
+                    i_AI->UpdateAI(diff);
+                    _AI_locked = false;
+                }
             }
 
             // creature can be dead after UpdateAI call
@@ -934,6 +957,82 @@ bool Creature::isCanTrainingAndResetTalentsOf(Player* player) const
     return player->getLevel() >= 10
         && GetCreatureTemplate()->trainer_type == TRAINER_TYPE_CLASS
         && player->getClass() == GetCreatureTemplate()->trainer_class;
+}
+
+bool Creature::CanReachWithSpellAttack(Unit *victim)
+{
+    if(!victim)
+        return false;
+
+    for(uint32 i = 0; i < CREATURE_MAX_SPELLS; ++i)
+    {
+        if(!_spells[i])
+            continue;
+
+        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(_spells[i]);
+        if (!spellInfo)
+        {
+            sLog->outError("WORLD: unknown spell id %i", _spells[i]);
+            continue;
+        }
+
+        if (spellInfo->ManaCost > uint32(GetPower(POWER_MANA)))
+            continue;
+
+        float range = spellInfo->GetMaxRange(true);
+        float minrange = spellInfo->GetMinRange(true);
+        float dist = GetDistance(victim);
+        if (dist > range || dist < minrange)
+            continue;
+        if (spellInfo->PreventionType == SPELL_PREVENTION_TYPE_SILENCE && HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SILENCED))
+            continue;
+        if (spellInfo->PreventionType == SPELL_PREVENTION_TYPE_PACIFY && HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED))
+            continue;
+        return true;
+    }
+    return false;
+}
+
+bool Creature::CanReach(Unit* pVictim)
+{
+    if (!pVictim)
+        return false;
+
+    if (!m_reachableTab.empty())
+    {
+        ReachableTab::const_iterator itr = m_reachableTab.find(pVictim->GetGUID());
+        if (itr!= m_reachableTab.end())
+            return itr->second.reachable;
+    }
+
+        bool isReachable = (canSeeOrDetect(pVictim, true) && IsValidAttackTarget(pVictim) && pVictim->isInAccessiblePlaceFor(this));
+
+    if (isReachable)
+    {
+        PathFinderMovementGenerator path(this);
+        float x, y, z;
+        pVictim->GetPosition(x, y, z);
+        path.calculate(x, y, z, false);
+        isReachable = path.getPathType() & PATHFIND_NORMAL;
+    }
+
+    m_reachableTab[pVictim->GetGUID()].reachable = isReachable;
+    sLog->outString("<< Creature::CanReach()> c=%s, t=%s result=%u >>",GetName(), pVictim->GetName(), isReachable);
+    return isReachable;
+}
+
+void Creature::EnterPreEvadeMode()
+{
+    if (m_preEvadeMode)
+        return;
+    m_preEvadeMode = true;
+    m_preEvadeTimer = time(NULL);
+    sLog->outString("<<< %s entering PREEVADE mode >>>", GetName());
+}
+
+bool Creature::IsInPreEvadeMode() const
+{
+    return m_preEvadeMode;
 }
 
 void Creature::AI_SendMoveToPacket(float x, float y, float z, uint32 time, uint32 /*MovementFlags*/, uint8 /*type*/)

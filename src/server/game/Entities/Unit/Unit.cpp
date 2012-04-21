@@ -9749,7 +9749,7 @@ bool Unit::Attack(Unit* victim, bool meleeAttack)
     }
     else
     {
-        if (victim->ToCreature()->IsInEvadeMode())
+        if (victim->ToCreature()->IsInEvadeMode() && victim->ToCreature()->IsInPreEvadeMode())
             return false;
     }
 
@@ -13046,6 +13046,24 @@ Unit* Creature::SelectVictim()
     }
     else
         return NULL;
+
+    if (target)
+    {
+        if(!m_ThreatManager.isLastTargetValid())
+        {
+            // remove all taunts
+            RemoveAurasByType(SPELL_AURA_MOD_TAUNT);
+            this->ToCreature()->EnterPreEvadeMode();
+            return NULL;
+        }
+        else
+        {
+            if (this->ToCreature()->IsInPreEvadeMode())
+                this->ToCreature()->EnterPreEvadeMode();
+        }
+        return NULL;
+    }
+
 
     if (target && _IsTargetAcceptable(target))
     {
