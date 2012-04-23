@@ -22,7 +22,7 @@
 #include "TerrainBuilder.h"
 #include "Map.h"
 
-static char const* MAP_VERSION_MAGIC = "v1.2";
+static char const* MAP_VERSION_MAGIC = "v1.5";
 
 namespace Pathfinding
 {
