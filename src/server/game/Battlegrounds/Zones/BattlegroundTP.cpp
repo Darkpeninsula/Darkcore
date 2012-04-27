@@ -177,7 +177,6 @@ void BattlegroundTP::StartingEventCloseDoors()
         DoorClose(i);
         SpawnBGObject(i, RESPAWN_IMMEDIATELY);
     }
-
     for (uint32 i = BG_TP_OBJECT_A_FLAG; i <= BG_TP_OBJECT_BERSERKBUFF_2; ++i)
         SpawnBGObject(i, RESPAWN_ONE_DAY);
 
@@ -195,7 +194,6 @@ void BattlegroundTP::StartingEventOpenDoors()
 
     for (uint32 i = BG_TP_OBJECT_A_FLAG; i <= BG_TP_OBJECT_BERSERKBUFF_2; ++i)
         SpawnBGObject(i, RESPAWN_IMMEDIATELY);
-
     // players joining later are not egible
     //StartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, TP_EVENT_START_BATTLE);
 }
@@ -357,7 +355,7 @@ void BattlegroundTP::EventPlayerDroppedFlag(Player* Source)
         {
             if (!this->IsHordeFlagPickedup())
                 return;
-            if (GetHordeFlagPickerGUID() == Source->GetGUID())
+            if (GetFlagPickerGUID(BG_TEAM_HORDE) == Source->GetGUID())
             {
                 SetHordeFlagPicker(0);
                 Source->RemoveAurasDueToSpell(BG_TP_SPELL_HORDE_FLAG);
@@ -367,7 +365,7 @@ void BattlegroundTP::EventPlayerDroppedFlag(Player* Source)
         {
             if (!this->IsAllianceFlagPickedup())
                 return;
-            if (GetAllianceFlagPickerGUID() == Source->GetGUID())
+            if (GetFlagPickerGUID(BG_TEAM_ALLIANCE) == Source->GetGUID())
             {
                 SetAllianceFlagPicker(0);
                 Source->RemoveAurasDueToSpell(BG_TP_SPELL_ALLIANCE_FLAG);
@@ -382,7 +380,7 @@ void BattlegroundTP::EventPlayerDroppedFlag(Player* Source)
     {
         if (!IsHordeFlagPickedup())
             return;
-        if (GetHordeFlagPickerGUID() == Source->GetGUID())
+        if (GetFlagPickerGUID(BG_TEAM_HORDE) == Source->GetGUID())
         {
             SetHordeFlagPicker(0);
             Source->RemoveAurasDueToSpell(BG_TP_SPELL_HORDE_FLAG);
@@ -399,7 +397,7 @@ void BattlegroundTP::EventPlayerDroppedFlag(Player* Source)
     {
         if (!IsAllianceFlagPickedup())
             return;
-        if (GetAllianceFlagPickerGUID() == Source->GetGUID())
+        if (GetFlagPickerGUID(BG_TEAM_ALLIANCE) == Source->GetGUID())
         {
             SetAllianceFlagPicker(0);
             Source->RemoveAurasDueToSpell(BG_TP_SPELL_ALLIANCE_FLAG);
@@ -554,7 +552,7 @@ void BattlegroundTP::EventPlayerClickedOnFlag(Player* Source, GameObject* target
     Source->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_ENTER_PVP_COMBAT);
 }
 
-void BattlegroundTP::RemovePlayer(Player* player, uint64 guid)
+void BattlegroundTP::RemovePlayer(Player* player, uint64 guid, uint32 /*team*/)
 {
     // sometimes flag aura not removed :(
     if (IsAllianceFlagPickedup() && m_FlagKeepers[BG_TEAM_ALLIANCE] == guid)
@@ -605,16 +603,16 @@ void BattlegroundTP::HandleAreaTrigger(Player* Source, uint32 Trigger)
 
     //uint32 SpellId = 0;
     //uint64 buff_guid = 0;
-    switch(Trigger)
+    switch (Trigger)
     {
         case 5904:                                          // Alliance Flag spawn
             if (m_FlagState[BG_TEAM_HORDE] && !m_FlagState[BG_TEAM_ALLIANCE])
-                if (GetHordeFlagPickerGUID() == Source->GetGUID())
+                if (GetFlagPickerGUID(BG_TEAM_HORDE) == Source->GetGUID())
                     EventPlayerCapturedFlag(Source);
             break;
         case 5905:                                          // Horde Flag spawn
             if (m_FlagState[BG_TEAM_ALLIANCE] && !m_FlagState[BG_TEAM_HORDE])
-                if (GetAllianceFlagPickerGUID() == Source->GetGUID())
+                if (GetFlagPickerGUID(BG_TEAM_ALLIANCE) == Source->GetGUID())
                     EventPlayerCapturedFlag(Source);
             break;
         case 5908:                                          // Horde Tower
@@ -630,7 +628,7 @@ void BattlegroundTP::HandleAreaTrigger(Player* Source, uint32 Trigger)
             break;
         default:
             sLog->outError("WARNING: Unhandled AreaTrigger in Battleground: %u", Trigger);
-            Source->GetSession()->SendAreaTriggerMessage("Warning: Unhandled AreaTrigger in Battleground: %u", Trigger);
+            //Source->GetSession()->SendAreaTriggerMessage("Warning: Unhandled AreaTrigger in Battleground: %u", Trigger);
             break;
     }
 
@@ -658,8 +656,8 @@ bool BattlegroundTP::SetupBattleground()
         || !AddObject(BG_TP_OBJECT_DOOR_H_1, BG_OBJECT_DOOR_H_1_TP_ENTRY, 1556.595f, 314.502f, 1.223f, 3.04f, 0, 0, 0, 0, RESPAWN_IMMEDIATELY)
         || !AddObject(BG_TP_OBJECT_DOOR_H_2, BG_OBJECT_DOOR_H_2_TP_ENTRY, 1587.415f, 319.935f, 1.522f, 6.20f, 0, 0, 0, 0, RESPAWN_IMMEDIATELY)
         || !AddObject(BG_TP_OBJECT_DOOR_H_3, BG_OBJECT_DOOR_H_3_TP_ENTRY, 1558.315f, 372.709f, 1.484f, 6.12f, 0, 0, 0, 0, RESPAWN_IMMEDIATELY)
-       )
-    {
+)
+	{
         sLog->outErrorDb("BatteGroundTP: Failed to spawn some object Battleground not created!");
         return false;
     }
@@ -671,22 +669,8 @@ bool BattlegroundTP::SetupBattleground()
         return false;
     }
 
-    sg = sWorldSafeLocsStore.LookupEntry(TP_GRAVEYARD_START_ALLIANCE);
-    if (!sg || !AddSpiritGuide(TP_SPIRIT_ALLIANCE, sg->x, sg->y, sg->z, 3.641396f, ALLIANCE))
-    {
-        sLog->outErrorDb("BatteGroundTP: Failed to spawn Alliance start spirit guide! Battleground not created!");
-        return false;
-    }
-
     sg = sWorldSafeLocsStore.LookupEntry(TP_GRAVEYARD_MIDDLE_HORDE);
     if (!sg || !AddSpiritGuide(TP_SPIRIT_HORDE, sg->x, sg->y, sg->z, 3.641396f, HORDE))
-    {
-        sLog->outErrorDb("BatteGroundTP: Failed to spawn Horde spirit guide! Battleground not created!");
-        return false;
-    }
-
-    sg = sWorldSafeLocsStore.LookupEntry(TP_GRAVEYARD_START_HORDE);
-    if (!sg || !AddSpiritGuide(TP_SPIRIT_ALLIANCE, sg->x, sg->y, sg->z, 3.641396f, HORDE))
     {
         sLog->outErrorDb("BatteGroundTP: Failed to spawn Horde start spirit guide! Battleground not created!");
         return false;
@@ -756,7 +740,7 @@ void BattlegroundTP::UpdatePlayerScore(Player* Source, uint32 type, uint32 value
     if (itr == _PlayerScores.end())                         // player not found
         return;
 
-    switch(type)
+    switch (type)
     {
         case SCORE_FLAG_CAPTURES:                           // flags captured
             ((BattlegroundTPScore*)itr->second)->FlagCaptures += value;
@@ -781,40 +765,20 @@ WorldSafeLocsEntry const* BattlegroundTP::GetClosestGraveYard(Player* player)
     //and start running around, while the doors are still closed
     if (player->GetTeam() == ALLIANCE)
     {
-        if (GetStatus() == STATUS_IN_PROGRESS)
-        {
-            WorldSafeLocsEntry const* ret;
-            WorldSafeLocsEntry const* closest;
-            float dist, nearest;
-            float x, y, z;
-
-            player->GetPosition(x, y, z);
-
-            closest = sWorldSafeLocsStore.LookupEntry(TP_GRAVEYARD_MIDDLE_ALLIANCE);
-            nearest = sqrt((closest->x - x)*(closest->x - x) + (closest->y - y)*(closest->y - y)+(closest->z - z)*(closest->z - z));
-
-            ret = sWorldSafeLocsStore.LookupEntry(TP_GRAVEYARD_START_ALLIANCE);
-            dist = sqrt((ret->x - x)*(ret->x - x) + (ret->y - y)*(ret->y - y)+(ret->z - z)*(ret->z - z));
-
-            if (dist < nearest)
-            {
-                closest = ret;
-                nearest = dist;
-            }
-
-            return closest;
-        }
+        if (GetStatus() == STATUS_IN_PROGRESS)	
+            return sWorldSafeLocsStore.LookupEntry(TP_GRAVEYARD_MIDDLE_ALLIANCE);
         else
             return sWorldSafeLocsStore.LookupEntry(TP_GRAVEYARD_FLAGROOM_ALLIANCE);
-    }
-    else
-    {
-        if (GetStatus() == STATUS_IN_PROGRESS)
+	}
+	else
+	{
+        if (GetStatus() == STATUS_IN_PROGRESS)	
             return sWorldSafeLocsStore.LookupEntry(TP_GRAVEYARD_MIDDLE_HORDE);
         else
             return sWorldSafeLocsStore.LookupEntry(TP_GRAVEYARD_FLAGROOM_HORDE);
-    }
-}
+	}
+}	
+	
 
 void BattlegroundTP::FillInitialWorldStates(WorldPacket& data)
 {

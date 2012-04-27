@@ -56,6 +56,7 @@ enum BG_TP_WorldStates
 {
     BG_TP_FLAG_UNK_ALLIANCE       = 1545,
     BG_TP_FLAG_UNK_HORDE          = 1546,
+//    FLAG_UNK                      = 1547,	
     BG_TP_FLAG_CAPTURES_ALLIANCE  = 1581,
     BG_TP_FLAG_CAPTURES_HORDE     = 1582,
     BG_TP_FLAG_CAPTURES_MAX       = 1601,
@@ -149,13 +150,10 @@ class BattlegroundTPScore : public BattlegroundScore
 
 class BattlegroundTP : public Battleground
 {
-    friend class BattlegroundMgr;
-
     public:
         /* Construction */
         BattlegroundTP();
         ~BattlegroundTP();
-        void PostUpdateImpl(uint32 diff);
 
         /* inherited from BattlegroundClass */
         virtual void AddPlayer(Player* player);
@@ -163,8 +161,12 @@ class BattlegroundTP : public Battleground
         virtual void StartingEventOpenDoors();
 
         /* BG Flags */
-        uint64 GetAllianceFlagPickerGUID() const    { return m_FlagKeepers[BG_TEAM_ALLIANCE]; }
-        uint64 GetHordeFlagPickerGUID() const       { return m_FlagKeepers[BG_TEAM_HORDE]; }
+        uint64 GetFlagPickerGUID(int32 team) const
+        {
+            if (team == BG_TEAM_ALLIANCE || team == BG_TEAM_HORDE)
+                return m_FlagKeepers[team];
+            return 0;
+        }
         void SetAllianceFlagPicker(uint64 guid)     { m_FlagKeepers[BG_TEAM_ALLIANCE] = guid; }
         void SetHordeFlagPicker(uint64 guid)        { m_FlagKeepers[BG_TEAM_HORDE] = guid; }
         bool IsAllianceFlagPickedup() const         { return m_FlagKeepers[BG_TEAM_ALLIANCE] != 0; }
@@ -182,7 +184,7 @@ class BattlegroundTP : public Battleground
         virtual void EventPlayerClickedOnFlag(Player* Source, GameObject* target_obj);
         virtual void EventPlayerCapturedFlag(Player* Source);
 
-        void RemovePlayer(Player* player, uint64 guid);
+        void RemovePlayer(Player* player, uint64 guid, uint32 team);
         void HandleAreaTrigger(Player* Source, uint32 Trigger);
         void HandleKillPlayer(Player* player, Player* killer);
         bool SetupBattleground();
@@ -218,5 +220,7 @@ class BattlegroundTP : public Battleground
         bool m_BothFlagsKept;
         uint8 m_FlagDebuffState;                            // 0 - no debuffs, 1 - focused assault, 2 - brutal assault
         uint8 m_minutesElapsed;
+		
+        virtual void PostUpdateImpl(uint32 diff);
 };
 #endif
