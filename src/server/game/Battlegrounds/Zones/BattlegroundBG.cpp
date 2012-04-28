@@ -1,25 +1,21 @@
 /*
- * Copyright (C) 2005 - 2012 MaNGOS <http://www.getmangos.com/>
+ * Copyright (C) 2011-2012 DarkCore <http://www.darkpeninsula.eu/>
+ * Copyright (C) 2011-2012 Project SkyFire <http://www.projectskyfire.org/>
+ * Copyright (C) 2008-2012 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2005-2012 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2011-2012 ArkCORE <http://www.arkania.net/>
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
  *
- * Copyright (C) 2008 - 2012 Trinity <http://www.trinitycore.org/>
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
  *
- * Copyright (C) 2010 - 2012 ProjectSkyfire <http://www.projectskyfire.org/>
- *
- * Copyright (C) 2011 - 2012 ArkCORE <http://www.arkania.net/>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "gamePCH.h"
@@ -44,7 +40,7 @@ uint32 BG_BG_HonorScoreTicks[BG_HONOR_MODE_NUM] = {
 BattlegroundBG::BattlegroundBG()
 {
     _BuffChange = true;
-	_BgObjects.resize(BG_BG_OBJECT_MAX);
+    _BgObjects.resize(BG_BG_OBJECT_MAX);
     _BgCreatures.resize(BG_BG_ALL_NODES_COUNT + 5);//+5 for aura triggers
 
     _StartMessageIds[BG_STARTING_EVENT_FIRST]  = LANG_BG_BG_START_TWO_MINUTES;
@@ -59,7 +55,7 @@ BattlegroundBG::~BattlegroundBG()
 
 void BattlegroundBG::PostUpdateImpl(uint32 diff)
 {
-	if (GetStatus() == STATUS_IN_PROGRESS)
+    if (GetStatus() == STATUS_IN_PROGRESS)
     {
         int team_points[BG_TEAMS_COUNT] = { 0, 0 };
 
@@ -172,7 +168,7 @@ void BattlegroundBG::StartingEventCloseDoors()
     // Starting doors
     DoorClose(BG_BG_OBJECT_GATE_A);
     DoorClose(BG_BG_OBJECT_GATE_H);
-	SpawnBGObject(BG_BG_OBJECT_GATE_A, RESPAWN_IMMEDIATELY);
+    SpawnBGObject(BG_BG_OBJECT_GATE_A, RESPAWN_IMMEDIATELY);
     SpawnBGObject(BG_BG_OBJECT_GATE_H, RESPAWN_IMMEDIATELY);
 
     // Starting base spirit guides

@@ -1,6 +1,10 @@
 /*
+ * Copyright (C) 2011-2012 DarkCore <http://www.darkpeninsula.eu/>
+ * Copyright (C) 2011-2012 Project SkyFire <http://www.projectskyfire.org/>
+ * Copyright (C) 2008-2012 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2005-2012 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2011-2012 ArkCORE <http://www.arkania.net/>
  * Copyright (C) 2012 StroustrupEMU <https://bitbucket.org/zgn/stroustrupemu/>
- *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
  * Free Software Foundation; either version 3 of the License, or (at your
@@ -56,7 +60,7 @@ BattlegroundTP::BattlegroundTP()
     _StartMessageIds[BG_STARTING_EVENT_SECOND] = LANG_BG_TP_START_ONE_MINUTE;
     _StartMessageIds[BG_STARTING_EVENT_THIRD]  = LANG_BG_TP_START_HALF_MINUTE;
     _StartMessageIds[BG_STARTING_EVENT_FOURTH] = LANG_BG_TP_HAS_BEGUN;
-	m_FlagDebuffState = 0;
+    m_FlagDebuffState = 0;
 }
 
 BattlegroundTP::~BattlegroundTP()
@@ -657,7 +661,7 @@ bool BattlegroundTP::SetupBattleground()
         || !AddObject(BG_TP_OBJECT_DOOR_H_2, BG_OBJECT_DOOR_H_2_TP_ENTRY, 1587.415f, 319.935f, 1.522f, 6.20f, 0, 0, 0, 0, RESPAWN_IMMEDIATELY)
         || !AddObject(BG_TP_OBJECT_DOOR_H_3, BG_OBJECT_DOOR_H_3_TP_ENTRY, 1558.315f, 372.709f, 1.484f, 6.12f, 0, 0, 0, 0, RESPAWN_IMMEDIATELY)
 )
-	{
+    {
         sLog->outErrorDb("BatteGroundTP: Failed to spawn some object Battleground not created!");
         return false;
     }
@@ -765,20 +769,20 @@ WorldSafeLocsEntry const* BattlegroundTP::GetClosestGraveYard(Player* player)
     //and start running around, while the doors are still closed
     if (player->GetTeam() == ALLIANCE)
     {
-        if (GetStatus() == STATUS_IN_PROGRESS)	
+        if (GetStatus() == STATUS_IN_PROGRESS)    
             return sWorldSafeLocsStore.LookupEntry(TP_GRAVEYARD_MIDDLE_ALLIANCE);
         else
             return sWorldSafeLocsStore.LookupEntry(TP_GRAVEYARD_FLAGROOM_ALLIANCE);
-	}
-	else
-	{
-        if (GetStatus() == STATUS_IN_PROGRESS)	
+    }
+    else
+    {
+        if (GetStatus() == STATUS_IN_PROGRESS)    
             return sWorldSafeLocsStore.LookupEntry(TP_GRAVEYARD_MIDDLE_HORDE);
         else
             return sWorldSafeLocsStore.LookupEntry(TP_GRAVEYARD_FLAGROOM_HORDE);
-	}
-}	
-	
+    }
+}    
+    
 
 void BattlegroundTP::FillInitialWorldStates(WorldPacket& data)
 {

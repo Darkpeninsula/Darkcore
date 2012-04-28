@@ -850,7 +850,7 @@ enum CoreStrings
     LANG_BG_IC_HORDE                    = 1301,
 
     // FREE IDS                           1228-9999
-	
+    
     // Twin Peaks
     LANG_BG_TP_START_TWO_MINUTES        = 1230,
     LANG_BG_TP_START_ONE_MINUTE         = 1231,
@@ -867,8 +867,8 @@ enum CoreStrings
     LANG_BG_TP_F_PLACED                 = 1242,
     LANG_BG_TP_ALLIANCE_FLAG_RESPAWNED  = 1243,
     LANG_BG_TP_HORDE_FLAG_RESPAWNED     = 1244,
-	
-    // FREE IDS                           1245-1249	
+    
+    // FREE IDS                           1245-1249    
 
     // Battle For Gilneas
     LANG_BG_BG_START_TWO_MINUTES        = 1250,
@@ -886,9 +886,9 @@ enum CoreStrings
     LANG_BG_BG_NODE_CLAIMED             = 1262,
     LANG_BG_BG_A_NEAR_VICTORY           = 1263,
     LANG_BG_BG_H_NEAR_VICTORY           = 1264,
-	
-    // FREE IDS                           1265-1299	
-	
+    
+    // FREE IDS                           1265-1299    
+    
     // AV
     LANG_BG_AV_ALLY                     = 1300,
     LANG_BG_AV_HORDE                    = 1301,
