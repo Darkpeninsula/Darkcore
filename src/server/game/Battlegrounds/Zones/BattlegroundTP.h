@@ -1,6 +1,10 @@
 /*
+ * Copyright (C) 2011-2012 DarkCore <http://www.darkpeninsula.eu/>
+ * Copyright (C) 2011-2012 Project SkyFire <http://www.projectskyfire.org/>
+ * Copyright (C) 2008-2012 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2005-2012 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2011-2012 ArkCORE <http://www.arkania.net/>
  * Copyright (C) 2012 StroustrupEMU <https://bitbucket.org/zgn/stroustrupemu/>
- *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
  * Free Software Foundation; either version 3 of the License, or (at your
@@ -42,12 +46,12 @@ enum BG_TP_Sound
 
 enum BG_TP_SpellId
 {
-    BG_TP_SPELL_HORDE_FLAG				= 23333,
-    BG_TP_SPELL_HORDE_FLAG_DROPPED		= 23334,
-    BG_TP_SPELL_HORDE_FLAG_PICKED		= 61266,    // fake spell, does not exist but used as timer start event
-    BG_TP_SPELL_ALLIANCE_FLAG			= 23335,
-    BG_TP_SPELL_ALLIANCE_FLAG_DROPPED	= 23336,
-    BG_TP_SPELL_ALLIANCE_FLAG_PICKED	= 61265,    // fake spell, does not exist but used as timer start event
+    BG_TP_SPELL_HORDE_FLAG                = 23333,
+    BG_TP_SPELL_HORDE_FLAG_DROPPED        = 23334,
+    BG_TP_SPELL_HORDE_FLAG_PICKED        = 61266,    // fake spell, does not exist but used as timer start event
+    BG_TP_SPELL_ALLIANCE_FLAG            = 23335,
+    BG_TP_SPELL_ALLIANCE_FLAG_DROPPED    = 23336,
+    BG_TP_SPELL_ALLIANCE_FLAG_PICKED    = 61265,    // fake spell, does not exist but used as timer start event
     BG_TP_SPELL_FOCUSED_ASSAULT         = 46392,
     BG_TP_SPELL_BRUTAL_ASSAULT          = 46393
 };
@@ -56,7 +60,7 @@ enum BG_TP_WorldStates
 {
     BG_TP_FLAG_UNK_ALLIANCE       = 1545,
     BG_TP_FLAG_UNK_HORDE          = 1546,
-//    FLAG_UNK                      = 1547,	
+//    FLAG_UNK                      = 1547,    
     BG_TP_FLAG_CAPTURES_ALLIANCE  = 1581,
     BG_TP_FLAG_CAPTURES_HORDE     = 1582,
     BG_TP_FLAG_CAPTURES_MAX       = 1601,
@@ -220,7 +224,7 @@ class BattlegroundTP : public Battleground
         bool m_BothFlagsKept;
         uint8 m_FlagDebuffState;                            // 0 - no debuffs, 1 - focused assault, 2 - brutal assault
         uint8 m_minutesElapsed;
-		
+        
         virtual void PostUpdateImpl(uint32 diff);
 };
 #endif

@@ -429,13 +429,13 @@ void BattlegroundMgr::BuildPvpLogDataPacket(WorldPacket *data, Battleground *bg)
                         data->put(extraFields, 2);            // count of next fields
                         *data << uint32(((BattlegroundICScore*)itr2->second)->BasesAssaulted);       // bases asssulted
                         *data << uint32(((BattlegroundICScore*)itr2->second)->BasesDefended);        // bases defended
-						break;
-					case 726:
+                        break;
+                    case 726:
                         data->put(extraFields, 2); // count of next fields
                         *data << uint32(((BattlegroundTPScore*)(itr2->second))->FlagCaptures); // flag captures
                         *data << uint32(((BattlegroundTPScore*)(itr2->second))->FlagReturns); // flag returns
                         break;
-					case 761:
+                    case 761:
                         data->put(extraFields, 2); // count of next fields
                         *data << uint32(((BattlegroundBGScore*)(itr2->second))->BasesAssaulted); // bases asssulted
                         *data << uint32(((BattlegroundBGScore*)(itr2->second))->BasesDefended); // bases defended
@@ -477,7 +477,7 @@ void BattlegroundMgr::BuildPvpLogDataPacket(WorldPacket *data, Battleground *bg)
                 *data << uint32(((BattlegroundICScore*)itr2->second)->BasesDefended);          // bases defended
                 break;
             case BATTLEGROUND_BG:                                 // Battle of Gilneas
-				data->put(extraFields, 2); // count of next fields
+                data->put(extraFields, 2); // count of next fields
                 *data << uint32(((BattlegroundBGScore*)(itr2->second))->BasesAssaulted); // bases asssulted
                 *data << uint32(((BattlegroundBGScore*)(itr2->second))->BasesDefended);          // bases defended
                 break;
@@ -714,7 +714,7 @@ Battleground* BattlegroundMgr::CreateNewBattleground(BattlegroundTypeId bgTypeId
         case BATTLEGROUND_TP:
             bg = new BattlegroundTP(*(BattlegroundTP*)bg_template);
             break;
-		case BATTLEGROUND_BG:
+        case BATTLEGROUND_BG:
             bg = new BattlegroundBG(*(BattlegroundBG*)bg_template);
             break;
         case BATTLEGROUND_RB:
@@ -765,8 +765,8 @@ uint32 BattlegroundMgr::CreateBattleground(CreateBattlegroundData& data)
         case BATTLEGROUND_DS: bg = new BattlegroundDS; break;
         case BATTLEGROUND_RV: bg = new BattlegroundRV; break;
         case BATTLEGROUND_IC: bg = new BattlegroundIC; break;
-		case BATTLEGROUND_TP: bg = new BattlegroundTP; break;
-		case BATTLEGROUND_BG: bg = new BattlegroundBG; break;
+        case BATTLEGROUND_TP: bg = new BattlegroundTP; break;
+        case BATTLEGROUND_BG: bg = new BattlegroundBG; break;
         case BATTLEGROUND_RB: bg = new BattlegroundRB; break;
         default:
             bg = new Battleground;
@@ -1055,7 +1055,7 @@ BattlegroundQueueTypeId BattlegroundMgr::BGQueueTypeId(BattlegroundTypeId bgType
             return BATTLEGROUND_QUEUE_IC;
         case BATTLEGROUND_TP:
             return BATTLEGROUND_QUEUE_TP;
-		case BATTLEGROUND_BG:
+        case BATTLEGROUND_BG:
             return BATTLEGROUND_QUEUE_BG;
         case BATTLEGROUND_RB:
             return BATTLEGROUND_QUEUE_RB;
@@ -1099,7 +1099,7 @@ BattlegroundTypeId BattlegroundMgr::BGTemplateId(BattlegroundQueueTypeId bgQueue
             return BATTLEGROUND_IC;
         case BATTLEGROUND_QUEUE_TP:
             return BATTLEGROUND_TP;
-		case BATTLEGROUND_QUEUE_BG:
+        case BATTLEGROUND_QUEUE_BG:
             return BATTLEGROUND_BG;
         case BATTLEGROUND_QUEUE_RB:
             return BATTLEGROUND_RB;
@@ -1242,8 +1242,8 @@ HolidayIds BattlegroundMgr::BGTypeToWeekendHolidayId(BattlegroundTypeId bgTypeId
         case BATTLEGROUND_SA: return HOLIDAY_CALL_TO_ARMS_SA;
         case BATTLEGROUND_AB: return HOLIDAY_CALL_TO_ARMS_AB;
         case BATTLEGROUND_IC: return HOLIDAY_CALL_TO_ARMS_IC;
-		case BATTLEGROUND_TP: return HOLIDAY_CALL_TO_ARMS_TP;
-		case BATTLEGROUND_BG: return HOLIDAY_CALL_TO_ARMS_BG;
+        case BATTLEGROUND_TP: return HOLIDAY_CALL_TO_ARMS_TP;
+        case BATTLEGROUND_BG: return HOLIDAY_CALL_TO_ARMS_BG;
         default: return HOLIDAY_NONE;
     }
 }
@@ -1258,8 +1258,8 @@ BattlegroundTypeId BattlegroundMgr::WeekendHolidayIdToBGType(HolidayIds holiday)
         case HOLIDAY_CALL_TO_ARMS_SA: return BATTLEGROUND_SA;
         case HOLIDAY_CALL_TO_ARMS_AB: return BATTLEGROUND_AB;
         case HOLIDAY_CALL_TO_ARMS_IC: return BATTLEGROUND_IC;
-		case HOLIDAY_CALL_TO_ARMS_TP: return BATTLEGROUND_TP;
-		case HOLIDAY_CALL_TO_ARMS_BG: return BATTLEGROUND_BG;
+        case HOLIDAY_CALL_TO_ARMS_TP: return BATTLEGROUND_TP;
+        case HOLIDAY_CALL_TO_ARMS_BG: return BATTLEGROUND_BG;
         default: return BATTLEGROUND_TYPE_NONE;
     }
 }
