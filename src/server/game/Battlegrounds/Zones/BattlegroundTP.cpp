@@ -95,7 +95,7 @@ void BattlegroundTP::PostUpdateImpl(uint32 diff)
         else if (GetStartTime() > uint32(m_minutesElapsed * MINUTE * IN_MILLISECONDS))
         {
             ++m_minutesElapsed;
-            UpdateWorldState(BG_TP_STATE_TIMER, 25 - m_minutesElapsed);
+            UpdateWorldState(BG_TP_STATE_TIMER, 28 - m_minutesElapsed);
         }
 
         if (m_FlagState[BG_TEAM_ALLIANCE] == BG_TP_FLAG_STATE_WAIT_RESPAWN)
@@ -287,7 +287,7 @@ void BattlegroundTP::EventPlayerCapturedFlag(Player* Source)
         if (GetTeamScore(ALLIANCE) < BG_TP_MAX_TEAM_SCORE)
             AddPoint(ALLIANCE, 1);
         PlaySoundToAll(BG_TP_SOUND_FLAG_CAPTURED_ALLIANCE);
-        RewardReputationToTeam(890, m_ReputationCapture, ALLIANCE);
+        RewardReputationToTeam(1174, m_ReputationCapture, ALLIANCE);
     }
     else
     {
@@ -305,7 +305,7 @@ void BattlegroundTP::EventPlayerCapturedFlag(Player* Source)
         if (GetTeamScore(HORDE) < BG_TP_MAX_TEAM_SCORE)
             AddPoint(HORDE, 1);
         PlaySoundToAll(BG_TP_SOUND_FLAG_CAPTURED_HORDE);
-        RewardReputationToTeam(889, m_ReputationCapture, HORDE);
+        RewardReputationToTeam(1172, m_ReputationCapture, HORDE);
     }
     //for flag capture is reward 2 honorable kills
     RewardHonorToTeam(GetBonusHonorFromKill(2), Source->GetTeam());
