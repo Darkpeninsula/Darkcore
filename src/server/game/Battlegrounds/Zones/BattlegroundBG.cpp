@@ -124,8 +124,8 @@ void BattlegroundBG::PostUpdateImpl(uint32 diff)
                 m_lastTick[team] -= BG_BG_TickIntervals[points];
                 _TeamScores[team] += BG_BG_TickPoints[points];
                 m_HonorScoreTics[team] += BG_BG_TickPoints[points];
-				m_ReputationScoreTics[team] += BG_BG_TickPoints[points];
-				if (m_ReputationScoreTics[team] >= m_ReputationTics)
+                m_ReputationScoreTics[team] += BG_BG_TickPoints[points];
+                if (m_ReputationScoreTics[team] >= m_ReputationTics)
                 {
                     (team == BG_TEAM_ALLIANCE) ? RewardReputationToTeam(509, 10, ALLIANCE) : RewardReputationToTeam(510, 10, HORDE);
                     m_ReputationScoreTics[team] -= m_ReputationTics;
@@ -582,12 +582,12 @@ void BattlegroundBG::Reset()
     m_lastTick[BG_TEAM_HORDE]               = 0;
     m_HonorScoreTics[BG_TEAM_ALLIANCE]      = 0;
     m_HonorScoreTics[BG_TEAM_HORDE]         = 0;
-	m_ReputationScoreTics[BG_TEAM_ALLIANCE] = 0;
+    m_ReputationScoreTics[BG_TEAM_ALLIANCE] = 0;
     m_ReputationScoreTics[BG_TEAM_HORDE]    = 0;
     m_IsInformedNearVictory                 = false;
     bool isBGWeekend = sBattlegroundMgr->IsBGWeekend(GetTypeID());
     m_HonorTics = (isBGWeekend) ? BG_BG_BGBGWeekendHonorTicks : BG_BG_NotBGBGWeekendHonorTicks;
-	m_ReputationTics = (isBGWeekend) ? BG_BG_BGBGWeekendReputationTicks : BG_BG_NotBGBGWeekendReputationTicks;
+    m_ReputationTics = (isBGWeekend) ? BG_BG_BGBGWeekendReputationTicks : BG_BG_NotBGBGWeekendReputationTicks;
     m_TeamScores500Disadvantage[BG_TEAM_ALLIANCE] = false;
     m_TeamScores500Disadvantage[BG_TEAM_HORDE]    = false;
 

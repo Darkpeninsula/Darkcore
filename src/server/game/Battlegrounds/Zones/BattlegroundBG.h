@@ -34,19 +34,19 @@ enum BG_BG_WorldStates
  /*
     BG_BG_OP_LIGHTHOUSE_ICON             = 1842,             //LIGHTHOUSE map icon (NONE)
     BG_BG_OP_LIGHTHOUSE_STATE_ALIENCE    = 1767,             //LIGHTHOUSE map state (ALIENCE)
-	BG_BG_OP_LIGHTHOUSE_STATE_HORDE      = 1768,             //LIGHTHOUSE map state (HORDE)
-	BG_BG_OP_LIGHTHOUSE_STATE_CON_ALI    = 1769,             //LIGHTHOUSE map state (CON ALIENCE)
-	BG_BG_OP_LIGHTHOUSE_STATE_CON_HOR    = 1770,             //LIGHTHOUSE map state (CON HORDE)
-	BG_BG_OP_WATERWORKS_ICON             = 1845,             //WATERWORKS map icon (NONE)
-	BG_BG_OP_WATERWORKS_STATE_ALIENCE    = 1772,             //WATERWORKS state (ALIENCE)
-	BG_BG_OP_WATERWORKS_STATE_HORDE      = 1773,             //WATERWORKS state (HORDE)
-	BG_BG_OP_WATERWORKS_STATE_CON_ALI    = 1774,             //WATERWORKS state (CON ALIENCE)
-	BG_BG_OP_WATERWORKS_STATE_CON_HOR    = 1775,             //WATERWORKS state (CON HORDE)
-	BG_BG_OP_MINE_ICON                   = 1846,             //MINE map icon (NONE)
-	BG_BG_OP_MINE_STATE_ALIENCE          = 1782,             //MINE map state (ALIENCE)
-	BG_BG_OP_MINE_STATE_HORDE            = 1783,             //MINE map state (HORDE)
-	BG_BG_OP_MINE_STATE_CON_ALI          = 1784,             //MINE map state (CON ALIENCE)
-	BG_BG_OP_MINE_STATE_CON_HOR          = 1785,             //MINE map state (CON HORDE)
+    BG_BG_OP_LIGHTHOUSE_STATE_HORDE      = 1768,             //LIGHTHOUSE map state (HORDE)
+    BG_BG_OP_LIGHTHOUSE_STATE_CON_ALI    = 1769,             //LIGHTHOUSE map state (CON ALIENCE)
+    BG_BG_OP_LIGHTHOUSE_STATE_CON_HOR    = 1770,             //LIGHTHOUSE map state (CON HORDE)
+    BG_BG_OP_WATERWORKS_ICON             = 1845,             //WATERWORKS map icon (NONE)
+    BG_BG_OP_WATERWORKS_STATE_ALIENCE    = 1772,             //WATERWORKS state (ALIENCE)
+    BG_BG_OP_WATERWORKS_STATE_HORDE      = 1773,             //WATERWORKS state (HORDE)
+    BG_BG_OP_WATERWORKS_STATE_CON_ALI    = 1774,             //WATERWORKS state (CON ALIENCE)
+    BG_BG_OP_WATERWORKS_STATE_CON_HOR    = 1775,             //WATERWORKS state (CON HORDE)
+    BG_BG_OP_MINE_ICON                   = 1846,             //MINE map icon (NONE)
+    BG_BG_OP_MINE_STATE_ALIENCE          = 1782,             //MINE map state (ALIENCE)
+    BG_BG_OP_MINE_STATE_HORDE            = 1783,             //MINE map state (HORDE)
+    BG_BG_OP_MINE_STATE_CON_ALI          = 1784,             //MINE map state (CON ALIENCE)
+    BG_BG_OP_MINE_STATE_CON_HOR          = 1785,             //MINE map state (CON HORDE)
  */
 };
 
@@ -214,62 +214,62 @@ class BattlegroundBGScore : public BattlegroundScore
 
 class BattlegroundBG : public Battleground
 {
-	public:
-		BattlegroundBG();
-		~BattlegroundBG();
+    public:
+        BattlegroundBG();
+        ~BattlegroundBG();
 
-		void AddPlayer(Player* player);
-		virtual void StartingEventCloseDoors();
-		virtual void StartingEventOpenDoors();
-		void RemovePlayer(Player* player, uint64 guid, uint32 team);
-		void HandleAreaTrigger(Player* Source, uint32 Trigger);
-		virtual bool SetupBattleground();
-		virtual void Reset();
-		void EndBattleground(uint32 winner);
-		virtual WorldSafeLocsEntry const* GetClosestGraveYard(Player* player);
+        void AddPlayer(Player* player);
+        virtual void StartingEventCloseDoors();
+        virtual void StartingEventOpenDoors();
+        void RemovePlayer(Player* player, uint64 guid, uint32 team);
+        void HandleAreaTrigger(Player* Source, uint32 Trigger);
+        virtual bool SetupBattleground();
+        virtual void Reset();
+        void EndBattleground(uint32 winner);
+        virtual WorldSafeLocsEntry const* GetClosestGraveYard(Player* player);
 
-		/* Scorekeeping */
-		virtual void UpdatePlayerScore(Player* Source, uint32 type, uint32 value, bool doAddHonor = true);
+        /* Scorekeeping */
+        virtual void UpdatePlayerScore(Player* Source, uint32 type, uint32 value, bool doAddHonor = true);
 
-		virtual void FillInitialWorldStates(WorldPacket& data);
-		
-		/* Nodes occupying */
-		virtual void EventPlayerClickedOnFlag(Player* source, GameObject* target_obj);		
+        virtual void FillInitialWorldStates(WorldPacket& data);
+        
+        /* Nodes occupying */
+        virtual void EventPlayerClickedOnFlag(Player* source, GameObject* target_obj);        
 
-		/* achievement req. */
-		bool IsAllNodesConrolledByTeam(uint32 team) const; // overwrited
-		bool IsTeamScores500Disadvantage(uint32 team) const { return m_TeamScores500Disadvantage[GetTeamIndexByTeamId(team)]; }
-	private:
-		virtual void PostUpdateImpl(uint32 diff);
-		/* Gameobject spawning/despawning */
-		void _CreateBanner(uint8 node, uint8 type, uint8 teamIndex, bool delay);
-		void _DelBanner(uint8 node, uint8 type, uint8 teamIndex);
-		void _SendNodeUpdate(uint8 node);
+        /* achievement req. */
+        bool IsAllNodesConrolledByTeam(uint32 team) const; // overwrited
+        bool IsTeamScores500Disadvantage(uint32 team) const { return m_TeamScores500Disadvantage[GetTeamIndexByTeamId(team)]; }
+    private:
+        virtual void PostUpdateImpl(uint32 diff);
+        /* Gameobject spawning/despawning */
+        void _CreateBanner(uint8 node, uint8 type, uint8 teamIndex, bool delay);
+        void _DelBanner(uint8 node, uint8 type, uint8 teamIndex);
+        void _SendNodeUpdate(uint8 node);
 
-		/* Creature spawning/despawning */
-		// TODO: working, scripted peons spawning
-		void _NodeOccupied(uint8 node, Team team);
-		void _NodeDeOccupied(uint8 node);
+        /* Creature spawning/despawning */
+        // TODO: working, scripted peons spawning
+        void _NodeOccupied(uint8 node, Team team);
+        void _NodeDeOccupied(uint8 node);
 
-		int32 _GetNodeNameId(uint8 node);
+        int32 _GetNodeNameId(uint8 node);
 
-		/* Nodes info:
-			0: neutral
-			1: ally contested
-			2: horde contested
-			3: ally occupied
-			4: horde occupied     */
-		uint8               m_Nodes[BG_BG_DYNAMIC_NODES_COUNT];
-		uint8 				m_prevNodes[BG_BG_DYNAMIC_NODES_COUNT];
-		BG_BG_BannerTimer 	m_BannerTimers[BG_BG_DYNAMIC_NODES_COUNT];
-		uint32         		m_NodeTimers[BG_BG_DYNAMIC_NODES_COUNT];
-		uint32 				m_lastTick[BG_TEAMS_COUNT];
-		uint32 				m_HonorScoreTics[BG_TEAMS_COUNT];
-		uint32 				m_ReputationScoreTics[BG_TEAMS_COUNT];
-		bool 				m_IsInformedNearVictory;
-		uint32 				m_HonorTics;
-		uint32 				m_ReputationTics;
-		// need for achievements
-		bool 				m_TeamScores500Disadvantage[BG_TEAMS_COUNT];
+        /* Nodes info:
+            0: neutral
+            1: ally contested
+            2: horde contested
+            3: ally occupied
+            4: horde occupied     */
+        uint8               m_Nodes[BG_BG_DYNAMIC_NODES_COUNT];
+        uint8                 m_prevNodes[BG_BG_DYNAMIC_NODES_COUNT];
+        BG_BG_BannerTimer     m_BannerTimers[BG_BG_DYNAMIC_NODES_COUNT];
+        uint32                 m_NodeTimers[BG_BG_DYNAMIC_NODES_COUNT];
+        uint32                 m_lastTick[BG_TEAMS_COUNT];
+        uint32                 m_HonorScoreTics[BG_TEAMS_COUNT];
+        uint32                 m_ReputationScoreTics[BG_TEAMS_COUNT];
+        bool                 m_IsInformedNearVictory;
+        uint32                 m_HonorTics;
+        uint32                 m_ReputationTics;
+        // need for achievements
+        bool                 m_TeamScores500Disadvantage[BG_TEAMS_COUNT];
 };
 #endif
