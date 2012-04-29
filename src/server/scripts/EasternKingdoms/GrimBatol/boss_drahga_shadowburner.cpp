@@ -263,7 +263,7 @@ public:
                         break;
                     case EVENT_DRAGAH_ENTER_VEHICLE:
                         me->GetMotionMaster()->Clear();
-                        // me->EnterVehicle(pValiona, 1);
+                        me->EnterVehicle(pValiona, 1);
                         break;
                     default:
                         break;

@@ -33,7 +33,7 @@
 
 enum BG_BG_Rewards
 {
-	BG_BG_MAP_COMPLETE,
+    BG_BG_MAP_COMPLETE,
     BG_BG_REWARD_NUM
 };
 
@@ -43,8 +43,8 @@ uint32 BG_BG_HonorScoreTicks[BG_HONOR_MODE_NUM] = {
 };
 
 uint32 BG_BG_Reputation[BG_HONOR_MODE_NUM][BG_BG_REWARD_NUM] = {
-	200, // normal honor
-	150  // holiday
+    200, // normal honor
+    150  // holiday
 };
 
 BattlegroundBG::BattlegroundBG()
