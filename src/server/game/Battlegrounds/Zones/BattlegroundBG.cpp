@@ -31,9 +31,20 @@
 #include "Player.h"
 #include "Util.h"
 
+enum BG_BG_Rewards
+{
+	BG_BG_MAP_COMPLETE,
+    BG_BG_REWARD_NUM
+};
+
 uint32 BG_BG_HonorScoreTicks[BG_HONOR_MODE_NUM] = {
     330, // normal honor
     200  // holiday
+};
+
+uint32 BG_BG_Reputation[BG_HONOR_MODE_NUM][BG_BG_REWARD_NUM] = {
+	200, // normal honor
+	150  // holiday
 };
 
 BattlegroundBG::BattlegroundBG()
