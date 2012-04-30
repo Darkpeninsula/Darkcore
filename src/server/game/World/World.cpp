@@ -1272,7 +1272,7 @@ void World::LoadConfigSettings(bool reload)
     m_bool_configs[CONFIG_PDUMP_NO_OVERWRITE] = ConfigMgr::GetBoolDefault("PlayerDump.DisallowOverwrite", true);
 
     //Aura Livers
-	m_bool_configs[CONFIG_LIVERS_AURA_ENABLE] = ConfigMgr::GetBoolDefault("Livers.Aura.Enable", true);
+    m_bool_configs[CONFIG_LFG_CAST_DESERTER] = ConfigMgr::GetBoolDefault("LookingForGroup.CastDeserter", true);
 
     sScriptMgr->OnConfigLoad(reload);
 }

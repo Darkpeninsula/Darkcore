@@ -2401,6 +2401,19 @@ AutoBroadcast.Timer = 60000
 ###################################################################################################
 
 ###################################################################################################
+# LOOKING FOR GROUP CONFIG
+#
+#   LookingForGroup.CastDeserter
+#        Description: Cast Deserter spell at players who leave Dungeon in progress.
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
+
+LookingForGroup.CastDeserter = 1
+
+#
+###################################################################################################
+
+###################################################################################################
 # BATTLEGROUND CONFIG
 #
 #    Battleground.CastDeserter
@@ -2978,13 +2991,6 @@ PlayerDump.DisallowPaths = 1
 #        Default:     1
 
 PlayerDump.DisallowOverwrite = 1
-
-#   Livers.Aura.Enable
-#     At the Liver of the Dungeon Finder imposed aura
-#       Default: 0 - Disable
-#              1 - Enable
-
-Livers.Aura.Enable = 1
 
 #
 ###################################################################################################
