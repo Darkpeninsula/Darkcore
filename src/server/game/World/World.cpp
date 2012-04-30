@@ -1271,6 +1271,9 @@ void World::LoadConfigSettings(bool reload)
     m_bool_configs[CONFIG_PDUMP_NO_PATHS] = ConfigMgr::GetBoolDefault("PlayerDump.DisallowPaths", true);
     m_bool_configs[CONFIG_PDUMP_NO_OVERWRITE] = ConfigMgr::GetBoolDefault("PlayerDump.DisallowOverwrite", true);
 
+    //Aura Livers
+	m_bool_configs[CONFIG_LIVERS_AURA_ENABLE] = ConfigMgr::GetBoolDefault("Livers.Aura.Enable", true);
+
     sScriptMgr->OnConfigLoad(reload);
 }
 

@@ -2979,5 +2979,12 @@ PlayerDump.DisallowPaths = 1
 
 PlayerDump.DisallowOverwrite = 1
 
+#   Livers.Aura.Enable
+#     At the Liver of the Dungeon Finder imposed aura
+#       Default: 0 - Disable
+#              1 - Enable
+
+Livers.Aura.Enable = 1
+
 #
 ###################################################################################################
