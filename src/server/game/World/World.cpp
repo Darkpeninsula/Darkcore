@@ -1271,8 +1271,9 @@ void World::LoadConfigSettings(bool reload)
     m_bool_configs[CONFIG_PDUMP_NO_PATHS] = ConfigMgr::GetBoolDefault("PlayerDump.DisallowPaths", true);
     m_bool_configs[CONFIG_PDUMP_NO_OVERWRITE] = ConfigMgr::GetBoolDefault("PlayerDump.DisallowOverwrite", true);
 
-    //Aura Livers
+    // Looking For Group
     m_bool_configs[CONFIG_LFG_CAST_DESERTER] = ConfigMgr::GetBoolDefault("LookingForGroup.CastDeserter", true);
+    m_bool_configs[CONFIG_LFG_CAST_COOLDOWN] = ConfigMgr::GetBoolDefault("LookingForGroup.CastCooldown", true);
 
     sScriptMgr->OnConfigLoad(reload);
 }

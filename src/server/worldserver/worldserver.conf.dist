@@ -2404,11 +2404,18 @@ AutoBroadcast.Timer = 60000
 # LOOKING FOR GROUP CONFIG
 #
 #   LookingForGroup.CastDeserter
-#        Description: Cast Deserter spell at players who leave Dungeon in progress.
+#        Description: Cast Deserter spell at players who Leave Dungeon when in Looking For Group.
 #        Default:     1 - (Enabled)
 #                     0 - (Disabled)
 
 LookingForGroup.CastDeserter = 1
+
+#   LookingForGroup.CastDeserter
+#        Description: Cast Cooldown spell at players who join Dungeon when in Looking For Group.
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
+
+LookingForGroup.CastCooldown = 1
 
 #
 ###################################################################################################

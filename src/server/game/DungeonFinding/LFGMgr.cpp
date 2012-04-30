@@ -1500,7 +1500,12 @@ void LFGMgr::UpdateProposal(uint32 proposalId, uint64 guid, bool accept)
 
         // Teleport Player
         for (LfgPlayerList::const_iterator it = playersToTeleport.begin(); it != playersToTeleport.end(); ++it)
+        {
+            if (sWorld->getBoolConfig(CONFIG_LFG_CAST_COOLDOWN))
+                (*it)->CastSpell(*it, LFG_SPELL_DUNGEON_COOLDOWN, false);
+
             TeleportPlayer(*it, false);
+        }
 
         // Update group info
         grp->SendUpdate();
@@ -1829,8 +1834,11 @@ void LFGMgr::TeleportPlayer(Player* player, bool out, bool fromOpcode /*= false*
                 }
 
                 if (player->TeleportTo(mapid, x, y, z, orientation))
+                {
                     // FIXME - HACK - this should be done by teleport, when teleporting far
                     player->RemoveAurasByType(SPELL_AURA_MOUNTED);
+                    player->CastSpell(player, LFG_SPELL_LUCK_OF_THE_DRAW, false);
+                }
                 else
                 {
                     error = LFG_TELEPORTERROR_INVALID_LOCATION;
