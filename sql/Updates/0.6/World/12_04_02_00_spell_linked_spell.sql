@@ -1,1 +1,0 @@
-INSERT INTO `spell_linked_spell` (`spell_trigger`, `spell_effect`, `type`, `comment`) VALUES ('61336', '50322', '1', 'Survival Instincts');
