@@ -3107,11 +3107,10 @@ void ObjectMgr::LoadPlayerInfo()
     {
         uint32 oldMSTime = getMSTime();
 
-
-        QueryResult result = QueryResult(NULL);	
-        if (sWorld->getBoolConfig(CONFIG_START_ALL_SPELLS))	
-            result = WorldDatabase.Query("SELECT race, class, Spell, Active FROM playercreateinfo_spell_custom");	
-        else	
+        QueryResult result = QueryResult(NULL);  
+        if (sWorld->getBoolConfig(CONFIG_START_ALL_SPELLS))  
+            result = WorldDatabase.Query("SELECT race, class, Spell, Active FROM playercreateinfo_spell_custom");  
+        else  
             result = WorldDatabase.Query("SELECT race, class, Spell FROM playercreateinfo_spell");
 
         if (!result)
@@ -6877,13 +6876,13 @@ void ObjectMgr::LoadRewardOnKill()
         uint32 creature_id = fields[0].GetUInt32();
 
         RewardOnKillEntry rewOnKill;
-        rewOnKill.RepFaction1          = fields[1].GetInt16();
-        rewOnKill.RepFaction2          = fields[2].GetInt16();
+        rewOnKill.RepFaction1          = fields[1].GetUInt32();
+        rewOnKill.RepFaction2          = fields[2].GetUInt32();
         rewOnKill.IsTeamAward1        = fields[3].GetBool();
-        rewOnKill.ReputationMaxCap1  = fields[4].GetUInt8();
+        rewOnKill.ReputationMaxCap1  = fields[4].GetUInt32();
         rewOnKill.RepValue1            = fields[5].GetInt32();
         rewOnKill.IsTeamAward2        = fields[6].GetBool();
-        rewOnKill.ReputationMaxCap2  = fields[7].GetUInt8();
+        rewOnKill.ReputationMaxCap2  = fields[7].GetUInt32();
         rewOnKill.RepValue2            = fields[8].GetInt32();
         rewOnKill.TeamDependent       = fields[9].GetUInt8();
         rewOnKill.CurrencyId1          = fields[10].GetUInt32();
@@ -8777,10 +8776,10 @@ void ObjectMgr::LoadCreatureClassLevelStats()
         CreatureBaseStats stats;
 
         for (uint8 i = 0; i < MAX_CREATURE_BASE_HP; ++i)
-            stats.BaseHealth[i] = fields[i + 2].GetInt16();
+            stats.BaseHealth[i] = fields[i + 2].GetInt32();
 
-        stats.BaseMana = fields[5].GetInt16();
-        stats.BaseArmor = fields[6].GetInt16();
+        stats.BaseMana = fields[6].GetInt32();
+        stats.BaseArmor = fields[7].GetInt32();
 
         if (!Class || ((1 << (Class - 1)) & CLASSMASK_ALL_CREATURES) == 0)
             sLog->outErrorDb("Creature base stats for level %u has invalid class %u", Level, Class);
