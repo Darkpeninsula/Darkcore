@@ -340,7 +340,7 @@ void WorldSession::HandleBattlefieldListOpcode(WorldPacket &recv_data)
     SendPacket(&data);
 }
 
-void WorldSession::HandleBattlegroundPortOpcode(WorldPacket &recv_data)
+void WorldSession::HandleBattlegroundPortOpcode(WorldPacket& recv_data)
 {
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Recvd CMSG_BATTLEGROUND_PORT Message");
 
