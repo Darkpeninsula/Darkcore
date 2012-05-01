@@ -3107,12 +3107,8 @@ void ObjectMgr::LoadPlayerInfo()
     {
         uint32 oldMSTime = getMSTime();
 
-
-        QueryResult result = QueryResult(NULL);	
-        if (sWorld->getBoolConfig(CONFIG_START_ALL_SPELLS))	
-            result = WorldDatabase.Query("SELECT race, class, Spell, Active FROM playercreateinfo_spell_custom");	
-        else	
-            result = WorldDatabase.Query("SELECT race, class, Spell FROM playercreateinfo_spell");
+        std::string tableName = sWorld->getBoolConfig(CONFIG_START_ALL_SPELLS) ? "playercreateinfo_spell_custom" : "playercreateinfo_spell";
+        QueryResult result = WorldDatabase.PQuery("SELECT race, class, Spell FROM %s", tableName);
 
         if (!result)
         {
