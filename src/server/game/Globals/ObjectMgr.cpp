@@ -2175,10 +2175,8 @@ void FillDisenchantFields(uint32* disenchantID, uint32* requiredDisenchantSkill,
 {
     *disenchantID = 0;
     *(int32*)requiredDisenchantSkill = -1;
-    if ((itemTemplate.Flags & (ITEM_PROTO_FLAG_CONJURED | ITEM_PROTO_FLAG_UNK6)) ||
-        itemTemplate.Bonding == BIND_QUEST_ITEM || itemTemplate.Area || itemTemplate.Map ||
-        itemTemplate.Stackable > 1 ||
-        !(itemTemplate.SellPrice) || sItemCurrencyCostStore.LookupEntry(itemTemplate.ItemId))
+
+    if ((itemTemplate.Flags & (ITEM_PROTO_FLAG_CONJURED | ITEM_PROTO_FLAG_UNK6)) || itemTemplate.Bonding == BIND_QUEST_ITEM || itemTemplate.Area || itemTemplate.Map || itemTemplate.Stackable > 1 || !(itemTemplate.SellPrice))
         return;
 
     for (uint32 i = 0; i < sItemDisenchantLootStore.GetNumRows(); ++i)
@@ -2187,23 +2185,8 @@ void FillDisenchantFields(uint32* disenchantID, uint32* requiredDisenchantSkill,
         if (!disenchant)
             continue;
 
-        if (disenchant->ItemClass == itemTemplate.Class &&
-            disenchant->ItemQuality == itemTemplate.Quality &&
-            disenchant->MinItemLevel <= itemTemplate.ItemLevel &&
-            disenchant->MaxItemLevel >= itemTemplate.ItemLevel)
+        if (disenchant->ItemClass == itemTemplate.Class && disenchant->ItemQuality == itemTemplate.Quality && disenchant->MinItemLevel <= itemTemplate.ItemLevel && disenchant->MaxItemLevel >= itemTemplate.ItemLevel)
         {
-            // extra check for epics in range 90 - 99
-            if (disenchant->MinItemLevel < 90)
-            {
-                if (itemTemplate.RequiredLevel > 60 || itemTemplate.RequiredSkillRank > 300)
-                    continue;
-            }
-            else
-            {
-                if (itemTemplate.RequiredLevel <= 60 || itemTemplate.RequiredSkillRank <= 300)
-                    continue;
-            }
-
             *disenchantID = disenchant->Id;
             *requiredDisenchantSkill = disenchant->RequiredDisenchantSkill;
             return;
@@ -2263,11 +2246,6 @@ void ObjectMgr::LoadItemTemplates()
 
         itemTemplate.ScalingStatDistribution = sparse->ScalingStatDistribution;
 
-        // cache item damage
-        FillItemDamageFields(&itemTemplate.DamageMin, &itemTemplate.DamageMax, &itemTemplate.DPS, sparse->ItemLevel,
-            db2Data->Class, db2Data->SubClass, sparse->Quality, sparse->Delay, sparse->StatScalingFactor,
-            sparse->InventoryType, sparse->Flags2);
-
         itemTemplate.DamageType = sparse->DamageType;
         itemTemplate.Armor = FillItemArmor(sparse->ItemLevel, db2Data->Class, db2Data->SubClass, sparse->Quality, sparse->InventoryType);
         itemTemplate.Delay = sparse->Delay;
@@ -2308,8 +2286,6 @@ void ObjectMgr::LoadItemTemplates()
 
         itemTemplate.socketBonus = sparse->SocketBonus;
         itemTemplate.GemProperties = sparse->GemProperties;
-        FillDisenchantFields(&itemTemplate.DisenchantID, &itemTemplate.RequiredDisenchantSkill, itemTemplate);
-
         itemTemplate.ArmorDamageModifier = sparse->ArmorDamageModifier;
         itemTemplate.Duration = sparse->Duration;
         itemTemplate.ItemLimitCategory = sparse->ItemLimitCategory;
@@ -2321,156 +2297,12 @@ void ObjectMgr::LoadItemTemplates()
         itemTemplate.FoodType = 0;
         itemTemplate.MinMoneyLoot = 0;
         itemTemplate.MaxMoneyLoot = 0;
+        itemTemplate.DisenchantID = 0;
+        itemTemplate.RequiredDisenchantSkill = 0;
+        
+        FillItemDamageFields(&itemTemplate.DamageMin, &itemTemplate.DamageMax, &itemTemplate.DPS, sparse->ItemLevel, db2Data->Class, db2Data->SubClass, sparse->Quality, sparse->Delay, sparse->StatScalingFactor, sparse->InventoryType, sparse->Flags2);
+        FillDisenchantFields(&itemTemplate.DisenchantID, &itemTemplate.RequiredDisenchantSkill, itemTemplate);
         ++sparseCount;
-    }
-
-    // Load missing items from item_template AND overwrite data from Item-sparse.db2 (item_template is supposed to contain Item-sparse.adb data)
-    //                                               0      1      2         3     4     5          6        7      8           9         10         11
-    QueryResult result = WorldDatabase.Query("SELECT entry, Class, SubClass, Unk0, Name, DisplayId, Quality, Flags, FlagsExtra, BuyPrice, SellPrice, InventoryType, "
-        //                                        12              13             14         15             16             17                 18             19
-        "AllowableClass, AllowableRace, ItemLevel, RequiredLevel, RequiredSkill, RequiredSkillRank, RequiredSpell, RequiredHonorRank, "
-        //                                        20                21                         22                      23        24         25
-        "RequiredCityRank, RequiredReputationFaction, RequiredReputationRank, MaxCount, Stackable, ContainerSlots, "
-        //                                        26          27           28           29           30          31           32           33
-        "stat_type1, stat_value1, stat_unk1_1, stat_unk2_1, stat_type2, stat_value2, stat_unk1_2, stat_unk2_2, "
-        //                                        34          35           36           37           38          39           40           41
-        "stat_type3, stat_value3, stat_unk1_3, stat_unk2_3, stat_type4, stat_value4, stat_unk1_4, stat_unk2_4, "
-        //                                        42          43           44           45           46          47           48           49
-        "stat_type5, stat_value5, stat_unk1_5, stat_unk2_5, stat_type6, stat_value6, stat_unk1_6, stat_unk2_6, "
-        //                                        50          51           52           53           54          55           56           57
-        "stat_type7, stat_value7, stat_unk1_7, stat_unk2_7, stat_type8, stat_value8, stat_unk1_8, stat_unk2_8, "
-        //                                        58          59           60           61           62           63            64            65
-        "stat_type9, stat_value9, stat_unk1_9, stat_unk2_9, stat_type10, stat_value10, stat_unk1_10, stat_unk2_10, "
-        //                                        66                       67          68     69
-        "ScalingStatDistribution, DamageType, Delay, RangedModRange, "
-        //                                        70         71              72              73               74               75
-        "spellid_1, spelltrigger_1, spellcharges_1, spellcooldown_1, spellcategory_1, spellcategorycooldown_1, "
-        //                                        76         77              78              79               80               81
-        "spellid_2, spelltrigger_2, spellcharges_2, spellcooldown_2, spellcategory_2, spellcategorycooldown_2, "
-        //                                        82         83              84              85               86               87
-        "spellid_3, spelltrigger_3, spellcharges_3, spellcooldown_3, spellcategory_3, spellcategorycooldown_3, "
-        //                                        88         89              90              91               92               93
-        "spellid_4, spelltrigger_4, spellcharges_4, spellcooldown_4, spellcategory_4, spellcategorycooldown_4, "
-        //                                        94         95              96              97               98               99
-        "spellid_5, spelltrigger_5, spellcharges_5, spellcooldown_5, spellcategory_5, spellcategorycooldown_5, "
-        //                                        100      101          102       103         104           105         106     107
-        "Bonding, Description, PageText, LanguageID, PageMaterial, StartQuest, LockID, Material, "
-        //                                        108     109             110           111      112            113   114  115        116
-        "Sheath, RandomProperty, RandomSuffix, ItemSet, MaxDurability, Area, Map, BagFamily, TotemCategory, "
-        //                                        117            118              119            120              121            122              123
-        "SocketColor_1, SocketContent_1, SocketColor_2, SocketContent_2, SocketColor_3, SocketContent_3, SocketBonus, "
-        //                                        124            125                  126       127                128        129                130       131
-        "GemProperties, ArmorDamageModifier, Duration, ItemLimitCategory, HolidayId, StatScalingFactor, Field130, Field131 "
-        "FROM item_template");
-
-    if (result)
-    {
-        do
-        {
-            Field* fields = result->Fetch();
-            uint32 itemId = fields[0].GetUInt32();
-            if (_itemTemplateStore.find(itemId) != _itemTemplateStore.end())
-                --sparseCount;
-
-            ItemTemplate& itemTemplate = _itemTemplateStore[itemId];
-
-            itemTemplate.ItemId = itemId;
-            itemTemplate.Class = fields[1].GetUInt32();
-            itemTemplate.SubClass = fields[2].GetUInt32();
-            itemTemplate.Unk0 = fields[3].GetInt32();
-            itemTemplate.Name1 = fields[4].GetString();
-            itemTemplate.DisplayInfoID = fields[5].GetUInt32();
-            itemTemplate.Quality = fields[6].GetUInt32();
-            itemTemplate.Flags = fields[7].GetUInt32();
-            itemTemplate.Flags2 = fields[8].GetUInt32();
-            itemTemplate.BuyCount = 1;
-            itemTemplate.BuyPrice = fields[9].GetInt32();
-            itemTemplate.SellPrice = fields[10].GetUInt32();
-            itemTemplate.InventoryType = fields[11].GetUInt32();
-            itemTemplate.AllowableClass = fields[12].GetUInt32();
-            itemTemplate.AllowableRace = fields[13].GetUInt32();
-            itemTemplate.ItemLevel = fields[14].GetUInt32();
-            itemTemplate.RequiredLevel = fields[15].GetUInt32();
-            itemTemplate.RequiredSkill = fields[16].GetUInt32();
-            itemTemplate.RequiredSkillRank = fields[17].GetUInt32();
-            itemTemplate.RequiredSpell = fields[18].GetUInt32();
-            itemTemplate.RequiredHonorRank = fields[19].GetUInt32();
-            itemTemplate.RequiredCityRank = fields[20].GetUInt32();
-            itemTemplate.RequiredReputationFaction = fields[21].GetUInt32();
-            itemTemplate.RequiredReputationRank = fields[22].GetUInt32();
-            itemTemplate.MaxCount = fields[23].GetInt32();
-            itemTemplate.Stackable = fields[24].GetInt32();
-            itemTemplate.ContainerSlots = fields[25].GetUInt32();
-            for (uint32 i = 0; i < MAX_ITEM_PROTO_STATS; ++i)
-            {
-                itemTemplate.ItemStat[i].ItemStatType = fields[26 + i * 4].GetUInt32();
-                itemTemplate.ItemStat[i].ItemStatValue = fields[26 + i * 4 + 1].GetInt32();
-                itemTemplate.ItemStat[i].ItemStatUnk1 = fields[26 + i * 4 + 2].GetInt32();
-                itemTemplate.ItemStat[i].ItemStatUnk2 = fields[26 + i * 4 + 3].GetInt32();
-            }
-
-            itemTemplate.ScalingStatDistribution = fields[66].GetUInt32();
-
-            // cache item damage
-            FillItemDamageFields(&itemTemplate.DamageMin, &itemTemplate.DamageMax, &itemTemplate.DPS, itemTemplate.ItemLevel,
-                itemTemplate.Class, itemTemplate.SubClass, itemTemplate.Quality, fields[68].GetUInt32(),
-                fields[129].GetFloat(), itemTemplate.InventoryType, itemTemplate.Flags2);
-
-            itemTemplate.DamageType = fields[67].GetUInt32();
-            itemTemplate.Armor = FillItemArmor(itemTemplate.ItemLevel, itemTemplate.Class, itemTemplate.SubClass, itemTemplate.Quality, itemTemplate.InventoryType);
-            itemTemplate.Delay = fields[68].GetUInt32();
-            itemTemplate.RangedModRange = fields[69].GetFloat();
-            for (uint32 i = 0; i < MAX_ITEM_PROTO_SPELLS; ++i)
-            {
-                itemTemplate.Spells[i].SpellId = fields[70 + 6 * i].GetInt32();
-                itemTemplate.Spells[i].SpellTrigger = fields[70 + 6 * i + 1].GetUInt32();
-                itemTemplate.Spells[i].SpellCharges = fields[70 + 6 * i + 2].GetInt32();
-                itemTemplate.Spells[i].SpellCooldown = fields[70 + 6 * i + 3].GetInt32();
-                itemTemplate.Spells[i].SpellCategory = fields[70 + 6 * i + 4].GetUInt32();
-                itemTemplate.Spells[i].SpellCategoryCooldown = fields[70 + 6 * i + 5].GetInt32();
-            }
-
-            itemTemplate.SpellPPMRate = 0.0f;
-            itemTemplate.Bonding = fields[100].GetUInt32();
-            itemTemplate.Description = fields[101].GetString();
-            itemTemplate.PageText = fields[102].GetUInt32();
-            itemTemplate.LanguageID = fields[103].GetUInt32();
-            itemTemplate.PageMaterial = fields[104].GetUInt32();
-            itemTemplate.StartQuest = fields[105].GetUInt32();
-            itemTemplate.LockID = fields[106].GetUInt32();
-            itemTemplate.Material = fields[107].GetInt32();
-            itemTemplate.Sheath = fields[108].GetUInt32();
-            itemTemplate.RandomProperty = fields[109].GetInt32();
-            itemTemplate.RandomSuffix = fields[110].GetInt32();
-            itemTemplate.ItemSet = fields[111].GetUInt32();
-            itemTemplate.MaxDurability = fields[112].GetUInt32();
-            itemTemplate.Area = fields[113].GetUInt32();
-            itemTemplate.Map = fields[114].GetUInt32();
-            itemTemplate.BagFamily = fields[115].GetUInt32();
-            itemTemplate.TotemCategory = fields[116].GetUInt32();
-            for (uint32 i = 0; i < MAX_ITEM_PROTO_SOCKETS; ++i)
-            {
-                itemTemplate.Socket[i].Color = fields[117 + i * 2].GetUInt32();
-                itemTemplate.Socket[i].Content = fields[117 + i * 2 + 1].GetUInt32();
-            }
-
-            itemTemplate.socketBonus = fields[123].GetUInt32();
-            itemTemplate.GemProperties = fields[124].GetUInt32();
-            FillDisenchantFields(&itemTemplate.DisenchantID, &itemTemplate.RequiredDisenchantSkill, itemTemplate);
-
-            itemTemplate.ArmorDamageModifier = fields[125].GetFloat();
-            itemTemplate.Duration = fields[126].GetUInt32();
-            itemTemplate.ItemLimitCategory = fields[127].GetUInt32();
-            itemTemplate.HolidayId = fields[128].GetUInt32();
-            itemTemplate.StatScalingFactor = fields[129].GetFloat();
-            itemTemplate.Field130 = fields[130].GetInt32();
-            itemTemplate.Field131 = fields[131].GetInt32();
-            itemTemplate.ScriptId = 0;
-            itemTemplate.FoodType = 0;
-            itemTemplate.MinMoneyLoot = 0;
-            itemTemplate.MaxMoneyLoot = 0;
-            ++dbCount;
-        } while (result->NextRow());
     }
 
     // Check if item templates for DBC referenced character start outfit are present
@@ -2528,6 +2360,8 @@ void ObjectMgr::LoadItemTemplateAddon()
             uint8 foodType = fields[2].GetUInt8();
             uint32 minMoneyLoot = fields[3].GetUInt32();
             uint32 maxMoneyLoot = fields[4].GetUInt32();
+            float spellPPMRate = fields[5].GetFloat();
+
             if (minMoneyLoot > maxMoneyLoot)
             {
                 sLog->outErrorDb("Minimum money loot specified in `item_template_addon` for item %u was greater than maximum amount, swapping.", itemId);
@@ -2539,7 +2373,7 @@ void ObjectMgr::LoadItemTemplateAddon()
             itemTemplate.FoodType = foodType;
             itemTemplate.MinMoneyLoot = minMoneyLoot;
             itemTemplate.MaxMoneyLoot = maxMoneyLoot;
-            itemTemplate.SpellPPMRate = fields[5].GetFloat();
+            itemTemplate.SpellPPMRate = spellPPMRate;
             ++count;
         } while (result->NextRow());
     }
