@@ -1599,7 +1599,13 @@ void Player::Update(uint32 p_time)
 
     GetAchievementMgr().UpdateTimedAchievements(p_time);
 
-    if (HasUnitState(UNIT_STATE_MELEE_ATTACKING) && !HasUnitState(UNIT_STATE_CASTING))
+    	// Bug fix http://www.wowhead.com/spell=47585
+	if (HasAura(47585) && HasAuraType(SPELL_AURA_MOUNTED))	
+		ToPlayer()->RemoveAurasByType(SPELL_AURA_MOUNTED);
+      
+	
+	if (HasUnitState(UNIT_STATE_MELEE_ATTACKING) && !HasUnitState(UNIT_STATE_CASTING))
+	
     {
         if (Unit *victim = getVictim())
         {
@@ -7911,7 +7917,7 @@ void Player::CheckDuelDistance(time_t currTime)
 
     if (duel->outOfBound == 0)
     {
-        if (!IsWithinDistInMap(obj, 50))
+        if (!IsWithinDistInMap(obj, 80))
         {
             duel->outOfBound = currTime;
 
@@ -7921,7 +7927,7 @@ void Player::CheckDuelDistance(time_t currTime)
     }
     else
     {
-        if (IsWithinDistInMap(obj, 40))
+        if (IsWithinDistInMap(obj, 70))
         {
             duel->outOfBound = 0;
 
