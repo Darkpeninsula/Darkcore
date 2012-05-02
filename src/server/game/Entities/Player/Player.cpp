@@ -1599,7 +1599,13 @@ void Player::Update(uint32 p_time)
 
     GetAchievementMgr().UpdateTimedAchievements(p_time);
 
-    if (HasUnitState(UNIT_STATE_MELEE_ATTACKING) && !HasUnitState(UNIT_STATE_CASTING))
+    	// Bug fix http://www.wowhead.com/spell=47585
+	if (HasAura(47585) && HasAuraType(SPELL_AURA_MOUNTED))	
+		ToPlayer()->RemoveAurasByType(SPELL_AURA_MOUNTED);
+      
+	
+	if (HasUnitState(UNIT_STATE_MELEE_ATTACKING) && !HasUnitState(UNIT_STATE_CASTING))
+	
     {
         if (Unit *victim = getVictim())
         {
