@@ -314,8 +314,8 @@ ChatCommand* ChatHandler::getCommandTable()
     {
         { "list",          SEC_MODERATOR,      true,  OldHandler<&ChatHandler::HandleGMTicketListCommand>,            "", NULL },
         { "onlinelist",    SEC_MODERATOR,      true,  OldHandler<&ChatHandler::HandleGMTicketListOnlineCommand>,      "", NULL },
-        { "viewname",      SEC_MODERATOR,      true,  OldHandler<&ChatHandler::HandleGMTicketGetByNameCommand>,       "", NULL },
         { "viewid",        SEC_MODERATOR,      true,  OldHandler<&ChatHandler::HandleGMTicketGetByIdCommand>,         "", NULL },
+        { "viewname",      SEC_MODERATOR,      true,  OldHandler<&ChatHandler::HandleGMTicketGetByNameCommand>,       "", NULL },
         { "close",         SEC_MODERATOR,      true,  OldHandler<&ChatHandler::HandleGMTicketCloseByIdCommand>,       "", NULL },
         { "closedlist",    SEC_MODERATOR,      true,  OldHandler<&ChatHandler::HandleGMTicketListClosedCommand>,      "", NULL },
         { "escalatedlist", SEC_GAMEMASTER,     true,  OldHandler<&ChatHandler::HandleGMTicketListEscalatedCommand>,   "", NULL },
