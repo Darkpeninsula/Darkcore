@@ -17,7 +17,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #include "Player.h"
 #include "Battleground.h"
 #include "BattlegroundIC.h"
@@ -49,7 +48,7 @@ BattlegroundIC::BattlegroundIC()
     resourceTimer = IC_RESOURCE_TIME;
 
     for (uint8 i = NODE_TYPE_REFINERY; i < MAX_NODE_TYPES; i++)
-        nodePoint[i] =  nodePointInitial[i];
+        nodePoint[i] = nodePointInitial[i];
 
     siegeEngineWorkshopTimer = WORKSHOP_UPDATE_TIME;
 
@@ -57,7 +56,9 @@ BattlegroundIC::BattlegroundIC()
     gunshipAlliance = NULL;
 }
 
-BattlegroundIC::~BattlegroundIC() {}
+BattlegroundIC::~BattlegroundIC()
+{
+}
 
 void BattlegroundIC::HandlePlayerResurrect(Player* player)
 {
@@ -357,7 +358,7 @@ void BattlegroundIC::FillInitialWorldStates(WorldPacket& data)
         data << uint32(uws) << uint32(1);
     }
 
-    for (uint8 i = 0 ; i < MAX_NODE_TYPES ; i++)
+    for (uint8 i = 0; i < MAX_NODE_TYPES; i++)
         data << uint32(nodePoint[i].worldStates[nodePoint[i].nodeState]) << uint32(1);
 }
 
@@ -835,6 +836,7 @@ void BattlegroundIC::DestroyGate(Player* player, GameObject* go)
     {
         case GO_HORDE_GATE_1:
             lang_entry = LANG_BG_IC_NORTH_GATE_DESTROYED;
+            break;        
         case GO_HORDE_GATE_2:
         case GO_ALLIANCE_GATE_1:
             lang_entry = LANG_BG_IC_WEST_GATE_DESTROYED;
@@ -871,8 +873,8 @@ WorldSafeLocsEntry const* BattlegroundIC::GetClosestGraveYard(Player* player)
     // If so, select the closest node to place ghost on
     if (!nodes.empty())
     {
-        float player_x = player->GetPositionX();
-        float player_y = player->GetPositionY();
+        float plr_x = player->GetPositionX();
+        float plr_y = player->GetPositionY();
 
         float mindist = 999999.0f;
         for (uint8 i = 0; i < nodes.size(); ++i)
@@ -880,7 +882,7 @@ WorldSafeLocsEntry const* BattlegroundIC::GetClosestGraveYard(Player* player)
             WorldSafeLocsEntry const*entry = sWorldSafeLocsStore.LookupEntry(BG_IC_GraveyardIds[nodes[i]]);
             if (!entry)
                 continue;
-            float dist = (entry->x - player_x)*(entry->x - player_x)+(entry->y - player_y)*(entry->y - player_y);
+            float dist = (entry->x - plr_x)*(entry->x - plr_x)+(entry->y - plr_y)*(entry->y - plr_y);
             if (mindist > dist)
             {
                 mindist = dist;
@@ -911,7 +913,7 @@ Transport* BattlegroundIC::CreateTransport(uint32 goEntry, uint32 period)
 
     std::set<uint32> mapsUsed;
 
-    if (!t->GenerateWaypoints(goinfo->moTransport.taxiPathId, goinfo->moTransport.moveSpeed, goinfo->moTransport.accelRate, mapsUsed))
+    if (!t->GenerateWaypoints(goinfo->moTransport.taxiPathId, mapsUsed)) // skip transports with empty waypoints list    
     {
         sLog->outErrorDb("Transport (path id %u) path size = 0. Transport ignored, check DBC files or transport GO data0 field.", goinfo->moTransport.taxiPathId);
         delete t;
@@ -922,7 +924,7 @@ Transport* BattlegroundIC::CreateTransport(uint32 goEntry, uint32 period)
 
     float x = t->m_WayPoints[0].x;
     float y = t->m_WayPoints[0].y;
-    float z =  t->m_WayPoints[0].z;
+    float z = t->m_WayPoints[0].z;
     float o = 1;
 
     // creates the Gameobject
