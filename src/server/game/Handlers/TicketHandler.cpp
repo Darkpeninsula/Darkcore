@@ -17,7 +17,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #include "Language.h"
 #include "WorldPacket.h"
 #include "Common.h"
@@ -40,7 +39,7 @@ void WorldSession::HandleGMTicketCreateOpcode(WorldPacket & recv_data)
         return;
     }
 
-    GMTicketResponse response = GMTICKET_RESPONSE_FAILURE;
+    GMTicketResponse response = GMTICKET_RESPONSE_CREATE_ERROR;
     // Player must not have ticket
     if (!sTicketMgr->GetTicketByPlayer(GetPlayer()->GetGUID()))
     {
@@ -50,7 +49,7 @@ void WorldSession::HandleGMTicketCreateOpcode(WorldPacket & recv_data)
 
         sWorld->SendGMText(LANG_COMMAND_TICKETNEW, GetPlayer()->GetName(), ticket->GetId());
 
-        response = GMTICKET_RESPONSE_SUCCESS;
+        response = GMTICKET_RESPONSE_CREATE_SUCCESS;
     }
 
     WorldPacket data(SMSG_GMTICKET_CREATE, 4);
@@ -63,8 +62,8 @@ void WorldSession::HandleGMTicketUpdateOpcode(WorldPacket & recv_data)
     std::string message;
     recv_data >> message;
 
-    GMTicketResponse response = GMTICKET_RESPONSE_FAILURE;
-    if (GmTicket *ticket = sTicketMgr->GetTicketByPlayer(GetPlayer()->GetGUID()))
+    GMTicketResponse response = GMTICKET_RESPONSE_UPDATE_ERROR;
+    if (GmTicket* ticket = sTicketMgr->GetTicketByPlayer(GetPlayer()->GetGUID()))
     {
         SQLTransaction trans = SQLTransaction(NULL);
         ticket->SetMessage(message);
@@ -72,7 +71,7 @@ void WorldSession::HandleGMTicketUpdateOpcode(WorldPacket & recv_data)
 
         sWorld->SendGMText(LANG_COMMAND_TICKETUPDATED, GetPlayer()->GetName(), ticket->GetId());
 
-        response = GMTICKET_RESPONSE_SUCCESS;
+        response = GMTICKET_RESPONSE_UPDATE_SUCCESS;
     }
 
     WorldPacket data(SMSG_GMTICKET_UPDATETEXT, 4);
@@ -171,13 +170,15 @@ void WorldSession::HandleReportLag(WorldPacket& recv_data)
     recv_data >> y;
     recv_data >> z;
 
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_ADD_LAG_REPORT);
+    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_LAG_REPORT);
     stmt->setUInt32(0, GUID_LOPART(GetPlayer()->GetGUID()));
     stmt->setUInt8 (1, lagType);
     stmt->setUInt16(2, mapId);
     stmt->setFloat (3, x);
     stmt->setFloat (4, y);
     stmt->setFloat (5, z);
+    stmt->setUInt32(6, GetLatency());
+    stmt->setUInt32(7, time(NULL));
     CharacterDatabase.Execute(stmt);
 }
 
