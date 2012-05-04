@@ -17,7 +17,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #ifndef __DARKCORE_REPUTATION_MGR_H
 #define __DARKCORE_REPUTATION_MGR_H
 
@@ -52,8 +51,8 @@ struct FactionState
 {
     uint32 ID;
     RepListID ReputationListID;
-    uint8 Flags;
     int32  Standing;
+    uint8 Flags;
     bool needSend;
     bool needSave;
 };
@@ -134,6 +133,9 @@ class ReputationMgr
 
         void ApplyForceReaction(uint32 faction_id, ReputationRank rank, bool apply);
 
+        //! Public for chat command needs
+        bool SetOneFactionReputation(FactionEntry const* factionEntry, int32 standing, bool incremental);
+
     public:                                                 // senders
         void SendInitialReputations();
         void SendForceReactions();
@@ -144,7 +146,6 @@ class ReputationMgr
         void Initialize();
         uint32 GetDefaultStateFlags(FactionEntry const* factionEntry) const;
         bool SetReputation(FactionEntry const* factionEntry, int32 standing, bool incremental);
-        bool SetOneFactionReputation(FactionEntry const* factionEntry, int32 standing, bool incremental);
         void SetVisible(FactionState* faction);
         void SetAtWar(FactionState* faction, bool atWar) const;
         void SetInactive(FactionState* faction, bool inactive) const;
@@ -158,6 +159,7 @@ class ReputationMgr
         uint8 _honoredFactionCount :8;
         uint8 _reveredFactionCount :8;
         uint8 _exaltedFactionCount :8;
+        bool _sendFactionIncreased; //! Play visual effect on next SMSG_SET_FACTION_STANDING sent
 };
 
 #endif

@@ -17,7 +17,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #include "DatabaseEnv.h"
 #include "ReputationMgr.h"
 #include "DBCStores.h"
@@ -168,15 +167,16 @@ void ReputationMgr::SendState(FactionState const* faction)
 {
     uint32 count = 1;
 
-    WorldPacket data(SMSG_SET_FACTION_STANDING, (16));  // last check 2.4.0
-    data << (float) 0;                                  // unk 2.4.0
-    data << (uint8) 0;                                  // wotlk 8634
+    WorldPacket data(SMSG_SET_FACTION_STANDING, 17);
+    data << float(0);
+    data << uint8(_sendFactionIncreased);
+    _sendFactionIncreased = false; // Reset
 
     size_t p_count = data.wpos();
-    data << (uint32) count;                             // placeholder
+    data << uint32(count);
 
-    data << (uint32) faction->ReputationListID;
-    data << (uint32) faction->Standing;
+    data << uint32(faction->ReputationListID);
+    data << uint32(faction->Standing);
 
     for (FactionStateList::iterator itr = _factions.begin(); itr != _factions.end(); ++itr)
     {
@@ -185,8 +185,8 @@ void ReputationMgr::SendState(FactionState const* faction)
             itr->second.needSend = false;
             if (itr->second.ReputationListID != faction->ReputationListID)
             {
-                data << (uint32) itr->second.ReputationListID;
-                data << (uint32) itr->second.Standing;
+                data << uint32(itr->second.ReputationListID);
+                data << uint32(itr->second.Standing);
                 ++count;
             }
         }
@@ -255,6 +255,7 @@ void ReputationMgr::Initialize()
     _honoredFactionCount = 0;
     _reveredFactionCount = 0;
     _exaltedFactionCount = 0;
+    _sendFactionIncreased = false;
 
     for (unsigned int i = 1; i < sFactionStore.GetNumRows(); i++)
     {
@@ -339,6 +340,7 @@ bool ReputationMgr::SetReputation(FactionEntry const* factionEntry, int32 standi
             }
         }
     }
+
     // spillover done, update faction itself
     FactionStateList::iterator faction = _factions.find(factionEntry->reputationListID);
     if (faction != _factions.end())
@@ -380,6 +382,9 @@ bool ReputationMgr::SetOneFactionReputation(FactionEntry const* factionEntry, in
 
         if (new_rank <= REP_HOSTILE)
             SetAtWar(&itr->second, true);
+
+        if (new_rank > old_rank)
+            _sendFactionIncreased = true;
 
         UpdateRankCounters(old_rank, new_rank);
 
@@ -517,7 +522,7 @@ void ReputationMgr::LoadFromDB(PreparedQueryResult result)
                 FactionState* faction = &_factions[factionEntry->reputationListID];
 
                 // update standing to current
-                faction->Standing = int32(fields[1].GetUInt32());
+                faction->Standing = fields[1].GetInt32();
 
                 // update counters
                 int32 BaseRep = GetBaseReputation(factionEntry);
