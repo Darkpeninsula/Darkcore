@@ -2246,8 +2246,7 @@ Pet* Player::SummonPet(uint32 entry, float x, float y, float z, float ang, PetTy
 {
     Pet* pet = new Pet(this, petType);
 
-    // if (petType == SUMMON_PET && pet->LoadPetFromDB(this, entry, 0, false, slotID))
-    if (petType == SUMMON_PET && pet->LoadPetFromDB(this, entry, 0, false, slotID))
+    if (petType == SUMMON_PET && pet->LoadPetFromDB(this, entry, 0, slotID != PET_SLOT_UNK_SLOT, slotID))
     {
         if (duration > 0)
             pet->SetDuration(duration);
@@ -2306,7 +2305,7 @@ Pet* Player::SummonPet(uint32 entry, float x, float y, float z, float ang, PetTy
             break;
     }
 
-    // map->AddToMap(pet->ToCreature());
+    map->AddToMap(pet->ToCreature());
 
     switch (petType)
     {
@@ -2323,7 +2322,6 @@ Pet* Player::SummonPet(uint32 entry, float x, float y, float z, float ang, PetTy
     if (duration > 0)
         pet->SetDuration(duration);
 
-    map->AddToMap(pet->ToCreature());
     //ObjectAccessor::UpdateObjectVisibility(pet);
 
     return pet;
