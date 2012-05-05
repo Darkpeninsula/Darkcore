@@ -2197,8 +2197,7 @@ void FillDisenchantFields(uint32* disenchantID, uint32* requiredDisenchantSkill,
 void ObjectMgr::LoadItemTemplates()
 {
     uint32 oldMSTime = getMSTime();
-    uint32 sparseCount = 0;
-    uint32 dbCount = 0;
+    uint32 itemsCount = 0;
 
     for (uint32 itemId = 0; itemId < sItemSparseStore.GetNumRows(); ++itemId)
     {
@@ -2302,33 +2301,10 @@ void ObjectMgr::LoadItemTemplates()
         
         FillItemDamageFields(&itemTemplate.DamageMin, &itemTemplate.DamageMax, &itemTemplate.DPS, sparse->ItemLevel, db2Data->Class, db2Data->SubClass, sparse->Quality, sparse->Delay, sparse->StatScalingFactor, sparse->InventoryType, sparse->Flags2);
         FillDisenchantFields(&itemTemplate.DisenchantID, &itemTemplate.RequiredDisenchantSkill, itemTemplate);
-        ++sparseCount;
+        ++itemsCount;
     }
 
-    // Check if item templates for DBC referenced character start outfit are present
-    std::set<uint32> notFoundOutfit;
-    for (uint32 i = 1; i < sCharStartOutfitStore.GetNumRows(); ++i)
-    {
-        CharStartOutfitEntry const* entry = sCharStartOutfitStore.LookupEntry(i);
-        if (!entry)
-            continue;
-
-        for (int j = 0; j < MAX_OUTFIT_ITEMS; ++j)
-        {
-            if (entry->ItemId[j] <= 0)
-                continue;
-
-            uint32 item_id = entry->ItemId[j];
-
-            if (!GetItemTemplate(item_id))
-                notFoundOutfit.insert(item_id);
-        }
-    }
-
-    for (std::set<uint32>::const_iterator itr = notFoundOutfit.begin(); itr != notFoundOutfit.end(); ++itr)
-        sLog->outErrorDb("Item (Entry: %u) does not exist in `item_template` but is referenced in `CharStartOutfit.dbc`", *itr);
-
-    sLog->outString(">> Loaded %u item templates from Item-sparse.db2 and %u from database in %u ms", sparseCount, dbCount, GetMSTimeDiffToNow(oldMSTime));
+    sLog->outString(">> Loaded %u item templates in %u ms", itemsCount, GetMSTimeDiffToNow(oldMSTime));
     sLog->outString();
 }
 

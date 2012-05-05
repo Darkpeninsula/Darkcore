@@ -1017,7 +1017,6 @@ bool Creature::CanReach(Unit* pVictim)
     }
 
     m_reachableTab[pVictim->GetGUID()].reachable = isReachable;
-    sLog->outString("<< Creature::CanReach()> c=%s, t=%s result=%u >>",GetName(), pVictim->GetName(), isReachable);
     return isReachable;
 }
 
@@ -1027,7 +1026,6 @@ void Creature::EnterPreEvadeMode()
         return;
     m_preEvadeMode = true;
     m_preEvadeTimer = time(NULL);
-    sLog->outString("<<< %s entering PREEVADE mode >>>", GetName());
 }
 
 bool Creature::IsInPreEvadeMode() const
