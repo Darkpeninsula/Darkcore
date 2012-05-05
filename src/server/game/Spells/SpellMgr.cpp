@@ -3248,6 +3248,11 @@ void SpellMgr::LoadSpellCustomAttr()
             case 29809: // Desecration Arm - 36 instead of 37 - typo? :/
                 spellInfo->Effects[0].RadiusEntry = sSpellRadiusStore.LookupEntry(37);
                 break;
+            case 12295: // Tactical Mastery (Rank 1)
+            case 12676: // Tactical Mastery (Rank 2)
+            case 12677: // Tactical Mastery (Rank 3)
+                spellInfo->Stances = 0;
+                break;
             // Master Shapeshifter: missing stance data for forms other than bear - bear version has correct data
             // To prevent aura staying on target after talent unlearned
             case 48420:
