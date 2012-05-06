@@ -10156,7 +10156,7 @@ void Unit::SetMinion(Minion *minion, bool apply, PetSlot slot)
             else
             {
                 sLog->outCrash("Unit::SetMinion. Try to add hunter pet to not alawed slot(%u). Minion %u for %u", slot, minion->GetEntry(), ToPlayer()->GetEntry());
-                return
+                return;
             }
         }
 
