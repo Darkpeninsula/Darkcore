@@ -39,9 +39,9 @@ enum HunterSpells
     HUNTER_PET_SPELL_CARRION_FEEDER_TRIGGERED    = 54045,
     HUNTER_SPELL_INVIGORATION_TRIGGERED          = 53398,
     HUNTER_SPELL_MASTERS_CALL_TRIGGERED          = 62305,
-    HUNTER_SPELL_CHIMERA_SHOT_SERPENT            = 53353,
-    HUNTER_SPELL_CHIMERA_SHOT_VIPER              = 53358,
-    HUNTER_SPELL_CHIMERA_SHOT_SCORPID            = 53359,
+    HUNTER_SPELL_CHIMERA_SHOT_SERPENT            = 80013, 
+    HUNTER_SPELL_CHIMERA_SHOT_VIPER              = 55382, // Hack Fix
+    HUNTER_SPELL_CHIMERA_SHOT_SCORPID            = 15752, // Hack Fix
     HUNTER_SPELL_ASPECT_OF_THE_BEAST_PET         = 61669,
     HUNTER_SPELL_KILL_COMMAND                    = 34026,
     HUNTER_SPELL_KILL_COMMAND_TRIGGER            = 83381,
@@ -118,14 +118,7 @@ public:
                     // Scorpid Sting - Attempts to Disarm the target for 10 sec. This effect cannot occur more than once per 1 minute.
                     else if (familyFlag[0] & 0x00008000)
                         spellId = HUNTER_SPELL_CHIMERA_SHOT_SCORPID;
-                    // ?? nothing say in spell desc (possibly need addition check)
-                    //if (familyFlag & 0x0000010000000000LL || // dot
-                    //    familyFlag & 0x0000100000000000LL)   // stun
-                    //{
-                    //    spellId = 53366; // 53366 Chimera Shot - Wyvern
-                    //}
 
-                    // Refresh aura duration
                     aura->RefreshDuration();
                 }
                 break;
