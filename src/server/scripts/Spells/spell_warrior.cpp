@@ -559,6 +559,5 @@ void AddSC_warrior_spell_scripts()
     new spell_warr_shockwave();
     new spell_warr_thunderclap();
     new spell_warr_deep_wounds();
-    new spell_warr_vigilance();
     new spell_warr_heroic_leap();
 }
