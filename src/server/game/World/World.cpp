@@ -2609,7 +2609,7 @@ void World::ShutdownMsg(bool show, Player* player)
 
     ///- Display a message every 12 hours, hours, 5 minutes, minute, 5 seconds and finally seconds
     if (show ||
-        (m_ShutdownTimet < 10 && (m_ShutdownTimer % 1) == 0) ||  // < 10 sec; every second (countdown)
+        (m_ShutdownTimer < 10 && (m_ShutdownTimer % 1) == 0) ||  // < 10 sec; every second (countdown)
         (m_ShutdownTimer < 1  * MINUTE && (m_ShutdownTimer % 15) == 0) || // < 1 min; every 15 sec
         (m_ShutdownTimer < 10 * MINUTE && (m_ShutdownTimer % MINUTE) == 0) || // < 10 min ; every 1 min
         (m_ShutdownTimer < 30 * MINUTE && (m_ShutdownTimer % (5 * MINUTE)) == 0) || // < 30 min ; every 5 min
