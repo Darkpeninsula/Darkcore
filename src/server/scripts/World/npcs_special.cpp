@@ -3139,21 +3139,19 @@ public:
 
     struct npc_shadowy_apparitionAI: public ScriptedAI
     {
-        npc_shadowy_apparitionAI (Creature* c) : ScriptedAI(c)
-        {
-            me->SetReactState(REACT_AGGRESSIVE);
-        }
+        npc_shadowy_apparitionAI (Creature* c) : ScriptedAI(c) {}
 
         uint64 targetGuid;
 
-        void InitializeAI ()
+        void Reset ()
         {
-            Unit * owner = me->GetOwner();
-
+            Unit* owner = me->GetOwner();
             if (!owner)
                 return;
-
-            owner->CastSpell(me, 87213, true);
+            
+            me->SetWalk(true);
+            owner->CastSpell(me, 87213, false);
+            me->CastSpell(me, 87427, true);
 
             if (me->GetCharmInfo())
             {
@@ -3163,14 +3161,9 @@ public:
             }
         }
 
-        void Reset ()
-        {
-            me->CastSpell(me, 87427, true);
-        }
-
         void MoveInLineOfSight (Unit* who)
         {
-            if(who->GetGUID() == targetGuid && me->GetDistance(who) <= 2.0f)
+            if(who->GetGUID() == targetGuid && me->GetDistance(who) <= 1.0f)
             {
                 me->CastCustomSpell(who, 87532, NULL, NULL, NULL, true, 0, 0, me->GetOwnerGUID());
                 me->CastSpell(me, 87529, true);

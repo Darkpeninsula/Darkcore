@@ -6223,11 +6223,10 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                 if (effIndex != 0)
                     return false;
 
-                int32 roll_chance = 0;
-                if(!ToPlayer()->isMoving())
-                        roll_chance = dummySpell->Effects[EFFECT_0].CalcValue();
-                else
-                        roll_chance = dummySpell->Effects[EFFECT_1].CalcValue();
+                int32 roll_chance = dummySpell->Effects[EFFECT_0].CalcValue();
+
+                if(ToPlayer()->isMoving())
+                        roll_chance *= int32(dummySpell->Effects[EFFECT_1].CalcValue() / 3);
 
                 // Summon Shadowy Apparition
                 if (roll_chance_i(roll_chance))
@@ -7424,7 +7423,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                 {
                     int32 bp1 = dummySpell->Effects[EFFECT_0].CalcValue();
                     int32 bp0 = -(bp1);
-                    
+
                     CastCustomSpell(this, 53390, &bp0, &bp1, NULL, true, NULL, triggeredByAura);
                     return true;
                 }
