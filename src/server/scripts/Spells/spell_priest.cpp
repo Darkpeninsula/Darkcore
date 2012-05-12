@@ -437,6 +437,49 @@ class spell_pri_power_word_shield : public SpellScriptLoader
         }
 };
 
+// 87212 Shadowy Apparition
+enum ShadowyApparition
+{
+    SPELL_SHADOWY_APPARITION_SUMMON = 87426,
+    NPC_SHADOWY_APPARITION = 46954,
+    MAX_SHADOWY_APPARITIONS  = 5,
+};
+
+class spell_shadowy_apparition_proc: public SpellScriptLoader
+{
+public:
+    spell_shadowy_apparition_proc () : SpellScriptLoader("spell_shadowy_apparition_proc")
+    {
+    }
+
+    // 87212 Summon Shadowy Apparition
+    class spell_shadowy_apparition_proc_SpellScript: public SpellScript
+    {
+        PrepareSpellScript(spell_shadowy_apparition_proc_SpellScript)
+        void HandleEffectScriptEffect (SpellEffIndex /*effIndex*/)
+        {
+            std::list<Creature*> shadowy_apparitions;
+            GetCaster()->GetAllMinionsByEntry(shadowy_apparitions, NPC_SHADOWY_APPARITION);
+
+            if (shadowy_apparitions.size() >= MAX_SHADOWY_APPARITIONS)
+                return;
+
+            if (Unit* caster = GetCaster())
+                caster->CastSpell(GetHitUnit(), SPELL_SHADOWY_APPARITION_SUMMON, true);
+        }
+
+        void Register ()
+        {
+            OnEffectHit += SpellEffectFn(spell_shadowy_apparition_proc_SpellScript::HandleEffectScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+        }
+    };
+
+    SpellScript *GetSpellScript () const
+    {
+        return new spell_shadowy_apparition_proc_SpellScript;
+    }
+};
+
 void AddSC_priest_spell_scripts()
 {
     new spell_pri_guardian_spirit();
@@ -449,4 +492,5 @@ void AddSC_priest_spell_scripts()
     new spell_pri_mind_blast();
     new spell_pri_power_word_fortitude();
     new spell_pri_power_word_shield();
+    new spell_shadowy_apparition_proc;
 }

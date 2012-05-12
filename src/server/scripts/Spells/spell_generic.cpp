@@ -658,13 +658,13 @@ enum PvPTrinketTriggeredSpells
 class spell_pvp_trinket_wotf_shared_cd : public SpellScriptLoader
 {
     public:
-        spell_pvp_trinket_wotf_shared_cd() : SpellScriptLoader("spell_pvp_trinket_wotf_shared_cd") {}
+        spell_pvp_trinket_wotf_shared_cd() : SpellScriptLoader("spell_pvp_trinket_wotf_shared_cd") { }
 
-        class spell_pvp_trinket_wotf_shared_cd_SpellScript : public SpellScript
+        class spell_pvp_trinket_wotf_shared_cd_AuraScript : public AuraScript
         {
-            PrepareSpellScript(spell_pvp_trinket_wotf_shared_cd_SpellScript);
+            PrepareAuraScript(spell_pvp_trinket_wotf_shared_cd_AuraScript);
 
-            bool Validate(SpellInfo const* /*spellEntry*/)
+            bool Validate(SpellInfo const* /*spell*/)
             {
                 if (!sSpellMgr->GetSpellInfo(SPELL_WILL_OF_THE_FORSAKEN_COOLDOWN_TRIGGER))
                     return false;
@@ -673,7 +673,7 @@ class spell_pvp_trinket_wotf_shared_cd : public SpellScriptLoader
                 return true;
             }
 
-            void HandleScript(SpellEffIndex /*effIndex*/)
+            void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
             {
                 Player* caster = GetCaster()->ToPlayer();
                 if (!caster)
@@ -691,13 +691,13 @@ class spell_pvp_trinket_wotf_shared_cd : public SpellScriptLoader
 
             void Register()
             {
-                OnEffectHit += SpellEffectFn(spell_pvp_trinket_wotf_shared_cd_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_DUMMY);
+                AfterEffectApply += AuraEffectRemoveFn(spell_pvp_trinket_wotf_shared_cd_AuraScript::OnApply, EFFECT_0, SPELL_AURA_MECHANIC_IMMUNITY, AURA_EFFECT_HANDLE_REAL);
             }
         };
 
-        SpellScript* GetSpellScript() const
+        AuraScript* GetAuraScript() const
         {
-            return new spell_pvp_trinket_wotf_shared_cd_SpellScript();
+            return new spell_pvp_trinket_wotf_shared_cd_AuraScript();
         }
 };
 
@@ -1420,66 +1420,6 @@ public:
     SpellScript* GetSpellScript() const
     {
         return new spell_gen_oracle_wolvar_reputation_SpellScript();
-    }
-};
-
-enum DamageReductionAura
-{
-   SPELL_BLESSING_OF_SANCTUARY         = 20911,
-   SPELL_GREATER_BLESSING_OF_SANCTUARY = 25899,
-   SPELL_RENEWED_HOPE                  = 63944,
-   SPELL_VIGILANCE                     = 50720,
-   SPELL_DAMAGE_REDUCTION_AURA         = 68066,
-};
-
-class spell_gen_damage_reduction_aura : public SpellScriptLoader
-{
-    public:
-    spell_gen_damage_reduction_aura() : SpellScriptLoader("spell_gen_damage_reduction_aura") { }
-
-    class spell_gen_damage_reduction_AuraScript : public AuraScript
-    {
-        PrepareAuraScript(spell_gen_damage_reduction_AuraScript);
-
-        bool Validate(SpellInfo const* /*SpellEntry*/)
-        {
-            if (!sSpellMgr->GetSpellInfo(SPELL_DAMAGE_REDUCTION_AURA))
-                return false;
-            return true;
-        }
-
-        void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            Unit* target = GetTarget();
-
-            target->CastSpell(target, SPELL_DAMAGE_REDUCTION_AURA, true);
-        }
-
-        void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            Unit* target = GetTarget();
-            if (!target->HasAura(SPELL_DAMAGE_REDUCTION_AURA))
-                return;
-
-            if (target->HasAura(SPELL_BLESSING_OF_SANCTUARY) ||
-                target->HasAura(SPELL_GREATER_BLESSING_OF_SANCTUARY) ||
-                target->HasAura(SPELL_RENEWED_HOPE) ||
-                target->HasAura(SPELL_VIGILANCE))
-                    return;
-
-            target->RemoveAurasDueToSpell(SPELL_DAMAGE_REDUCTION_AURA);
-        }
-
-        void Register()
-        {
-            OnEffectApply += AuraEffectApplyFn(spell_gen_damage_reduction_AuraScript::OnApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
-            OnEffectRemove += AuraEffectRemoveFn(spell_gen_damage_reduction_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
-        }
-    };
-
-    AuraScript* GetAuraScript() const
-    {
-        return new spell_gen_damage_reduction_AuraScript();
     }
 };
 
@@ -2519,7 +2459,6 @@ void AddSC_generic_spell_scripts()
     new spell_gen_launch();
     new spell_gen_vehicle_scaling();
     new spell_gen_oracle_wolvar_reputation();
-    new spell_gen_damage_reduction_aura();
     new spell_gen_luck_of_the_draw();
     new spell_gen_spirit_healer_res();
     new spell_gen_reindeer_transformation();

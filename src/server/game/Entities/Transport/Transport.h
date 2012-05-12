@@ -17,7 +17,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #ifndef TRANSPORTS_H
 #define TRANSPORTS_H
 
@@ -34,7 +33,7 @@ class Transport : public GameObject
         ~Transport();
 
         bool Create(uint32 guidlow, uint32 entry, uint32 mapid, float x, float y, float z, float ang, uint32 animprogress, uint32 dynflags);
-        bool GenerateWaypoints(uint32 pathid, uint32 moveSpeed, uint32 accelRate, std::set<uint32> &mapids);
+        bool GenerateWaypoints(uint32 pathid, std::set<uint32> &mapids);
         void Update(uint32 p_time);
         bool AddPassenger(Player* passenger);
         bool RemovePassenger(Player* passenger);
@@ -77,7 +76,7 @@ class Transport : public GameObject
         WayPointMap::const_iterator m_curr;
         WayPointMap::const_iterator m_next;
         uint32 m_pathTime;
-        uint32 _timer;
+        uint32 m_timer;
 
         PlayerSet m_passengers;
 
@@ -86,6 +85,7 @@ class Transport : public GameObject
         uint32 ScriptId;
     public:
         WayPointMap m_WayPoints;
+        uint32 m_nextNodeTime;
 
     private:
         void TeleportTransport(uint32 newMapid, float x, float y, float z);

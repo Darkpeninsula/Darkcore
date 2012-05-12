@@ -17,7 +17,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #include "DatabaseEnv.h"
 #include "Log.h"
 #include "World.h"
@@ -73,7 +72,7 @@ void LoadSkillDiscoveryTable()
 
         uint32 spellId         = fields[0].GetUInt32();
         int32  reqSkillOrSpell = fields[1].GetInt32();
-        uint32 reqSkillValue   = fields[2].GetUInt32();
+        uint32 reqSkillValue   = fields[2].GetUInt16();
         float  chance          = fields[3].GetFloat();
 
         if (chance <= 0)                                    // chance
@@ -134,7 +133,8 @@ void LoadSkillDiscoveryTable()
         }
 
         ++count;
-    } while (result->NextRow());
+    }
+    while (result->NextRow());
 
     if (!ssNonDiscoverableEntries.str().empty())
         sLog->outErrorDb("Some items can't be successfully discovered: have in chance field value < 0.000001 in `skill_discovery_template` DB table . List:\n%s", ssNonDiscoverableEntries.str().c_str());

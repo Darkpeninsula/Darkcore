@@ -17,7 +17,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #include "SkillExtraItems.h"
 #include "DatabaseEnv.h"
 #include "Log.h"
@@ -57,7 +56,7 @@ void LoadSkillExtraItemTable()
 
     SkillExtraItemStore.clear();                            // need for reload
 
-    //                                                 0        1                       2                       3
+    //                                                  0               1                       2                    3
     QueryResult result = WorldDatabase.Query("SELECT spellId, requiredSpecialization, additionalCreateChance, additionalMaxNum FROM skill_extra_item_template");
 
     if (!result)

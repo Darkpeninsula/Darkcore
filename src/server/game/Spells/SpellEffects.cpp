@@ -791,15 +791,34 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                 break;
             }
             case SPELLFAMILY_HUNTER:
-                {
-                    // Rapid Recuperation
-                    if (m_caster->HasAura(3045))
-                        if (m_caster->HasAura(53228))                // Rank 1
-                            m_caster->CastSpell(m_caster, 53230, true);
-                        else
-                            if (m_caster->HasAura(53232))                // Rank 2
-                                m_caster->CastSpell(m_caster, 54227, true);
+            {
+                switch (m_spellInfo->Id)
+                {    // PETS BASIC ATTACK
+                    case 17253: // Bite
+                    case 16827: // Claw
+                    case 49966: // Smack
+                    case 53508: // Wolverine Bite
+                    {
+                        damage += int32((m_caster->GetOwner()->GetTotalAttackPowerValue(RANGED_ATTACK) * 0.4f) / 2);
+                        break;
+                    }
                 }
+                // Gore
+                if (m_spellInfo->SpellIconID == 1578)
+                    if (m_caster->HasAura(57627))           // Charge 6 sec post-effect
+                        damage *= 2;
+                break;
+                // Rapid Recuperation
+                if (m_caster->HasAura(3045))
+                {
+                    if (m_caster->HasAura(53228))           // Rank 1
+                        m_caster->CastSpell(m_caster, 53230, true);
+                    else
+                    if (m_caster->HasAura(53232))           // Rank 2
+                        m_caster->CastSpell(m_caster, 54227, true);
+                }
+                break;
+            }
             case SPELLFAMILY_PALADIN:
             {
                 // Hammer of the Righteous
@@ -2182,7 +2201,7 @@ void Spell::EffectForceCast(SpellEffIndex effIndex)
     unitTarget->CastSpell(targets, spellInfo, &values, TRIGGERED_FULL_MASK);
 }
 
-// not implemented yet.
+// NYI.
 /*void Spell::EffectTriggerSpellWithValue(SpellEffIndex effIndex)
 {
     uint32 triggered_spell_id = m_spellInfo->Effects[effIndex].TriggerSpell;
@@ -4249,7 +4268,7 @@ void Spell::EffectTameCreature(SpellEffIndex /*effIndex*/)
 
     if (m_caster->GetTypeId() == TYPEID_PLAYER)
     {
-        pet->SavePetToDB(PET_SLOT_ACTUAL_PET_SLOT);
+        pet->SavePetToDB(m_caster->ToPlayer()->getSlotForNewPet());
         m_caster->ToPlayer()->PetSpellInitialize();
     }
 }
@@ -6963,20 +6982,28 @@ void Spell::EffectSummonDeadPet(SpellEffIndex /*effIndex*/)
     if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT)
         return;
 
-    if (m_caster->GetTypeId() != TYPEID_PLAYER)
+    Player* player = m_caster->ToPlayer();
+    if (!player)
         return;
-    Player* _player = m_caster->ToPlayer();
-    Pet* pet = _player->GetPet();
-    if (!pet)
+
+    Pet* pet = player->GetPet();
+    if (pet && pet->isAlive())
         return;
-    if (pet->isAlive())
-        return;
+
     if (damage < 0)
         return;
 
     float x, y, z;
-    _player->GetPosition(x, y, z);
-    _player->GetMap()->CreatureRelocation(pet, x, y, z, _player->GetOrientation());
+    player->GetPosition(x, y, z);
+    if (!pet)
+    {
+        player->SummonPet(0, x, y, z, player->GetOrientation(), SUMMON_PET, 0);
+        pet = player->GetPet();
+    }
+    if (!pet)
+        return;
+
+    player->GetMap()->CreatureRelocation(pet, x, y, z, player->GetOrientation());
 
     pet->SetUInt32Value(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_NONE);
     pet->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SKINNABLE);

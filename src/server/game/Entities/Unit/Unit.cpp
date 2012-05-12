@@ -2938,18 +2938,19 @@ void Unit::_UpdateSpells(uint32 time)
 
 void Unit::_UpdateAutoRepeatSpell()
 {
+    bool isAutoShot = m_currentSpells[CURRENT_AUTOREPEAT_SPELL]->m_spellInfo->Id == 75;
     // check "realtime" interrupts
-    if ((GetTypeId() == TYPEID_PLAYER && ToPlayer()->isMoving()) || IsNonMeleeSpellCasted(false, false, true, m_currentSpells[CURRENT_AUTOREPEAT_SPELL]->m_spellInfo->Id == 75))
+    if (IsNonMeleeSpellCasted(false, false, true, isAutoShot))
     {
         // cancel wand shoot
-        if (m_currentSpells[CURRENT_AUTOREPEAT_SPELL]->m_spellInfo->Id != 75)
+        if (!isAutoShot)
             InterruptSpell(CURRENT_AUTOREPEAT_SPELL);
         m_AutoRepeatFirstCast = true;
         return;
     }
 
     // apply delay (Auto Shot (spellID 75) not affected)
-    if (m_AutoRepeatFirstCast && getAttackTimer(RANGED_ATTACK) < 500 && m_currentSpells[CURRENT_AUTOREPEAT_SPELL]->m_spellInfo->Id != 75)
+    if (m_AutoRepeatFirstCast && getAttackTimer(RANGED_ATTACK) < 500 && !isAutoShot)
         setAttackTimer(RANGED_ATTACK, 500);
     m_AutoRepeatFirstCast = false;
 
@@ -6214,6 +6215,28 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
         }
         case SPELLFAMILY_PRIEST:
         {
+            // Shadowy Apparition
+            if (dummySpell->SpellIconID == 4879)
+            {
+                if (!victim || !victim->isAlive())
+                    return false;
+
+                if (effIndex != 0)
+                    return false;
+
+                int32 roll_chance = dummySpell->Effects[EFFECT_0].CalcValue();
+
+                if(ToPlayer()->isMoving())
+                        roll_chance *= int32(dummySpell->Effects[EFFECT_1].CalcValue() / 3);
+
+                // Summon Shadowy Apparition
+                if (roll_chance_i(roll_chance))
+                {
+                    ToPlayer()->CastSpell(ToPlayer(), 87212, true, castItem, triggeredByAura);
+                    return true;
+                }
+                return false;
+            }
             // Vampiric Touch
             if (dummySpell->SpellFamilyFlags[1] & 0x00000400)
             {
@@ -7401,7 +7424,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                 {
                     int32 bp1 = dummySpell->Effects[EFFECT_0].CalcValue();
                     int32 bp0 = -(bp1);
-                    
+
                     CastCustomSpell(this, 53390, &bp0, &bp1, NULL, true, NULL, triggeredByAura);
                     return true;
                 }
@@ -10092,6 +10115,9 @@ void Unit::SetMinion(Minion *minion, bool apply, PetSlot slot)
 {
     sLog->outDebug(LOG_FILTER_UNITS, "SetMinion %u for %u, apply %u", minion->GetEntry(), GetEntry(), apply);
 
+    if(slot == PET_SLOT_ACTUAL_PET_SLOT)
+        slot = ToPlayer()->_currentPetSlot;
+
     if (apply)
     {
         if (!minion->AddUInt64Value(UNIT_FIELD_SUMMONEDBY, GetGUID()))
@@ -10141,16 +10167,19 @@ void Unit::SetMinion(Minion *minion, bool apply, PetSlot slot)
 
         if (GetTypeId() == TYPEID_PLAYER)
         {
-            if(!minion->isHunterPet()) //If its not a Hunter Pet, well lets not try to use it for hunters then.
-            {
+            // If its not a Hunter Pet, only set pet slot. use setPetSlotUsed only for hanter pets.
+            // Always save thoose spots where hunter is correct
+            if (!minion->isHunterPet())
                 ToPlayer()->_currentPetSlot = slot;
-                ToPlayer()->_petSlotUsed = 3452816845; // the same as 100 so that the pet is only that and nothing more
-                // ToPlayer()->setPetSlotUsed(slot, true);
-            }
-            if (slot >= PET_SLOT_HUNTER_FIRST && slot <= PET_SLOT_HUNTER_LAST) // Always save thoose spots where hunter is correct
+            else if (slot >= PET_SLOT_HUNTER_FIRST && slot <= PET_SLOT_HUNTER_LAST)
             {
                 ToPlayer()->_currentPetSlot = slot;
                 ToPlayer()->setPetSlotUsed(slot, true);
+            }
+            else
+            {
+                sLog->outCrash("Unit::SetMinion. Try to add hunter pet to not alawed slot(%u). Minion %u for %u", slot, minion->GetEntry(), ToPlayer()->GetEntry());
+                return;
             }
         }
 

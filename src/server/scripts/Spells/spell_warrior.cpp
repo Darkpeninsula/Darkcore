@@ -508,62 +508,42 @@ class spell_warr_deep_wounds : public SpellScriptLoader
         }
 };
 
-enum DamageReductionAura
+// Heroic Leap
+// Spell Id: 52174
+class spell_warr_heroic_leap : public SpellScriptLoader
 {
-   SPELL_BLESSING_OF_SANCTUARY         = 20911,
-   SPELL_GREATER_BLESSING_OF_SANCTUARY = 25899,
-   SPELL_RENEWED_HOPE                  = 63944,
-   SPELL_DAMAGE_REDUCTION_AURA         = 68066,
-};
+    public:
+        spell_warr_heroic_leap() : SpellScriptLoader("spell_warr_heroic_leap") { }
 
-class spell_warr_vigilance : public SpellScriptLoader
-{
-public:
-   spell_warr_vigilance() : SpellScriptLoader("spell_warr_vigilance") { }
+        class spell_warr_heroic_leap_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_warr_heroic_leap_SpellScript);
 
-   class spell_warr_vigilance_AuraScript : public AuraScript
-   {
-       PrepareAuraScript(spell_warr_vigilance_AuraScript);
+            void CalculateDamage(SpellEffIndex effect)
+            {
+                int32 damage = GetHitDamage();
+                if (Unit* target = GetHitUnit())
+                {
+                    if (Unit* caster = GetCaster())
+                    {
+                        damage += CalculatePctN(caster->GetTotalAttackPowerValue(BASE_ATTACK), 50);
+                        
+                        int32 dmg = caster->SpellDamageBonus(target, GetSpellInfo(), damage, SPELL_DIRECT_DAMAGE);
+                        SetHitDamage(dmg);
+                    }
+                }
+            }
 
-       bool Validate(SpellInfo const* /*SpellEntry*/)
-       {
-           if (!sSpellMgr->GetSpellInfo(SPELL_DAMAGE_REDUCTION_AURA))
-               return false;
-           return true;
-       }
+            void Register()
+            {
+                OnEffectHitTarget += SpellEffectFn(spell_warr_heroic_leap::spell_warr_heroic_leap_SpellScript::CalculateDamage, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+            }
+        };
 
-       void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-       {
-           Unit* target = GetTarget();
-           target->CastSpell(target, SPELL_DAMAGE_REDUCTION_AURA, true);
-       }
-
-       void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-       {
-           Unit* target = GetTarget();
-
-           if (!target->HasAura(SPELL_DAMAGE_REDUCTION_AURA))
-               return;
-
-           if (target->HasAura(SPELL_BLESSING_OF_SANCTUARY) ||
-               target->HasAura(SPELL_GREATER_BLESSING_OF_SANCTUARY) ||
-               target->HasAura(SPELL_RENEWED_HOPE))
-                   return;
-
-           target->RemoveAurasDueToSpell(SPELL_DAMAGE_REDUCTION_AURA);
-       }
-
-       void Register()
-       {
-           OnEffectApply += AuraEffectApplyFn(spell_warr_vigilance_AuraScript::OnApply, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
-           OnEffectRemove += AuraEffectRemoveFn(spell_warr_vigilance_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
-       }
-   };
-
-   AuraScript* GetAuraScript() const
-   {
-       return new spell_warr_vigilance_AuraScript();
-   }
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_warr_heroic_leap_SpellScript();
+        }
 };
 
 void AddSC_warrior_spell_scripts()
@@ -579,5 +559,5 @@ void AddSC_warrior_spell_scripts()
     new spell_warr_shockwave();
     new spell_warr_thunderclap();
     new spell_warr_deep_wounds();
-    new spell_warr_vigilance();
+    new spell_warr_heroic_leap();
 }

@@ -97,7 +97,7 @@ namespace MMAP
         uint32 packedGridPos = packTileID(x, y);
         if (mmap->mmapLoadedTiles.find(packedGridPos) != mmap->mmapLoadedTiles.end())
         {
-            sLog->outError("MMAP:loadMap: Asked to load already loaded navmesh tile. %03u%02i%02i.mmtile", mapId, y, x);
+            sLog->outDebug(LOG_FILTER_MAPS, "MMAP:loadMap: Asked to load already loaded navmesh tile. %03u%02i%02i.mmtile", mapId, y, x);
             return false;
         }
 
@@ -118,7 +118,7 @@ namespace MMAP
         // read header
         MmapTileHeader fileHeader;
         fread(&fileHeader, sizeof(MmapTileHeader), 1, file);
-        sLog->outString("FileHeader[%u] MMAP_MAGIC [%u]", fileHeader.mmapMagic, MMAP_MAGIC);
+        sLog->outDebug(LOG_FILTER_MAPS, "FileHeader[%u] MMAP_MAGIC [%u]", fileHeader.mmapMagic, MMAP_MAGIC);
         if (fileHeader.mmapMagic != MMAP_MAGIC)
         {
             sLog->outError("MMAP:loadMap: Bad header in mmap %03u%02i%02i.mmtile", mapId, y, x);

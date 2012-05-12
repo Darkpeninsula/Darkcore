@@ -516,93 +516,105 @@ void WorldSession::HandleSellItemOpcode(WorldPacket & recv_data)
         GetPlayer()->RemoveAurasByType(SPELL_AURA_FEIGN_DEATH);
 
     Item* pItem = _player->GetItemByGuid(itemguid);
-    if (pItem)
+    if(!pItem)
     {
-        // prevent sell not owner item
-        if (_player->GetGUID() != pItem->GetOwnerGUID())
+        _player->SendSellError(SELL_ERR_YOU_DONT_OWN_THAT_ITEM, NULL, itemguid, 0);
+        return;
+    }
+    
+    // prevent sell not owner item
+    if (_player->GetGUID() != pItem->GetOwnerGUID())
+    {
+        _player->SendSellError(SELL_ERR_YOU_DONT_OWN_THAT_ITEM, creature, itemguid, 0);
+        return;
+    }
+
+    // prevent sell non empty bag by drag-and-drop at vendor's item list
+    if (pItem->IsNotEmptyBag())
+    {
+        _player->SendSellError(SELL_ERR_ONLY_EMPTY_BAG, creature, itemguid, 0);
+        return;
+    }
+
+    // prevent sell currently looted item
+    if (_player->GetLootGUID() == pItem->GetGUID())
+    {
+        _player->SendSellError(SELL_ERR_CANT_SELL_ITEM, creature, itemguid, 0);
+        return;
+    }
+    
+    // prevent selling item for sellprice when the item is still refundable
+    // this probably happens when right clicking a refundable item, the client sends both
+    // CMSG_SELL_ITEM and CMSG_REFUND_ITEM (unverified)
+    if (pItem->HasFlag(ITEM_FIELD_FLAGS, ITEM_FLAG_REFUNDABLE))
+        return; // Therefore, no feedback to client
+    
+    // special case at auto sell (sell all)
+    if (count == 0)
+    {
+        count = pItem->GetCount();
+    }
+    else
+    {
+        // prevent sell more items that exist in stack (possible only not from client)
+        if (count > pItem->GetCount())
         {
             _player->SendSellError(SELL_ERR_CANT_SELL_ITEM, creature, itemguid, 0);
-            return;
-        }
-
-        // prevent sell non empty bag by drag-and-drop at vendor's item list
-        if (pItem->IsNotEmptyBag())
-        {
-            _player->SendSellError(SELL_ERR_CANT_SELL_ITEM, creature, itemguid, 0);
-            return;
-        }
-
-        // prevent sell currently looted item
-        if (_player->GetLootGUID() == pItem->GetGUID())
-        {
-            _player->SendSellError(SELL_ERR_CANT_SELL_ITEM, creature, itemguid, 0);
-            return;
-        }
-
-        // prevent selling item for sellprice when the item is still refundable
-        // this probably happens when right clicking a refundable item, the client sends both
-        // CMSG_SELL_ITEM and CMSG_REFUND_ITEM (unverified)
-        if (pItem->HasFlag(ITEM_FIELD_FLAGS, ITEM_FLAG_REFUNDABLE))
-            return; // Therefore, no feedback to client
-
-        // special case at auto sell (sell all)
-        if (count == 0)
-        {
-            count = pItem->GetCount();
-        }
-        else
-        {
-            // prevent sell more items that exist in stack (possible only not from client)
-            if (count > pItem->GetCount())
-            {
-                _player->SendSellError(SELL_ERR_CANT_SELL_ITEM, creature, itemguid, 0);
-                return;
-            }
-        }
-
-        ItemTemplate const* proto = pItem->GetTemplate();
-        if (proto)
-        {
-            if (proto->SellPrice > 0)
-            {
-                if (count < pItem->GetCount())               // need split items
-                {
-                    Item* pNewItem = pItem->CloneItem(count, _player);
-                    if (!pNewItem)
-                    {
-                        sLog->outError("WORLD: HandleSellItemOpcode - could not create clone of item %u; count = %u", pItem->GetEntry(), count);
-                        _player->SendSellError(SELL_ERR_CANT_SELL_ITEM, creature, itemguid, 0);
-                        return;
-                    }
-
-                    pItem->SetCount(pItem->GetCount() - count);
-                    _player->ItemRemovedQuestCheck(pItem->GetEntry(), count);
-                    if (_player->IsInWorld())
-                        pItem->SendUpdateToPlayer(_player);
-                    pItem->SetState(ITEM_CHANGED, _player);
-
-                    _player->AddItemToBuyBackSlot(pNewItem);
-                    if (_player->IsInWorld())
-                        pNewItem->SendUpdateToPlayer(_player);
-                }
-                else
-                {
-                    _player->ItemRemovedQuestCheck(pItem->GetEntry(), pItem->GetCount());
-                    _player->RemoveItem(pItem->GetBagSlot(), pItem->GetSlot(), true);
-                    pItem->RemoveFromUpdateQueueOf(_player);
-                    _player->AddItemToBuyBackSlot(pItem);
-                }
-
-                uint32 money = proto->SellPrice * count;
-                _player->ModifyMoney(money);
-                _player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_MONEY_FROM_VENDORS, money);
-            }
-            else
-                _player->SendSellError(SELL_ERR_CANT_SELL_ITEM, creature, itemguid, 0);
             return;
         }
     }
-    _player->SendSellError(SELL_ERR_CANT_FIND_ITEM, creature, itemguid, 0);
+    
+    ItemTemplate const* proto = pItem->GetTemplate();
+    if(!proto)
+    {
+        _player->SendSellError(SELL_ERR_CANT_FIND_ITEM, creature, itemguid, 0);
+        return;
+    }
+    
+    if (proto->SellPrice > 0)
+    {
+        if (count < pItem->GetCount())               // need split items
+        {
+            Item* pNewItem = pItem->CloneItem(count, _player);
+            if (!pNewItem)
+            {
+                sLog->outError("WORLD: HandleSellItemOpcode - could not create clone of item %u; count = %u", pItem->GetEntry(), count);
+                _player->SendSellError(SELL_ERR_CANT_SELL_ITEM, creature, itemguid, 0);
+                return;
+            }
+                
+            pItem->SetCount(pItem->GetCount() - count);
+            _player->ItemRemovedQuestCheck(pItem->GetEntry(), count);
+                
+            if (_player->IsInWorld())
+                pItem->SendUpdateToPlayer(_player);
+                
+            pItem->SetState(ITEM_CHANGED, _player);
+            _player->AddItemToBuyBackSlot(pNewItem);
+                
+            if (_player->IsInWorld())
+                pNewItem->SendUpdateToPlayer(_player);
+        }
+        else
+        {
+            _player->ItemRemovedQuestCheck(pItem->GetEntry(), pItem->GetCount());
+            _player->RemoveItem(pItem->GetBagSlot(), pItem->GetSlot(), true);
+            pItem->RemoveFromUpdateQueueOf(_player);
+            _player->AddItemToBuyBackSlot(pItem);
+        }
+        
+        uint32 money = proto->SellPrice * count;
+        _player->ModifyMoney(money);
+        _player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_MONEY_FROM_VENDORS, money);
+        return;
+    }
+    else
+    {
+        _player->SendSellError(SELL_ERR_CANT_SELL_ITEM, creature, itemguid, 0);
+        return;
+    }
+
+    _player->SendSellError(SELL_ERR_UNK, creature, itemguid, 0);
     return;
 }
 
