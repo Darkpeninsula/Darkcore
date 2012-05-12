@@ -41,8 +41,8 @@ enum Spells
     SPELL_SHIELD_OF_NIGHTMARE           = 75809,
     SPELL_BINDING_SHADOWS               = 79466,
     SPELL_UMBRAL_MENDING                = 79467,
-    SPELL_TWILIGHT_CORRUPTION_DOT       = 93613,
-    SPELL_TWILIGHT_CORRUPTION_VISUAL    = 75755,
+    SPELL_TWILIGHT_CORRUPTION           = 75569,
+
     // Alexstraszas Eggs
     SPELL_SUMMON_TWILIGHT_HATCHLINGS = 91058,
 };
@@ -55,7 +55,6 @@ enum Events
     EVENT_REMOVE_TWILIGHT_PORTAL            = 4,
     EVENT_CAST_SHIELD_OF_NIGHTMARE_DELAY    = 5,
     EVENT_BINDING_SHADOWS                   = 6,
-
     EVENT_TRIGGER_GALE_CHECK_PLAYERS        = 7,
 };
 
@@ -347,8 +346,7 @@ public:
 
                 pTarget->AI()->DoZoneInCombat();
 
-                DoCast(pTarget,SPELL_TWILIGHT_CORRUPTION_DOT,true);
-                DoCast(pTarget,SPELL_TWILIGHT_CORRUPTION_VISUAL,true);
+                DoCast(pTarget,SPELL_TWILIGHT_CORRUPTION,true);
             }
         }
 
@@ -418,6 +416,13 @@ public:
             me->SetReactState(REACT_PASSIVE);
         }
 
+        uint32 TwilightCorruptionTimer;
+
+        void Reset()
+        {
+            TwilightCorruptionTimer = 9 * IN_MILLISECONDS;
+        }
+
         void JustDied(Unit* killer)
         {
             DoCastAOE(SPELL_SUMMON_TWILIGHT_HATCHLINGS, true);
@@ -427,6 +432,18 @@ public:
         {
             summon->setActive(true);
             summon->AI()->DoZoneInCombat();
+        }
+        
+        void UpdateAI(const uint32 diff)
+        {
+            if(me->HasAura(75569))
+            {
+                if (TwilightCorruptionTimer <= diff)
+                {
+                    me->DealDamage(me,me->GetHealth());
+                    TwilightCorruptionTimer = 9 * IN_MILLISECONDS;
+                } else TwilightCorruptionTimer -= diff;
+            }
         }
     };
 };
