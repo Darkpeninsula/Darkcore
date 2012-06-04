@@ -1408,6 +1408,10 @@ void Player::HandleDrowning(uint32 time_diff)
     // In dark water
     if (_MirrorTimerFlags & UNDERWARER_INDARKWATER)
     {
+        // Hard Fix Need Real Fix
+        if (GetZoneId() == 4815 || GetZoneId() == 5145 || GetZoneId() == 5144)
+            return;
+
         // Fatigue timer not activated - activate it
         if (_MirrorTimer[FATIGUE_TIMER] == DISABLED_MIRROR_TIMER)
         {
