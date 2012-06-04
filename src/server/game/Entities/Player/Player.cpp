@@ -1332,6 +1332,9 @@ int32 Player::getMaxTimer(MirrorTimerType timer)
     switch (timer)
     {
         case FATIGUE_TIMER:
+            if (!isAlive() || GetZoneId() == 4815 || GetZoneId() == 5145 || GetZoneId() == 5144)
+                return DISABLED_MIRROR_TIMER;
+
             return MINUTE * IN_MILLISECONDS;
         case BREATH_TIMER:
         {
