@@ -1587,17 +1587,17 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
                 case 88751: //Wild mushroom: detonate
                 {
                     std::list<Creature*> templist;
-                    
+
                     CellCoord pair(Darkcore::ComputeCellCoord(m_caster->GetPositionX(), m_caster->GetPositionY()));
                     Cell cell(pair);
                     cell.SetNoCreate();
-                    
+
                     Darkcore::AllFriendlyCreaturesInGrid check(m_caster);
                     Darkcore::CreatureListSearcher<Darkcore::AllFriendlyCreaturesInGrid> searcher(m_caster, templist, check);
-                    
+
                     TypeContainerVisitor<Darkcore::CreatureListSearcher<Darkcore::AllFriendlyCreaturesInGrid>, GridTypeMapContainer> cSearcher(searcher);
                     cell.Visit(pair, cSearcher, *(m_caster->GetMap()), *m_caster, m_caster->GetGridActivationRange());
-                    
+
                     if (!templist.empty())
                     {
                         for (std::list<Creature*>::const_iterator itr = templist.begin(); itr != templist.end(); ++itr)
@@ -1605,13 +1605,13 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
                             //You cannot detonate other people's mushrooms
                             if((*itr)->GetOwner() != m_caster)
                                 continue;
-                            
+
                             // Find all the enemies
                             std::list<Unit*> targets;
                             Darkcore::AnyUnfriendlyUnitInObjectRangeCheck u_check((*itr), (*itr), 6.0f);
                             Darkcore::UnitListSearcher<Darkcore::AnyUnfriendlyUnitInObjectRangeCheck> searcher((*itr), targets, u_check);
                             (*itr)->VisitNearbyObject(6.0f, searcher);
-                            
+
                             for (std::list<Unit*>::const_iterator iter = targets.begin(); iter != targets.end(); ++iter)
                             {
                                 //Damage spell
@@ -1649,7 +1649,7 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
                     // Skull Bash
                     m_caster->CastSpell(unitTarget, 93983 ,true);
                     m_caster->CastSpell(unitTarget, 93985 ,true);
-                    break; 
+                    break;
                 }
             }
             break;
@@ -2037,7 +2037,7 @@ void Spell::EffectTriggerSpell(SpellEffIndex effIndex)
             {
                 // Feral Agression
                 if (AuraEffect const * aurEff = m_caster->GetDummyAuraEffect(SPELLFAMILY_DRUID, 960, 0))
-                { 
+                {
                     uint8 count = uint8(aurEff->GetAmount() - 1);
                     while(count)
                     {
@@ -4348,9 +4348,12 @@ void Spell::EffectSummonPet(SpellEffIndex effIndex)
     pet->SetUInt32Value(UNIT_CREATED_BY_SPELL, m_spellInfo->Id);
 
     // generate new name for summon pet
-    std::string new_name=sObjectMgr->GeneratePetName(petentry);
-    if (!new_name.empty())
-        pet->SetName(new_name);
+    if (petentry)
+    {
+        std::string new_name=sObjectMgr->GeneratePetName(petentry);
+        if (!new_name.empty())
+            pet->SetName(new_name);
+    }
 
     ExecuteLogEffectSummonObject(effIndex, pet);
 }
