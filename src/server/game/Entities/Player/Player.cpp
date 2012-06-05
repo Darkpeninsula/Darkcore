@@ -1332,9 +1332,6 @@ int32 Player::getMaxTimer(MirrorTimerType timer)
     switch (timer)
     {
         case FATIGUE_TIMER:
-            if (!isAlive() || GetZoneId() == 4815 || GetZoneId() == 5145 || GetZoneId() == 5144)
-                return DISABLED_MIRROR_TIMER;
-
             return MINUTE * IN_MILLISECONDS;
         case BREATH_TIMER:
         {
@@ -1408,10 +1405,6 @@ void Player::HandleDrowning(uint32 time_diff)
     // In dark water
     if (_MirrorTimerFlags & UNDERWARER_INDARKWATER)
     {
-        // Hard Fix Need Real Fix
-        if (GetZoneId() == 4815 || GetZoneId() == 5145 || GetZoneId() == 5144)
-            return;
-
         // Fatigue timer not activated - activate it
         if (_MirrorTimer[FATIGUE_TIMER] == DISABLED_MIRROR_TIMER)
         {
@@ -23769,7 +23762,7 @@ void Player::UpdateUnderwaterState(Map* m, float x, float y, float z)
     }
 
     // Allow travel in dark water on taxi or transport
-    if ((liquid_status.type & MAP_LIQUID_TYPE_DARK_WATER) && !isInFlight() && !GetTransport())
+    if ((liquid_status.type & MAP_LIQUID_TYPE_DARK_WATER) && !isInFlight() && !GetTransport() && !IsInUnderWaterZone())
         _MirrorTimerFlags |= UNDERWARER_INDARKWATER;
     else
         _MirrorTimerFlags &= ~UNDERWARER_INDARKWATER;

@@ -1153,6 +1153,7 @@ class Player : public Unit, public GridObject<Player>
 
         bool IsInWater() const { return _isInWater; }
         bool IsUnderWater() const;
+        bool IsInUnderWaterZone() { return (GetZoneId() == 4815 || GetZoneId() == 4816 || GetZoneId() == 5144 || GetZoneId() == 5145); }
         bool IsFalling() { return GetPositionZ() < _lastFallZ; }
 
         void SendPetGUIDs();
