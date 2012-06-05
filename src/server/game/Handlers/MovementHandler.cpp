@@ -360,7 +360,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket & recv_data)
 
         plMover->UpdateFallInformationIfNeed(movementInfo, opcode);
 
-        float underMapValue = -500.0f;
+        float underMapValue = -5000.0f;
         switch (plMover->GetMapId())
         {
             case 617: underMapValue = 3.0f;  break; // Dalaran Sewers
