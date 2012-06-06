@@ -20342,6 +20342,9 @@ void Player::RemovePet(Pet* pet, PetSlot mode, bool returnreagent)
             return;
     }
 
+    if (!pet || pet->GetOwnerGUID() != GetGUID())
+        return;
+
     if (mode == PET_SLOT_ACTUAL_PET_SLOT)
         mode = _currentPetSlot;
 
@@ -20371,9 +20374,6 @@ void Player::RemovePet(Pet* pet, PetSlot mode, bool returnreagent)
         _temporaryUnsummonedPetNumber = 0;
     }
 
-    if (!pet || pet->GetOwnerGUID() != GetGUID())
-        return;
-
     pet->CombatStop();
 
     /*if (returnreagent)
@@ -20389,6 +20389,12 @@ void Player::RemovePet(Pet* pet, PetSlot mode, bool returnreagent)
                 break;
         }
     }*/
+
+    if(pet->IsPetGhoul())
+    {
+        mode = PET_SLOT_HUNTER_FIRST;
+        m_currentPetSlot = PET_SLOT_HUNTER_FIRST;
+    }
 
     // only if current pet in slot
     pet->SavePetToDB(mode);
