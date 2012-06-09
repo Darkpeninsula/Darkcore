@@ -1236,6 +1236,11 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                         else
                             target->AddAura(74396, target);
                     }
+                    case 120: // Cone of Cold
+                        if (caster->HasAura(11190))        // Improved Cone of Cold, rank 1/2
+							target->CastSpell(target, 83301, true, NULL, GetEffect(0), GetCasterGUID());
+						else if (caster->HasAura(12489))    // Improved Cone of Cold, rank 2/2
+						    target->CastSpell(target, 83302, true, NULL, GetEffect(0), GetCasterGUID());
                     default:
                         break;
                 }
