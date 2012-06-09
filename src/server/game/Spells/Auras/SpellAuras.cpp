@@ -1203,6 +1203,7 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                 {
                     case 12536: // Clearcasting
                     case 12043: // Presence of Mind
+                    {
                         // Arcane Potency
                         if (AuraEffect const* aurEff = caster->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_MAGE, 2120, 0))
                         {
@@ -1219,10 +1220,12 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                                 caster->CastSpell(caster, spellId, true);
                         }
                         break;
+                    }
                     case 64343: // Impact
                     {
                         // Reset cooldown on Fire Blast
                         caster->ToPlayer()->RemoveSpellCooldown(2136, true);
+                        break;
                     }
                     case 44544: // Fingers of Frost
                     {
@@ -1235,12 +1238,25 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                         }
                         else
                             target->AddAura(74396, target);
+                        break;
                     }
                     case 120: // Cone of Cold
-                        if (caster->HasAura(11190))        // Improved Cone of Cold, rank 1/2
-							target->CastSpell(target, 83301, true, NULL, GetEffect(0), GetCasterGUID());
-						else if (caster->HasAura(12489))    // Improved Cone of Cold, rank 2/2
-						    target->CastSpell(target, 83302, true, NULL, GetEffect(0), GetCasterGUID());
+                    {
+                        // Improved Cone of Cold
+                        if (AuraEffect const* aurEff = caster->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_MAGE, 35, 0))
+                        {
+                            uint32 spellId = 0;
+
+                            switch (aurEff->GetId())
+                            {
+                                case 11190: spellId = 83301; break;
+                                case 12489: spellId = 83302; break;
+                            }
+                            if (spellId)
+                                target->CastSpell(target, spellId, true, NULL, GetEffect(0), GetCasterGUID());
+                        }
+                        break;
+                    }
                     default:
                         break;
                 }
