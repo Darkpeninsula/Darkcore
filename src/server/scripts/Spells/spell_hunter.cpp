@@ -160,7 +160,7 @@ public:
         void HandleScriptEffect(SpellEffIndex /*effIndex*/)
         {
             if (Unit* unitTarget = GetHitUnit())
-                if (AuraEffect* aurEff = unitTarget->GetDummyAuraEffect(SPELLFAMILY_HUNTER, 3487, 0))
+                if (AuraEffect* aurEff = unitTarget->GetDummyAuraEffect(SPELLFAMILY_HUNTER, 3487, EFFECT_0))
                     if (roll_chance_i(aurEff->GetAmount()))
                         unitTarget->CastSpell(unitTarget, HUNTER_SPELL_INVIGORATION_TRIGGERED, true);
         }
@@ -536,7 +536,7 @@ public:
 
             if (Unit* target = GetTarget())
             {
-                if (AuraEffect const* aurEff = caster->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_HUNTER, 536, EFFECT_0))
+                if (AuraEffect const* aurEff = caster->GetDummyAuraEffect(SPELLFAMILY_HUNTER, 536, EFFECT_0))
                 {
                     int32 basepoints0 = aurEff->GetAmount() * GetAura()->GetEffect(EFFECT_0)->GetTotalTicks() * caster->SpellDamageBonus(target, GetSpellInfo(), GetAura()->GetEffect(0)->GetAmount(), DOT) / 100;
                     caster->CastCustomSpell(target, 83077, &basepoints0, NULL, NULL, true, NULL, GetAura()->GetEffect(0));

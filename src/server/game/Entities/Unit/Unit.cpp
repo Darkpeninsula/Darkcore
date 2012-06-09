@@ -3742,7 +3742,7 @@ void Unit::RemoveAurasDueToSpellByDispel(uint32 spellId, uint32 dispellerSpellId
                         {
                             uint32 triggeredSpellId = 0;
                             // Lava Flows
-                            if (AuraEffect const* aurEff = caster->GetDummyAuraEffect(SPELLFAMILY_SHAMAN, 3087, 0))
+                            if (AuraEffect const* aurEff = caster->GetDummyAuraEffect(SPELLFAMILY_SHAMAN, 3087, EFFECT_0))
                             {
                                 switch (aurEff->GetId())
                                 {
@@ -11139,7 +11139,7 @@ bool Unit::isSpellCrit(Unit* victim, SpellInfo const* spellProto, SpellSchoolMas
                     case SPELLFAMILY_WARLOCK:
                         // Improved Searing Pain
                         if (spellProto->SpellFamilyFlags[0] & 0x100 && spellProto->SpellIconID == 816)
-                                if (AuraEffect const* aurEff = GetDummyAuraEffect(SPELLFAMILY_WARLOCK, 816, 0))
+                                if (AuraEffect const* aurEff = GetDummyAuraEffect(SPELLFAMILY_WARLOCK, 816, EFFECT_0))
                                     if (victim->HealthBelowPct(25))
                                         crit_chance += aurEff->GetAmount();
                         break;
@@ -11153,7 +11153,7 @@ bool Unit::isSpellCrit(Unit* victim, SpellInfo const* spellProto, SpellSchoolMas
                     case SPELLFAMILY_DRUID:
                         // Improved Faerie Fire
                         if (victim->HasAuraState(AURA_STATE_FAERIE_FIRE))
-                            if (AuraEffect const* aurEff = GetDummyAuraEffect(SPELLFAMILY_DRUID, 109, 0))
+                            if (AuraEffect const* aurEff = GetDummyAuraEffect(SPELLFAMILY_DRUID, 109, EFFECT_0))
                                 crit_chance += aurEff->GetAmount();
 
                         // cumulative effect - don't break
@@ -11162,7 +11162,7 @@ bool Unit::isSpellCrit(Unit* victim, SpellInfo const* spellProto, SpellSchoolMas
                         if (spellProto->SpellFamilyFlags[0] & 0x4 && spellProto->SpellIconID == 1485)
                         {
                             // Improved Insect Swarm
-                            if (AuraEffect const* aurEff = GetDummyAuraEffect(SPELLFAMILY_DRUID, 1771, 0))
+                            if (AuraEffect const* aurEff = GetDummyAuraEffect(SPELLFAMILY_DRUID, 1771, EFFECT_0))
                                 if (victim->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_DRUID, 0x00000002, 0, 0))
                                     crit_chance += aurEff->GetAmount();
                            break;
@@ -11193,7 +11193,7 @@ bool Unit::isSpellCrit(Unit* victim, SpellInfo const* spellProto, SpellSchoolMas
                         else if (spellProto->SpellFamilyFlags[2] & 0x4000)
                         {
                             // Last Word
-                            if (AuraEffect const* aurEff = GetDummyAuraEffect(SPELLFAMILY_PALADIN, 2139, 0))
+                            if (AuraEffect const* aurEff = GetDummyAuraEffect(SPELLFAMILY_PALADIN, 2139, EFFECT_0))
                                 if (victim->HasAuraState(AURA_STATE_HEALTHLESS_35_PERCENT))
                                     crit_chance += aurEff->GetAmount();
                             break;
@@ -11225,7 +11225,7 @@ bool Unit::isSpellCrit(Unit* victim, SpellInfo const* spellProto, SpellSchoolMas
                             && spellProto->SpellIconID == 1680
                             && victim->HasAuraState(AURA_STATE_BLEEDING))
                         {
-                            if (AuraEffect const* rendAndTear = GetDummyAuraEffect(SPELLFAMILY_DRUID, 2859, 1))
+                            if (AuraEffect const* rendAndTear = GetDummyAuraEffect(SPELLFAMILY_DRUID, 2859, EFFECT_1))
                                 crit_chance += rendAndTear->GetAmount();
                             break;
                         }
@@ -11842,7 +11842,7 @@ void Unit::MeleeDamageBonus(Unit* victim, uint32 *pdamage, WeaponAttackType attT
             case SPELLFAMILY_DEATHKNIGHT:
                 // Glacier Rot
                 if (spellProto->SpellFamilyFlags[0] & 0x2 || spellProto->SpellFamilyFlags[1] & 0x6)
-                    if (AuraEffect* aurEff = GetDummyAuraEffect(SPELLFAMILY_DEATHKNIGHT, 196, 0))
+                    if (AuraEffect* aurEff = GetDummyAuraEffect(SPELLFAMILY_DEATHKNIGHT, 196, EFFECT_0))
                     {
                         Unit* owner = GetOwner() ? GetOwner() : this;
                         if (victim->GetDiseasesByCaster(owner->GetGUID()) > 0)

@@ -1570,7 +1570,7 @@ void AuraEffect::HandleShapeshiftBoosts(Unit* target, bool apply) const
             {
                 case FORM_CAT:
                     // Savage Roar
-                    if (target->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_DRUID, 0 , 0x10000000, 0))
+                    if (target->GetDummyAuraEffect(SPELLFAMILY_DRUID, 2865, EFFECT_0))
                         target->CastSpell(target, 62071, true);
                     // Nurturing Instinct
                     if (AuraEffect const* aurEff = target->GetAuraEffect(SPELL_AURA_MOD_SPELL_HEALING_OF_STAT_PERCENT, SPELLFAMILY_DRUID, 2254, 0))
@@ -2074,7 +2074,7 @@ void AuraEffect::HandleAuraModShapeshift(AuraApplication const* aurApp, uint8 mo
                 {
                     // get furor proc chance
                     int32 FurorChance = 0;
-                    if (AuraEffect const* dummy = target->GetDummyAuraEffect(SPELLFAMILY_DRUID, 238, 0))
+                    if (AuraEffect const* dummy = target->GetDummyAuraEffect(SPELLFAMILY_DRUID, 238, EFFECT_0))
                         FurorChance = std::max(dummy->GetAmount(), 0);
 
                     switch (GetMiscValue())
@@ -5326,7 +5326,7 @@ void AuraEffect::HandleAuraDummy(AuraApplication const* aurApp, uint8 mode, bool
                     if (m_spellInfo->SpellFamilyFlags[1] & 0x0400 && aurApp->GetRemoveMode() == AURA_REMOVE_BY_ENEMY_SPELL && GetEffIndex() == 0)
                     {
                         // Sin and Punishment
-                        if (AuraEffect* aurEff = caster->GetDummyAuraEffect(SPELLFAMILY_PRIEST, 1869, 1))
+                        if (AuraEffect* aurEff = caster->GetDummyAuraEffect(SPELLFAMILY_PRIEST, 1869, EFFECT_1))
                         {
                             if (roll_chance_i(aurEff->GetAmount()))
                                 target->CastCustomSpell(target, 87204, NULL, NULL, NULL, true, NULL, NULL, GetCasterGUID());

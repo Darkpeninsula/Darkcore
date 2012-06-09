@@ -426,7 +426,7 @@ public:
                 totalheal *= 3;
 
                 // Selfless Healer
-                if (AuraEffect const* auraEff = caster->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_PALADIN, 3924, EFFECT_0))
+                if (AuraEffect const* auraEff = caster->GetDummyAuraEffect(SPELLFAMILY_PALADIN, 3924, EFFECT_0))
                     if (target != caster)
                         totalheal += totalheal + (totalheal * auraEff->GetAmount()) / 100;
 
@@ -487,7 +487,7 @@ public:
 
         void CalculateOvertime(AuraEffect const* aurEff, int32& amount, bool& canBeRecalculated)
         {
-            if (AuraEffect const* longWord = GetCaster()->GetDummyAuraEffect(SPELLFAMILY_PALADIN, 4127, 1))
+            if (AuraEffect const* longWord = GetCaster()->GetDummyAuraEffect(SPELLFAMILY_PALADIN, 4127, EFFECT_1))
             {
                 canBeRecalculated = true;
                 amount = ((GetSpellInfo()->Effects[EFFECT_0].CalcValue() * longWord->GetAmount()) / 100)  / 3;

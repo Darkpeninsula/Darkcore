@@ -307,7 +307,7 @@ public:
         {
             Unit* target = GetTarget();
             if (Unit *caster = aurEff->GetBase()->GetCaster())
-                if (AuraEffect* aur = caster->GetDummyAuraEffect(SPELLFAMILY_SHAMAN, 2289, 0))
+                if (AuraEffect* aur = caster->GetDummyAuraEffect(SPELLFAMILY_SHAMAN, 2289, EFFECT_0))
                     if (roll_chance_i(aur->GetBaseAmount()))
                         target->CastSpell(target, SHAMAN_TOTEM_SPELL_EARTHEN_POWER, true, NULL, aurEff);
         }
@@ -316,7 +316,7 @@ public:
         {
             Unit* target = GetTarget();
             if (Unit *caster = aurEff->GetBase()->GetCaster())
-                if (AuraEffect* aur = caster->GetDummyAuraEffect(SPELLFAMILY_SHAMAN, 20, 1))
+                if (AuraEffect* aur = caster->GetDummyAuraEffect(SPELLFAMILY_SHAMAN, 20, EFFECT_1))
                     if (roll_chance_i(aur->GetBaseAmount()))
                         target->CastSpell(target, SHAMAN_TOTEM_SPELL_EARTHGRAB, true, NULL, aurEff);
         }
@@ -361,7 +361,7 @@ public:
 
             // applied by a totem - cast the real aura if owner has the talent
             if (Unit *caster = aurEff->GetBase()->GetCaster())
-                if (caster->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_GENERIC, 2019, 0))
+                if (caster->GetDummyAuraEffect(SPELLFAMILY_GENERIC, 2019, EFFECT_0))
                     target->CastSpell(target, SHAMAN_TOTEM_SPELL_TOTEMIC_WRATH_AURA, true, NULL, aurEff);
         }
 
@@ -406,7 +406,7 @@ public:
             if(!target || !caster)
                 return;
 
-            AuraEffect *fulminationAura = caster->GetDummyAuraEffect(SPELLFAMILY_SHAMAN, 2010, 0);
+            AuraEffect *fulminationAura = caster->GetDummyAuraEffect(SPELLFAMILY_SHAMAN, 2010, EFFECT_0);
             if (!fulminationAura)
                 return;
 
