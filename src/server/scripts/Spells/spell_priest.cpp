@@ -294,7 +294,7 @@ class spell_pri_shadow_word_death : public SpellScriptLoader
                 if (Unit* caster = GetCaster())
                 {
                     int32 back_damage = caster->SpellDamageBonus(GetHitUnit(), GetSpellInfo(), uint32(GetHitDamage()), SPELL_DIRECT_DAMAGE);
-                    if (AuraEffect* aurEff = caster->GetDummyAuraEffect(SPELLFAMILY_PRIEST, 2874, 1))
+                    if (AuraEffect* aurEff = caster->GetDummyAuraEffect(SPELLFAMILY_PRIEST, 2874, EFFECT_0))
                         back_damage -= back_damage * (-aurEff->GetAmount() / 100);
 
                     if (back_damage < int32(GetHitUnit()->GetHealth()))
@@ -342,7 +342,7 @@ class spell_pri_mind_blast : public SpellScriptLoader
             {
                 if (Unit* caster = GetCaster())
                 {
-                    if (AuraEffect * aurEff = caster->GetDummyAuraEffect(SPELLFAMILY_PRIEST, 95, 1)) // If we have Improved Mind Blast
+                    if (AuraEffect * aurEff = caster->GetDummyAuraEffect(SPELLFAMILY_PRIEST, 95, EFFECT_1)) // If we have Improved Mind Blast
                         if (caster->GetShapeshiftForm() == FORM_SHADOW)
                             if (roll_chance_i(aurEff->GetAmount()))
                                 caster->CastSpell(GetHitUnit(), 48301, true); // Cast Mind Trauma

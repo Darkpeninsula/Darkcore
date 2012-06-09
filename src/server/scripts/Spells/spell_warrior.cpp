@@ -419,7 +419,7 @@ class spell_warr_thunderclap : public SpellScriptLoader
                     if (Unit* caster = GetCaster())
                     {
                         // Blood and Thunder rank 1 & 2
-                        if (AuraEffect const * aurEff = caster->GetDummyAuraEffect(SPELLFAMILY_WARRIOR, 5057, 0))
+                        if (AuraEffect const * aurEff = caster->GetDummyAuraEffect(SPELLFAMILY_WARRIOR, 5057, EFFECT_0))
                         {
                             if (roll_chance_i(aurEff->GetAmount()))
                             {

@@ -587,7 +587,7 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                 if (m_spellInfo->Id == 5176)
                 {
                     // Improved Insect Swarm
-                    if (AuraEffect const * aurEff = m_caster->GetDummyAuraEffect(SPELLFAMILY_DRUID, 1771, 0))
+                    if (AuraEffect const * aurEff = m_caster->GetDummyAuraEffect(SPELLFAMILY_DRUID, 1771, EFFECT_0))
                         if (unitTarget->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_DRUID, 0x00200000, 0, 0))
                             AddPctN(damage, aurEff->GetAmount());
 
@@ -1731,7 +1731,7 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
                         damage = int32(owner->SpellHealingBonus(unitTarget, m_triggeredByAuraSpell, damage, HEAL));
 
                     // Restorative Totems
-                    if (AuraEffect* dummy = owner->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_SHAMAN, 338, 1))
+                    if (AuraEffect* dummy = owner->GetDummyAuraEffect(SPELLFAMILY_SHAMAN, 338, EFFECT_1))
                         AddPctN(damage, dummy->GetAmount());
 
                     // Glyph of Healing Stream Totem
@@ -1758,11 +1758,11 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
                 if (m_caster->ToPlayer()->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND))
                 {
                     // Damage is increased by 25% if your off-hand weapon is enchanted with Flametongue.
-                    if (m_caster->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_SHAMAN, 0x200000, 0, 0))
+                    if (m_caster->GetDummyAuraEffect(SPELLFAMILY_SHAMAN, 4617, EFFECT_0))
                         AddPctN(m_damage, damage);
                 }
                 // Improved Lava Lash
-                if (AuraEffect const* ill = m_caster->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_SHAMAN, 4780, 1))
+                if (AuraEffect const* ill = m_caster->GetDummyAuraEffect(SPELLFAMILY_SHAMAN, 4780, EFFECT_1))
                 // Searing Flames
                 if (AuraEffect const* sf = unitTarget->GetAuraEffect(77661, 0, m_caster->GetOwner()->GetGUID()))
                 {
@@ -2036,7 +2036,7 @@ void Spell::EffectTriggerSpell(SpellEffIndex effIndex)
             case 91565:
             {
                 // Feral Agression
-                if (AuraEffect const * aurEff = m_caster->GetDummyAuraEffect(SPELLFAMILY_DRUID, 960, 0))
+                if (AuraEffect const * aurEff = m_caster->GetDummyAuraEffect(SPELLFAMILY_DRUID, 960, EFFECT_0))
                 {
                     uint8 count = uint8(aurEff->GetAmount() - 1);
                     while(count)
@@ -4576,7 +4576,7 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
             // Shred, Maul - Rend and Tear
             else if (m_spellInfo->SpellFamilyFlags[0] & 0x00008800 && unitTarget->HasAuraState(AURA_STATE_BLEEDING))
             {
-                if (AuraEffect const* rendAndTear = m_caster->GetDummyAuraEffect(SPELLFAMILY_DRUID, 2859, 0))
+                if (AuraEffect const* rendAndTear = m_caster->GetDummyAuraEffect(SPELLFAMILY_DRUID, 2859, EFFECT_0))
                     AddPctN(totalDamagePercentMod, rendAndTear->GetAmount());
             }
             if(m_spellInfo->Id == 80313) // Pulverize

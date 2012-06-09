@@ -290,7 +290,7 @@ public:
                 caster->ModifyHealth(-damage);
 
                 // Improved Life Tap mod
-                if (AuraEffect const* aurEff = caster->GetDummyAuraEffect(SPELLFAMILY_WARLOCK, 208, 0))
+                if (AuraEffect const* aurEff = caster->GetDummyAuraEffect(SPELLFAMILY_WARLOCK, 208, EFFECT_0))
                     multiplier += int32(aurEff->GetAmount() / 100);
 
                 mana = int32(damage * multiplier);
@@ -336,7 +336,7 @@ class spell_warl_fear : public SpellScriptLoader
             void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
             {
                 // Check for Improved Fear
-                if (AuraEffect* aurEff = GetCaster()->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_WARLOCK, 98, 0))
+                if (AuraEffect* aurEff = GetCaster()->GetDummyAuraEffect(SPELLFAMILY_WARLOCK, 98, EFFECT_0))
                 {
                     uint32 spellId = 0;
                     switch (aurEff->GetId())
@@ -383,7 +383,7 @@ public:
             int32 bp = 2; // Normal, restore 2% of health
 
             // Check for Death's Embrace
-            if (AuraEffect const* aurEff = GetCaster()->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_WARLOCK, 3223, 0))
+            if (AuraEffect const* aurEff = GetCaster()->GetDummyAuraEffect(SPELLFAMILY_WARLOCK, 3223, EFFECT_0))
                 if (GetCaster()->HealthBelowPct(25))
                     bp += int32(aurEff->GetAmount());
 
