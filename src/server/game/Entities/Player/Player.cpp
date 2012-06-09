@@ -4309,7 +4309,7 @@ void Player::ReduceSpellCooldown(uint32 spell_id, uint32 seconds)
         WorldPacket data(SMSG_MODIFY_COOLDOWN, 4 + 8 + 4);
         data << uint32(spell_id); // Spell ID
         data << uint64(GetGUID()); // Player GUID
-        data << uint32(-seconds); // Cooldown mod in milliseconds
+        data << uint32(seconds); // Cooldown mod in milliseconds
         GetSession()->SendPacket(&data);
     }
 }
@@ -20393,7 +20393,7 @@ void Player::RemovePet(Pet* pet, PetSlot mode, bool returnreagent)
     if(pet->IsPetGhoul())
     {
         mode = PET_SLOT_HUNTER_FIRST;
-        m_currentPetSlot = PET_SLOT_HUNTER_FIRST;
+        _currentPetSlot = PET_SLOT_HUNTER_FIRST;
     }
 
     // only if current pet in slot
