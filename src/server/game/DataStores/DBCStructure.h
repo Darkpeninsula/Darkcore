@@ -1511,7 +1511,7 @@ struct RandomPropertiesPointsEntry
 //{
 //    uint32    id;                                           // 0
 //    uint32    mapId;                                        // 1
-//    uint32    unk1;                                         // 2 QuestPOIBlob.dbc ?
+//    uint32    QuestPOI;                                     // 2 QuestPOIBlob.dbc
 //    char*     name;                                         // 3
 //    uint32    flags;                                        // 4
 //};
@@ -1524,19 +1524,19 @@ struct RandomPropertiesPointsEntry
 //    uint32    HasReward;                                    // 3
 //    uint32    ResearchBranch;                               // 4
 //    uint32    SpellReward;                                  // 5
-//    uint32    unk1;                                         // 6 flag ?
+//    uint32    reqKeystone;                                  // 6
 //    char*     icon;                                         // 7
- //   uint32    requiredSkillValue;                           // 8
+//    uint32    requiredSkillValue;                           // 8
 //};
 
 //struct ResearchBranchEntry
 //{
 //    uint32    id;                                           // 0
 //    char*     name;                                         // 1
-//    uint32    unk1;                                         // 2 bool active ?
+//    uint32    unk1;                                         // 2
 //    uint32    currency;                                     // 3
 //    char*     icon;                                         // 4
-//    uint32    item;                                         // 5
+//    uint32    keystone;                                     // 5
 //};
 
 struct ScalingStatDistributionEntry
