@@ -1507,37 +1507,37 @@ struct RandomPropertiesPointsEntry
     uint32    UncommonPropertiesPoints[5];                  // 12-16
 };
 
-//struct ResearchSiteEntry
-//{
-//    uint32    id;                                           // 0
-//    uint32    mapId;                                        // 1
-//    uint32    QuestPOI;                                     // 2 QuestPOIBlob.dbc
-//    char*     name;                                         // 3
-//    uint32    flags;                                        // 4
-//};
+struct ResearchBranchEntry
+{
+    uint32    id;                                           // 0
+    //char*     name;                                       // 1
+    //uint32    unk1;                                       // 2
+    uint32    RequiredCurrency;                             // 3
+    //char*     icon;                                       // 4
+    uint32    keystone;                                     // 5
+};
 
-//struct ResearchProjectEntry
-//{
-//    uint32    id;                                           // 0
-//    char*     name;                                         // 1
-//    char*     desc;                                         // 2
-//    uint32    HasReward;                                    // 3
-//    uint32    ResearchBranch;                               // 4
-//    uint32    SpellReward;                                  // 5
-//    uint32    reqKeystone;                                  // 6
-//    char*     icon;                                         // 7
-//    uint32    requiredSkillValue;                           // 8
-//};
+struct ResearchProjectEntry
+{
+    uint32    id;                                           // 0
+    //char*     name;                                       // 1
+    //char*     desc;                                       // 2
+    //uint32    HasReward;                                  // 3
+    uint32    BranchId;                                     // 4
+    uint32    SpellReward;                                  // 5
+    uint32    reqKeystone;                                  // 6
+    //char*     icon;                                       // 7
+    uint32    requiredFragments;                            // 8
+};
 
-//struct ResearchBranchEntry
-//{
-//    uint32    id;                                           // 0
-//    char*     name;                                         // 1
-//    uint32    unk1;                                         // 2
-//    uint32    currency;                                     // 3
-//    char*     icon;                                         // 4
-//    uint32    keystone;                                     // 5
-//};
+struct ResearchSiteEntry
+{
+    uint32    id;                                           // 0
+    uint32    MapId;                                        // 1
+    uint32    QuestPOI;                                     // 2 QuestPOIBlob.dbc
+    //char*     name;                                       // 3
+    //uint32    flags;                                      // 4
+};
 
 struct ScalingStatDistributionEntry
 {
