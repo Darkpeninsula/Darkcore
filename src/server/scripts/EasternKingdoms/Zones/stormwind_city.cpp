@@ -708,6 +708,132 @@ public:
     }
 };
 
+/*#####
+# npc_varian_wrynn
+######*/
+
+enum VarianWrynn
+{
+    SPELL_HEROIC_LEAP   = 59688, // triggers 59689
+    SPELL_WHIRLWIND     = 41056, // triggers 41057
+
+    NPC_GUARD           = 1756,  // this is the wrong guard, it says he summons lvl 75 ones, but I couldnt find them, nor a summon spell
+
+    EVENT_HEROIC_LEAP   = 1,
+    EVENT_WHIRLWIND     = 2,
+    EVENT_SUMMON_GUARDS = 3,
+};
+
+class npc_varian_wrynn : public CreatureScript
+{
+public:
+    npc_varian_wrynn() : CreatureScript("npc_varian_wrynn") { }
+
+    struct npc_varian_wrynnAI : public ScriptedAI
+    {
+        npc_varian_wrynnAI(Creature* creature) : ScriptedAI(creature), Summons(me) { }
+
+        EventMap events;
+        SummonList Summons;
+
+        void Reset()
+        {
+            events.ScheduleEvent(EVENT_WHIRLWIND, urand(6000, 9000));
+            events.ScheduleEvent(EVENT_HEROIC_LEAP, urand(15000, 25000));
+            events.ScheduleEvent(EVENT_SUMMON_GUARDS, urand(30000, 45000));
+
+            Summons.DespawnAll();
+        }
+
+        void EnterCombat(Unit* /*who*/) {}
+
+        void MovementInform(uint32 type, uint32 id)
+        {
+            if (type != EFFECT_MOTION_TYPE)
+                return;
+
+            switch (id)
+            {
+                case 1:
+                    if (me->getVictim())
+                    {
+                        me->GetMotionMaster()->Clear();
+                        me->GetMotionMaster()->MoveChase(me->getVictim());
+                    }
+                    break;
+            }
+        }
+
+        void UpdateAI(const uint32 diff)
+        {
+            if (!UpdateVictim())
+                return;
+
+            events.Update(diff);
+
+            if (me->HasUnitState(UNIT_STATE_CASTING))
+                return;
+
+            while (uint32 eventId = events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                    case EVENT_WHIRLWIND:
+                    {
+                        DoCastVictim(SPELL_WHIRLWIND);
+                        events.ScheduleEvent(EVENT_WHIRLWIND, urand(10000, 15000));
+                    }
+                    break;
+                    case EVENT_HEROIC_LEAP:
+                    {
+                        if (Unit* target = SelectTarget(SELECT_TARGET_FARTHEST, 0, 25.0f, true))
+                        {
+                            me->GetMotionMaster()->MoveJump(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), SPEED_CHARGE, SPEED_CHARGE, 1);
+                            DoCast(target, SPELL_HEROIC_LEAP);
+                        }
+                        events.ScheduleEvent(EVENT_HEROIC_LEAP, urand(40000, 50000));
+                    }
+                    break;
+                    case EVENT_SUMMON_GUARDS:
+                    {
+                        // this feels a bit custom, but sources say he summons guards...so lets summon guards!
+                        uint32 guardCount = urand(1,2);
+                        for (uint32 iter = 0; iter < guardCount; ++iter)
+                        {
+                            Creature* summon = me->SummonCreature(NPC_GUARD, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation());
+                            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 45.0f, true))
+                            {
+                                summon->Attack(target, true);
+                                summon->GetMotionMaster()->MoveChase(summon->getVictim());
+                            }
+                        }
+                        events.ScheduleEvent(EVENT_SUMMON_GUARDS, urand(30000, 45000));
+                    }
+                    break;
+                }
+            }
+
+            DoMeleeAttackIfReady();
+        }
+
+        void JustSummoned(Creature* summon)
+        {
+            Summons.Summon(summon);
+        }
+
+        void SummonedCreateDespawn(Creature* summon)
+        {
+            Summons.Despawn(summon);
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_varian_wrynnAI (creature);
+    }
+
+};
+
 void AddSC_stormwind_city()
 {
     new npc_archmage_malin();
@@ -718,4 +844,5 @@ void AddSC_stormwind_city()
     new npc_tyrion_spybot();
     new npc_lord_gregor_lescovar();
     new npc_marzon_silent_blade();
+	new npc_varian_wrynn();
 }
