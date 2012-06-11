@@ -157,6 +157,11 @@ DBCStorage <QuestSortEntry> sQuestSortStore(QuestSortEntryfmt);
 DBCStorage <QuestXPEntry>   sQuestXPStore(QuestXPfmt);
 DBCStorage <QuestFactionRewEntry>  sQuestFactionRewardStore(QuestFactionRewardfmt);
 DBCStorage <RandomPropertiesPointsEntry> sRandomPropertiesPointsStore(RandomPropertiesPointsfmt);
+
+//DBCStorage <ResearchBranchEntry> sPvPDifficultyStore(ResearchBranchfmt);
+//DBCStorage <ResearchProjectEntry> sPvPDifficultyStore(ResearchProjectfmt);
+//DBCStorage <ResearchSiteEntry> sPvPDifficultyStore(ResearchSitefmt);
+
 DBCStorage <ScalingStatDistributionEntry> sScalingStatDistributionStore(ScalingStatDistributionfmt);
 DBCStorage <ScalingStatValuesEntry> sScalingStatValuesStore(ScalingStatValuesfmt);
 
@@ -438,6 +443,10 @@ void LoadDBCStores(const std::string& dataPath, uint32& availableDbcLocales)
         if (PvPDifficultyEntry const* entry = sPvPDifficultyStore.LookupEntry(i))
             if (entry->bracketId > MAX_BATTLEGROUND_BRACKETS)
                 ASSERT(false && "Need update MAX_BATTLEGROUND_BRACKETS by DBC data");
+
+    //LoadDBC(availableDbcLocales, bad_dbc_files, sResearchBranchStore,        dbcPath, "ResearchBranch.dbc");
+    //LoadDBC(availableDbcLocales, bad_dbc_files, sResearchProjectStore,       dbcPath, "ResearchProject.dbc");
+    //LoadDBC(availableDbcLocales, bad_dbc_files, sResearchSiteStore,          dbcPath, "ResearchSite.dbc");
 
     LoadDBC(availableDbcLocales, bad_dbc_files, sQuestXPStore,                 dbcPath, "QuestXP.dbc");
     LoadDBC(availableDbcLocales, bad_dbc_files, sQuestFactionRewardStore,      dbcPath, "QuestFactionReward.dbc");
