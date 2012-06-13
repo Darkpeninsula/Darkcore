@@ -281,7 +281,7 @@ void ChatHandler::HandleCharacterDeletedRestoreHelper(DeletedInfo const& delInfo
 
     // check character count
     uint32 charcount = AccountMgr::GetCharactersCount(delInfo.accountId);
-    if (charcount >= 10)
+    if (charcount >= 12)
     {
         PSendSysMessage(LANG_CHARACTER_DELETED_SKIP_FULL, delInfo.name.c_str(), delInfo.lowguid, delInfo.accountId);
         return;
