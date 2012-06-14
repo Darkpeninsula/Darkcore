@@ -1,7 +1,6 @@
-
 -- Redridge
 UPDATE creature_template SET minlevel=17, maxlevel=17, faction_A=72, faction_H=72 WHERE entry IN (43461, 43459, 43508, 43607, 43462);
-UPDATE creature_template SET minlevel=17, maxlevel=25, faction_A=72, faction_H=72 WHERE entry IN (43458, 43611);
+UPDATE creature_template SET minlevel=25, maxlevel=25, faction_A=72, faction_H=72 WHERE entry IN (43458, 43611);
 UPDATE creature_template SET minlevel=35, maxlevel=35, faction_A=72, faction_H=72 WHERE entry=43733;
 UPDATE creature_template SET minlevel=85, maxlevel=85, faction_A=72, faction_H=72 WHERE entry=43072;
 
