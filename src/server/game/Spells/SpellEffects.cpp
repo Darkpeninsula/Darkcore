@@ -4742,11 +4742,6 @@ void Spell::EffectHealMaxHealth(SpellEffIndex /*effIndex*/)
         return;
 
     int32 addhealth;
-    if (m_spellInfo->SpellFamilyName == SPELLFAMILY_PALADIN) // Lay on Hands
-    {
-        if (m_caster->GetGUID() == unitTarget->GetGUID())
-            m_caster->CastSpell(m_caster, 25771, true); // Forbearance
-    }
 
     // damage == 0 - heal for caster max health
     if (damage == 0)

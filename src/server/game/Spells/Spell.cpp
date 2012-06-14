@@ -4863,7 +4863,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                 Unit* target = m_targets.GetUnitTarget();
                 if(target)
                 {
-                    // Cannot be cast on paladin with Forbearance
+                    // Lay on Hands cannot be casted if target has Forbearance
                     if (m_spellInfo->Id == 633)
                         if (target->HasAura(25771))
                             return SPELL_FAILED_TARGET_AURASTATE;
@@ -5216,9 +5216,10 @@ SpellCastResult Spell::CheckCast(bool strict)
     {
         switch (m_spellInfo->Effects[i].ApplyAuraName)
         {
+
             case SPELL_AURA_DUMMY:
             {
-                //custom check
+                // custom checks
                 switch (m_spellInfo->Id)
                 {
                     // Tag Murloc
@@ -5233,6 +5234,8 @@ SpellCastResult Spell::CheckCast(bool strict)
                         if (m_caster->GetTypeId() != TYPEID_PLAYER || !m_caster->ToPlayer()->IsInFeralForm())
                             return SPELL_FAILED_ONLY_SHAPESHIFT;
                         break;*/
+
+                    // Tame Beast
                     case 1515:
                     {
                         if (m_caster->GetTypeId() != TYPEID_PLAYER)
@@ -5267,8 +5270,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                             return SPELL_FAILED_DONT_REPORT;
                         break;
                     }
-                    default:
-                        break;
+                    break;
                 }
                 break;
             }
@@ -5277,11 +5279,19 @@ SpellCastResult Spell::CheckCast(bool strict)
                 Unit* target = m_targets.GetUnitTarget();
                 if(target)
                 {
-                    // Cannot be cast on paladin with Forbearance
-                    if (m_spellInfo->Id == 642 || m_spellInfo->Id == 1022)
+                    // Hand of Protection cannot be casted if target has Forbearance
+                    if (m_spellInfo->Id == 1022)    
                         if (target->HasAura(25771))
                             return SPELL_FAILED_TARGET_AURASTATE;
                 }
+                break;
+            }
+            case SPELL_AURA_MOD_DAMAGE_PERCENT_DONE:
+            {
+                // Divine Shield cannot be casted if target has Forbearance
+                if (m_spellInfo->Id == 642)    
+                    if (m_caster->HasAura(25771))
+                        return SPELL_FAILED_TARGET_AURASTATE;
                 break;
             }
             case SPELL_AURA_MOD_POSSESS_PET:
