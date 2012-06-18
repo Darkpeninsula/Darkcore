@@ -1091,9 +1091,9 @@ StartPlayerMoney = 0
 #
 #    MaxHonorPoints
 #        Description: Maximum honor points a character can have.
-#        Default:     75000
+#        Default:     4000
 
-MaxHonorPoints = 75000
+MaxHonorPoints = 4000
 
 #
 #    StartHonorPoints
@@ -1105,9 +1105,9 @@ StartHonorPoints = 0
 #
 #    MaxConquestPoints
 #        Description: Maximum conquest points a character can have.
-#        Default:     10000
+#        Default:     3100
 
-MaxConquestPoints = 10000
+MaxConquestPoints = 3100
 
 #
 #    StartConquestPoints
@@ -1119,7 +1119,7 @@ StartConquestPoints = 0
 #
 #    MaxJusticePoints
 #        Description: Maximum justice points a character can have.
-#        Default:     10000
+#        Default:     4000
 
 MaxJusticePoints = 4000
 
