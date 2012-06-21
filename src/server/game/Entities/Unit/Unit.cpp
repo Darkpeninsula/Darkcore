@@ -10163,18 +10163,13 @@ void Unit::SetMinion(Minion *minion, bool apply, PetSlot slot)
 
         if (GetTypeId() == TYPEID_PLAYER)
         {
-            // If its not a Hunter Pet, only set pet slot. use setPetSlotUsed only for hanter pets.
-            // Always save thoose spots where hunter is correct
+            // If its a Hunter Pet, set pet slot and setPetSlotUsed.
             if (minion->isHunterPet())
             {
                 if (slot >= PET_SLOT_HUNTER_FIRST && slot <= PET_SLOT_HUNTER_LAST)
                 {
                     ToPlayer()->_currentPetSlot = slot;
                     ToPlayer()->setPetSlotUsed(slot, true);
-                }
-                else if (slot >= PET_SLOT_HUNTER_FIRST && slot <= PET_SLOT_HUNTER_LAST)
-                {
-                    ToPlayer()->_currentPetSlot = slot;
                 }
                 else
                 {
