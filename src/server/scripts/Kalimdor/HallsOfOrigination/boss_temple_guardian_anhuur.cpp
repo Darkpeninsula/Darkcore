@@ -52,7 +52,7 @@ enum Spells
     SPELL_DIVINE_RECKONING   = 75592,
     SPELL_REVERBERATING_HYMN = 75322,
     SPELL_SHIELD_OF_LIGHT    = 74938,
-    SPELL_SEARING_FLAME_SUMM = 75114,
+    SPELL_SEARING_FLAME_SUMM = 75115,
     // Lever beams.
     SPELL_BEAM_LEFT          = 83697, // Object 203133
     SPELL_BEAM_RIGHT         = 83698, // Object 203136
@@ -212,7 +212,7 @@ class boss_temple_guardian_anhuur : public CreatureScript
 
             void UpdateAI(const uint32 diff)
             {
-                if (!UpdateVictim() && !me->HasAura(SPELL_SHIELD_OF_LIGHT))
+                if (!UpdateVictim())
                     return;
 
                 if ((me->HealthBelowPct(34) && Phase == PHASE_NORMAL && PhaseCount == 1) || (me->HealthBelowPct(67) && Phase == PHASE_NORMAL && PhaseCount == 0))
@@ -231,6 +231,9 @@ class boss_temple_guardian_anhuur : public CreatureScript
                     Phase = PHASE_NORMAL;
                     RemoveSummons();
                 }
+
+                if (me->HasAura(SPELL_SHIELD_OF_LIGHT))
+                    return;
 
                 if (DivineReckoningTimer <= diff && Phase == PHASE_NORMAL)
                 {
