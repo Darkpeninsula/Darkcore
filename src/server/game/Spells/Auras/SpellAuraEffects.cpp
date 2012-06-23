@@ -2899,6 +2899,7 @@ void AuraEffect::HandleAuraMounted(AuraApplication const* aurApp, uint8 mode, bo
         case 55164: // Spectral Gryphon
             spellId = 86460;
             break;
+        case 30174: // Riding Turtle
         case 64731: // Sea Turtle
             spellId = 86496;
             break;
