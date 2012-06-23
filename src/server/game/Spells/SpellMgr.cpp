@@ -3500,6 +3500,8 @@ void SpellMgr::LoadSpellCustomAttr()
             case 71123: // Decimate (Stinky & Precious)
                 spellInfo->Effects[0].RadiusEntry = sSpellRadiusStore.LookupEntry(12);   // 100yd
                 break;
+            case 75339: // Earth Spike
+            case 89882: // Earth Spike
             case 72723: // Resistant Skin (Deathbringer Saurfang adds)
                 // this spell initially granted Shadow damage immunity, however it was removed but the data was left in client
                 spellInfo->Effects[2].Effect = 0;
