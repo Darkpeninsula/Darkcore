@@ -1257,6 +1257,7 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                         }
                         break;
                     }
+
                     default:
                         break;
                 }
@@ -1286,30 +1287,6 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                                 target->RemoveMovementImpairingAuras();
                             }
                         break;
-                }
-                break;
-            case SPELLFAMILY_HUNTER:
-                if (!caster)
-                    break;
-
-                switch (GetId())
-                {
-                    case 82925: // Master Marksman
-                    {
-                        if (target->GetTypeId() == TYPEID_PLAYER && GetStackAmount() == 5)
-                        {
-                            target->CastSpell(target, 82926, true);
-                            target->RemoveAura(82925);
-                        }
-                        break;
-                    }
-                    case 68361: // Animal Handler
-                    {
-                        if (Unit* owner = target->GetOwner())
-                            if (AuraEffect* auraEff = owner->GetDummyAuraEffect(SPELLFAMILY_HUNTER, 2234, EFFECT_1))
-                                GetEffect(0)->SetAmount(auraEff->GetAmount());
-                        break;
-                    }
                 }
                 break;
             case SPELLFAMILY_PRIEST:
@@ -1355,6 +1332,30 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                     // in official maybe there is only one icon?
                     if (target->HasAura(58039)) // Glyph of Blurred Speed
                         target->CastSpell(target, 61922, true); // Sprint (waterwalk)
+                break;
+            case SPELLFAMILY_HUNTER:
+                if (!caster)
+                    break;
+
+                switch (GetId())
+                {
+                    case 82925: // Master Marksman
+                    {
+                        if (target->GetTypeId() == TYPEID_PLAYER && GetStackAmount() == 5)
+                        {
+                            target->CastSpell(target, 82926, true);
+                            target->RemoveAura(82925);
+                        }
+                        break;
+                    }
+                    case 68361: // Animal Handler
+                    {
+                        if (Unit* owner = target->GetOwner())
+                            if (AuraEffect* auraEff = owner->GetDummyAuraEffect(SPELLFAMILY_HUNTER, 2234, EFFECT_1))
+                                GetEffect(0)->SetAmount(auraEff->GetAmount());
+                        break;
+                    }
+                }
                 break;
             case SPELLFAMILY_PALADIN:
                 // Sanctfied Wrath Cataclysm proc
