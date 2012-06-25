@@ -1156,20 +1156,6 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                         break;
                 }
                 break;
-            case SPELLFAMILY_DRUID:
-                if (!caster)
-                    break;
-                // Rejuvenation
-                if (GetSpellInfo()->SpellFamilyFlags[0] & 0x10 && GetEffect(EFFECT_0))
-                {
-                    // Druid T8 Restoration 4P Bonus
-                    if (caster->HasAura(64760))
-                    {
-                        int32 heal = GetEffect(EFFECT_0)->GetAmount();
-                        caster->CastCustomSpell(target, 64801, &heal, NULL, NULL, true, NULL, GetEffect(EFFECT_0));
-                    }
-                }
-                break;
             case SPELLFAMILY_MAGE:
                 if (!caster)
                     break;
@@ -1257,7 +1243,6 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                         }
                         break;
                     }
-
                     default:
                         break;
                 }
@@ -1323,6 +1308,20 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                         // instantly heal m_amount% of the absorb-value
                         int32 heal = glyph->GetAmount() * GetEffect(0)->GetAmount()/100;
                         caster->CastCustomSpell(GetUnitOwner(), 56160, &heal, NULL, NULL, true, 0, GetEffect(0));
+                    }
+                }
+                break;
+            case SPELLFAMILY_DRUID:
+                if (!caster)
+                    break;
+                // Rejuvenation
+                if (GetSpellInfo()->SpellFamilyFlags[0] & 0x10 && GetEffect(EFFECT_0))
+                {
+                    // Druid T8 Restoration 4P Bonus
+                    if (caster->HasAura(64760))
+                    {
+                        int32 heal = GetEffect(EFFECT_0)->GetAmount();
+                        caster->CastCustomSpell(target, 64801, &heal, NULL, NULL, true, NULL, GetEffect(EFFECT_0));
                     }
                 }
                 break;
