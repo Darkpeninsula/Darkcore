@@ -1243,6 +1243,15 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                         }
                         break;
                     }
+                    case 79683: //Arcane Missile!
+                    {
+                        if (caster->HasAura(44445) || // Hot Streak
+                            caster->HasAura(44546) || caster->HasAura(44548) || caster->HasAura(44549)) // Brain Freeze
+                        {
+                            caster->RemoveAurasDueToSpell(79683);
+                            break;
+                        }
+                    }
                     default:
                         break;
                 }
