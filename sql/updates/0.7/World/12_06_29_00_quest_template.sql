@@ -16,7 +16,7 @@ DELETE FROM character_queststatus_rewarded WHERE quest IN (13265, 13268, 13269, 
 
 -- [171] ALCHEMY -> Potion/Elixir/Transmutation Master (spells 28675, 28677, 28672) 
 DELETE FROM character_spell WHERE spell IN (28675, 28677, 28672);
-DELETE FROM character_queststatus_rewarded WHERE quest IN (29067, 29481, 29482);
+DELETE FROM character_queststatus_rewarded WHERE quest IN (10897, 10899, 10902);
 
 -- [182] HERBALISM -> Lifeblood rank (graphical override due to rank mismatch) -- FIXED 
 
