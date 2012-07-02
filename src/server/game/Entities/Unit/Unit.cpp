@@ -8424,10 +8424,9 @@ bool Unit::HandleAuraProc(Unit* victim, uint32 damage, Aura* triggeredByAura, Sp
         }
         case SPELLFAMILY_MAGE:
         {
-            // Combustion
             switch (dummySpell->Id)
             {
-                case 11129:
+                case 11129: // Combustion
                 {
                     *handled = true;
                     Unit* caster = triggeredByAura->GetCaster();
