@@ -1422,11 +1422,8 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
                 }
                 switch (m_spellInfo->Id)
                 {
-                    case 92315: // Pyroblast!
-                        m_caster->RemoveAurasDueToSpell(48108); // Remove hot streak
-                        break;
                     case 30455: // Ice lance
-                        if (Aura* fof = m_caster->GetAura(44544))
+                        if (Aura* fof = m_caster->GetAura(44544)) // Finger of Frost
                             AddPctN(damage, 25*fof->GetCharges());
                         break;
                     case 1459: // Arcane Brilliance
