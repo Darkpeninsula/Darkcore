@@ -1279,12 +1279,34 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                                 target->NearTeleportTo(obj->GetPositionX(), obj->GetPositionY(), obj->GetPositionZ(), obj->GetOrientation());
                                 target->RemoveMovementImpairingAuras();
                             }
-                        break;
+                    break;
                 }
                 break;
             case SPELLFAMILY_PRIEST:
                 if (!caster)
                     break;
+
+                switch (GetId())
+                {
+                    case 528: // Cure Disease
+                    {
+                        // Body and Soul
+                        if (caster->HasAura(64127) || caster->HasAura(64129))
+                            if (target == caster)
+                                caster->CastSpell(target, 64136, true, NULL, NULL, GetCasterGUID());
+                        break;
+                    }
+                    case 17: // Power Word: Shield
+                    case 73325: // Leap of Faith
+                    {
+                        // Body and Soul
+                        if (caster->HasAura(64127))
+                            caster->CastSpell(target, 64128, true, NULL, GetEffect(0), GetCasterGUID());
+                        else if (caster->HasAura(64129))
+                            caster->CastSpell(target, 65081, true, NULL, GetEffect(0), GetCasterGUID());
+                        break;
+                    }
+                }
                 // Devouring Plague
                 if (GetSpellInfo()->SpellFamilyFlags[0] & 0x02000000 && GetEffect(0))
                 {
