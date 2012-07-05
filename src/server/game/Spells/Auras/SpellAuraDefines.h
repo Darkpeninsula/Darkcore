@@ -392,7 +392,7 @@ enum AuraType
     SPELL_AURA_327                                 = 327,
     SPELL_AURA_328                                 = 328,    // Something related to eclipse power, only 1 spell: 2 effects: 1: +100, 2: -100
     SPELL_AURA_MOD_RUNE_REGEN_SPEED                = 329,    // NYI - This aura is for increasing power regeneration percent
-    SPELL_AURA_CAST_WHILE_WALKING                  = 330,    // NYI
+    SPELL_AURA_CAST_WHILE_WALKING                  = 330,    // Allows that spell to be casted while moving
     SPELL_AURA_331                                 = 331,
     SPELL_AURA_OVERRIDE_ACTIONBAR_SPELLS_1         = 332,
     SPELL_AURA_OVERRIDE_ACTIONBAR_SPELLS_2         = 333,

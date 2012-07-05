@@ -3510,7 +3510,7 @@ void Spell::update(uint32 difftime)
         (m_spellInfo->Effects[0].Effect != SPELL_EFFECT_STUCK || !m_caster->HasUnitMovementFlag(MOVEMENTFLAG_FALLING)))
     {
         // don't cancel for melee, autorepeat, triggered and instant spells
-        if (!IsNextMeleeSwingSpell() && !IsAutoRepeat() && !IsTriggered())
+        if (!IsNextMeleeSwingSpell() && !IsAutoRepeat() && !IsTriggered() && !m_caster->CanCastWhileWalking(m_spellInfo->Id))
             cancel();
     }
 
