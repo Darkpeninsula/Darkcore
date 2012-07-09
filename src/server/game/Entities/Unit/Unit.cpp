@@ -3152,9 +3152,8 @@ bool Unit::CanCastWhileWalking(uint32 spell_id)
     AuraEffectList const& auras = GetAuraEffectsByType(SPELL_AURA_CAST_WHILE_WALKING);
     for (Unit::AuraEffectList::const_iterator itr = auras.begin(); itr != auras.end(); ++itr)
     {
-        if (*itr)
-            if ((*itr)->GetSpellInfo()->Effects[(*itr)->GetEffIndex()].SpellClassMask.HasFlag(spell->SpellFamilyFlags))
-                return true;
+        if ((*itr)->GetSpellInfo()->Effects[(*itr)->GetEffIndex()].SpellClassMask.HasFlag(spell->SpellFamilyFlags))
+            return true;
     }
     return false;
 }
