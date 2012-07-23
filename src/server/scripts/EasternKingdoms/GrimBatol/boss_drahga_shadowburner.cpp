@@ -150,15 +150,17 @@ public:
 
         void JustSummoned(Creature* summon)
         {
-            summon->setActive(true);
+            if(summon)
+            {	
+                summon->setActive(true);
 
-            if(summon->GetEntry() == NPC_INVOCATION_OF_THE_FLAME_STALKER)
-            {
-                summon->SetFlag(UNIT_FIELD_FLAGS,UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_NOT_SELECTABLE);
-
-                summon->GetAI()->DoCast(SPELL_INVOCATION_TRIGGER);
+                if(summon->GetEntry() == NPC_INVOCATION_OF_THE_FLAME_STALKER)
+                {
+                    summon->SetFlag(UNIT_FIELD_FLAGS,UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_NOT_SELECTABLE);
+                    summon->CastSpell(summon, SPELL_INVOCATION_TRIGGER, true);
+                }
+                Summons.Summon(summon);
             }
-            Summons.Summon(summon);
         }
 
         void JustDied(Unit * /*victim*/)
@@ -258,12 +260,12 @@ public:
                         break;
                     case EVENT_SUMMON_INVOKED_FLAME_SPIRIT:
                         me->MonsterYell(SAY_SUMMON, LANG_UNIVERSAL, NULL);
-                        DoCast(SPELL_INVOCATION_OF_FLAME);
+                        me->CastSpell(me->getVictim(), SPELL_INVOCATION_OF_FLAME, true);
                         events.ScheduleEvent(EVENT_SUMMON_INVOKED_FLAME_SPIRIT,20000);
                         break;
                     case EVENT_DRAGAH_ENTER_VEHICLE:
                         me->GetMotionMaster()->Clear();
-                        me->EnterVehicle(pValiona, 1);
+                        me->EnterVehicle(pValiona);
                         break;
                     default:
                         break;

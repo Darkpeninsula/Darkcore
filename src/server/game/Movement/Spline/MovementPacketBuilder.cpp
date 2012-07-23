@@ -73,7 +73,7 @@ namespace Movement
         splineflags.enter_cycle = move_spline.isCyclic();
         data << uint32(splineflags & ~MoveSplineFlag::Mask_No_Monster_Move);
 
-        if (splineflags.animation && splineflags.animation2)
+        if (splineflags.animation)
         {
             data << splineflags.getAnimationId();
             data << move_spline.effect_start_time;
