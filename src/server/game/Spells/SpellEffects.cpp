@@ -1797,7 +1797,8 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
                     // Blood Presence
                     if (m_caster->HasAura(48263))
                     {
-                        int32 shield = CalculatePctN(bp, int32(aurEff->GetAmount() * m_caster->ToPlayer()->GetMasteryPoints()));
+                        int32 shield = bp;
+                        AddPctF(shield, aurEff->GetAmount() * m_caster->ToPlayer()->GetMasteryPoints());
                         m_caster->CastCustomSpell(m_caster, 77535, &shield, NULL, NULL, false);
                     }
                 }
