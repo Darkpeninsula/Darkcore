@@ -255,14 +255,14 @@ public:
     }
 };
 
-class npc_siamat_servant : public CreatureScript
+class mob_siamat_servant : public CreatureScript
 {
 public:
-    npc_siamat_servant() : CreatureScript("npc_siamat_servant") { }
+    mob_siamat_servant() : CreatureScript("mob_siamat_servant") { }
     
-    struct npc_siamat_servantAI : public ScriptedAI
+    struct mob_siamat_servantAI : public ScriptedAI
     {
-        npc_siamat_servantAI(Creature* pCreature) : ScriptedAI(pCreature)
+        mob_siamat_servantAI(Creature* pCreature) : ScriptedAI(pCreature)
         {
             pInstance = me->GetInstanceScript();
         }
@@ -324,18 +324,18 @@ public:
     
     CreatureAI* GetAI(Creature *pCreature) const
     {
-        return new npc_siamat_servantAI (pCreature);
+        return new mob_siamat_servantAI (pCreature);
     }
 };
 
-class npc_siamat_minion : public CreatureScript
+class mob_siamat_minion : public CreatureScript
 {
 public:
-    npc_siamat_minion() : CreatureScript("npc_siamat_minion") { }
+    mob_siamat_minion() : CreatureScript("mob_siamat_minion") { }
     
-    struct npc_siamat_minionAI : public ScriptedAI
+    struct mob_siamat_minionAI : public ScriptedAI
     {
-        npc_siamat_minionAI(Creature* pCreature) : ScriptedAI(pCreature)
+        mob_siamat_minionAI(Creature* pCreature) : ScriptedAI(pCreature)
         {
             pInstance = me->GetInstanceScript();
         }
@@ -393,13 +393,13 @@ public:
     
     CreatureAI* GetAI(Creature *pCreature) const
     {
-        return new npc_siamat_minionAI (pCreature);
+        return new mob_siamat_minionAI (pCreature);
     }
 };
 
 void AddSC_boss_siamat()
 {
     new boss_siamat();
-    new npc_siamat_servant();
-    new npc_siamat_minion();
+    new mob_siamat_servant();
+    new mob_siamat_minion();
 }

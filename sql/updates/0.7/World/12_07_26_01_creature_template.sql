@@ -15,8 +15,8 @@ UPDATE `creature_template` SET `faction_A` = '14', `faction_H` = '14', `mindmg` 
 UPDATE `creature_template` SET `faction_A` = '14', `faction_H` = '14', `mindmg` = '1000', `maxdmg` = '1300', `dmg_multiplier` = '8', `minlevel` = '85', `maxlevel` = '85', `Health_Mod` = '3.65', `exp` = '3' WHERE `entry` = 49260;
 
 -- Siamat Servant and Minion scriptnames
-UPDATE `creature_template` SET `ScriptName` = 'npc_siamat_servant' WHERE `entry` = 45269;
-UPDATE `creature_template` SET `ScriptName` = 'npc_siamat_minion' WHERE `entry` = 44704;
+UPDATE `creature_template` SET `ScriptName` = 'mob_siamat_servant' WHERE `entry` = 45269;
+UPDATE `creature_template` SET `ScriptName` = 'mob_siamat_minion' WHERE `entry` = 44704;
 
 -- Siamat Yells
 REPLACE INTO `script_texts` (`npc_entry`, `entry`, `content_default`, `content_loc6`, `content_loc7`, `sound`, `type`, `language`, `emote`, `comment`) VALUES
