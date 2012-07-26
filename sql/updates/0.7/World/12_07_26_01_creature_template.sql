@@ -8,18 +8,15 @@ UPDATE `creature_template` SET `faction_A` = '14', `faction_H` = '14', `mindmg` 
 
 -- Blizzlike stats of Siamat Servant (Normal and heroic mode)
 UPDATE `creature_template` SET `faction_A` = '14', `faction_H` = '14', `mindmg` = '1000', `maxdmg` = '1300', `dmg_multiplier` = '6', `minlevel` = '85', `maxlevel` = '85', `Health_Mod` = '5.28', `exp` = '3', `difficulty_entry_1` = '49256' WHERE `entry` = 45269;
-
 UPDATE `creature_template` SET `faction_A` = '14', `faction_H` = '14', `mindmg` = '1000', `maxdmg` = '1300', `dmg_multiplier` = '12', `minlevel` = '85', `maxlevel` = '85', `Health_Mod` = '7.92', `exp` = '3' WHERE `entry` = 49256;
 
 -- Blizzlike stats of Siamat Minion (Normal and heroic mode)
 UPDATE `creature_template` SET `faction_A` = '14', `faction_H` = '14', `mindmg` = '1000', `maxdmg` = '1300', `dmg_multiplier` = '4', `minlevel` = '85', `maxlevel` = '85', `Health_Mod` = '1.82', `exp` = '3', `difficulty_entry_1` = '49260' WHERE `entry` = 44704;
-
 UPDATE `creature_template` SET `faction_A` = '14', `faction_H` = '14', `mindmg` = '1000', `maxdmg` = '1300', `dmg_multiplier` = '8', `minlevel` = '85', `maxlevel` = '85', `Health_Mod` = '3.65', `exp` = '3' WHERE `entry` = 49260;
 
 -- Siamat Servant and Minion scriptnames
 UPDATE `creature_template` SET `ScriptName` = 'npc_siamat_servant' WHERE `entry` = 45269;
 UPDATE `creature_template` SET `ScriptName` = 'npc_siamat_minion' WHERE `entry` = 44704;
-
 
 -- Siamat Yells
 REPLACE INTO `script_texts` (`npc_entry`, `entry`, `content_default`, `content_loc6`, `content_loc7`, `sound`, `type`, `language`, `emote`, `comment`) VALUES
