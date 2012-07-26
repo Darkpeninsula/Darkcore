@@ -36,10 +36,8 @@ enum Spells
     // Drahgas Spells
     SPELL_BURNING_SHADOWBOLT    = 75245,
     SPELL_BURNING_SHADOWBOLT_H  = 90915,
-
     SPELL_INVOCATION_OF_FLAME   = 75218, // Summons Trigger at Random Location
     SPELL_INVOCATION_TRIGGER    = 75222, // Summons & Visual is casted by the Trigger
-
     SPELL_TWILIGHT_PROTECTION   = 76303,
 
     // Valionas Spells
@@ -47,7 +45,6 @@ enum Spells
     SPELL_SHREDDING_SWIPE       = 75271,
     SPELL_SEEPING_TWILIGHT      = 75318, // wowhead says 75317 but this spell gives the visual aura
     SPELL_DEVOURING_FLAMES_H    = 90950,
-
     SPELL_TWILIGHT_SHIFT        = 75328,
 
     // Invoked Flame Spirits Spells
@@ -60,7 +57,6 @@ enum Phase
     PHASE_CASTER_PHASE  = 1,
     PHASE_DRAGON_PHASE  = 2,
     PHASE_FINAL_PHASE   = 3,
-
     PHASE_NON           = 4,
 };
 
@@ -68,12 +64,10 @@ enum Events
 {
     EVENT_BURNING_SHADOWBOLT            = 1,
     EVENT_SUMMON_INVOKED_FLAME_SPIRIT   = 2,
-
     EVENT_VALIONAS_FLAME                = 3,
     EVENT_SHREDDING_SWIPE               = 4,
     EVENT_SEEPING_TWILIGHT              = 5,
     EVENT_DEVOURING_FLAMES              = 6,
-
     EVENT_DRAGAH_ENTER_VEHICLE          = 7,
 };
 
@@ -81,7 +75,6 @@ enum Actions
 {
     ACTION_DRAGAH_CALLS_VALIONA_FOR_HELP    = 1,
     ACTION_VALIONA_SHOULD_FLY_AWAY          = 2,
-
     ACTION_DRAGAH_IS_ON_THE_GROUND          = 3,
 };
 
@@ -91,17 +84,17 @@ enum Points
     POINT_VALIONA_LAND              = 2,
     POINT_VALIONA_FLY_AWAY          = 3,
     POINT_VALIONA_IS_AWAY           = 4,
-
     POINT_DRAHGA_GO_TO_THE_LAVA     = 5,
 };
 
-Position const position[5] =
+Position const position[6] =
 {
-    {-400.613f, -671.578f, 265.896f, 0.102f},   // Drahga Point from who he jump down
-    {-388.189f, -668.078f, 280.316f, 3.470f},   // Valionas Way to the Platform
+    {-400.613f, -671.578f, 265.896f, 0.102f},    // Drahga Point from who he jump down
+    {-388.189f, -668.078f, 280.316f, 3.470f},    // Valionas Way to the Platform
     {-435.54f, -695.072f, 280.316f, 3.4010f},
-    {-435.54f, -695.072f, 268.687f, 3.4010f},   // Valiona first land Position
-    {-375.742f, -519.749f, 300.663f, 0.0f}      // Valionas End Position
+    {-435.54f, -695.072f, 268.687f, 3.4010f},    // Valiona first land Position
+    {-375.742f, -519.749f, 300.663f, 0.0f},      // Valionas End Position
+    {-428.194f, -692.322f, 268.388f, 3.57706f}   // Valiona Home Position
 };
 
 class boss_drahga_shadowburner : public CreatureScript
@@ -126,8 +119,6 @@ public:
 
         void Reset()
         {
-            //me->GetMotionMaster()->Clear();
-
             pValiona = NULL;
             phase = PHASE_NON;
             Summons.DespawnAll();
@@ -138,9 +129,7 @@ public:
             phase = PHASE_CASTER_PHASE;
 
             me->SetReactState(REACT_AGGRESSIVE);
-
             me->MonsterYell(SAY_AGGRO, LANG_UNIVERSAL, NULL);
-
             me->GetMotionMaster()->Clear();
             me->GetMotionMaster()->MoveChase(me->getVictim());
 
@@ -151,7 +140,7 @@ public:
         void JustSummoned(Creature* summon)
         {
             if(summon)
-            {	
+            {    
                 summon->setActive(true);
 
                 if(summon->GetEntry() == NPC_INVOCATION_OF_THE_FLAME_STALKER)
@@ -200,7 +189,6 @@ public:
             switch(action)
             {
                 case ACTION_DRAGAH_IS_ON_THE_GROUND:
-                    //me->ExitVehicle();
                     me->SetReactState(REACT_AGGRESSIVE);
                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                     events.ScheduleEvent(EVENT_BURNING_SHADOWBOLT, 4000);
@@ -219,17 +207,17 @@ public:
             if(phase == PHASE_CASTER_PHASE && !HealthAbovePct(30))
             {
                 phase = PHASE_DRAGON_PHASE;
+
                 me->SetSpeed(MOVE_RUN, 1.5f);
                 me->SetReactState(REACT_PASSIVE);
-
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                 me->RemoveAllAuras(); // He should not die when he is jumping down...
 
                 DoCast(me, SPELL_TWILIGHT_PROTECTION, true);
 
                 events.Reset(); // He Should not cast while he is flying
-                me->GetMotionMaster()->MovePoint(POINT_DRAHGA_GO_TO_THE_LAVA, position[0]);
 
+                me->GetMotionMaster()->MovePoint(POINT_DRAHGA_GO_TO_THE_LAVA, position[0]);
                 pValiona = me->SummonCreature(NPC_VALIONA,-375.33f,-667.291f,270.0f,3.29545f, TEMPSUMMON_CORPSE_DESPAWN);
             }
 
@@ -242,9 +230,7 @@ public:
                 me->GetMotionMaster()->MoveChase(me->getVictim());
 
                 if(pValiona)
-                {
                     pValiona->GetAI()->DoAction(ACTION_VALIONA_SHOULD_FLY_AWAY);
-                }
             }
 
             events.Update(diff);
@@ -293,6 +279,7 @@ public:
 
         EventMap events;
         uint8 currentWaypoint;
+        bool HomePosition;
         SummonList Summons;
         Unit* pDragah;
 
@@ -303,25 +290,29 @@ public:
             events.Reset();
             me->SetReactState(REACT_PASSIVE);
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-            //me->GetMotionMaster()->MoveTargetedHome();
+            me->SetHomePosition(position[5]);
+            HomePosition = false;
         }
 
         void EnterCombat(Unit* /*pWho*/) {}
 
         void JustSummoned(Creature* summon)
         {
-            summon->setActive(true);
-
-            if(summon->GetEntry() == NPC_SEEPING_TWILIGHT_TRIGGER)
+            if(summon)
             {
-                summon->SetFlag(UNIT_FIELD_FLAGS,UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_NOT_SELECTABLE);
-                summon->GetAI()->DoCast(SPELL_SEEPING_TWILIGHT);
+                summon->setActive(true);
+
+                if(summon->GetEntry() == NPC_SEEPING_TWILIGHT_TRIGGER)
+                {
+                    summon->SetFlag(UNIT_FIELD_FLAGS,UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_NOT_SELECTABLE);
+                    summon->CastSpell(summon, SPELL_SEEPING_TWILIGHT, true);
+                }
+
+                if(me->isInCombat())
+                    summon->AI()->DoZoneInCombat();
+
+                Summons.Summon(summon);
             }
-
-            if(me->isInCombat())
-                summon->AI()->DoZoneInCombat();
-
-            Summons.Summon(summon);
         }
 
         void IsSummonedBy(Unit* summoner)
@@ -333,6 +324,26 @@ public:
         {
             if (!UpdateVictim() || me->HasUnitState(UNIT_STATE_CASTING))
                 return;
+
+            if(me->GetPositionX() == position[5].GetPositionX() && me->GetPositionY() == position[5].GetPositionY() && 
+                me->GetPositionZ() == position[5].GetPositionZ() && !HomePosition)
+            {
+                if(pDragah)
+                    pDragah->GetAI()->DoAction(ACTION_DRAGAH_IS_ON_THE_GROUND);
+
+                me->SetFlying(false);
+                me->SetSpeed(MOVE_WALK, 1.0f);
+                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                me->SetReactState(REACT_AGGRESSIVE);
+
+                events.ScheduleEvent(EVENT_VALIONAS_FLAME, urand(4000,7000));
+                events.ScheduleEvent(EVENT_SHREDDING_SWIPE, urand(10000,13000));
+
+                if(me->GetMap()->IsHeroic()) // To test it on non heroic difficulty
+                    events.ScheduleEvent(EVENT_DEVOURING_FLAMES, urand(15000,17000));
+
+                HomePosition = true;
+            }
 
             events.Update(diff);
 
@@ -347,7 +358,7 @@ public:
                         break;
                     case EVENT_SHREDDING_SWIPE:
                         if(me->getVictim())
-                            DoCastVictim(SPELL_SHREDDING_SWIPE);
+                            me->CastSpell(me->getVictim(), SPELL_SHREDDING_SWIPE, true);
                         events.RepeatEvent(urand(21000,30000));
                         break;
                     case EVENT_DEVOURING_FLAMES:
@@ -399,24 +410,7 @@ public:
                     if(currentWaypoint < 3) // You can extend the Waypoints by yourself if you want
                         me->GetMotionMaster()->MovePoint(POINT_VALIONA_FLY_IN_THE_AIR, position[currentWaypoint]);
                     else
-                        me->GetMotionMaster()->MoveLand(POINT_VALIONA_LAND, position[3],5);
-                    break;
-                case POINT_VALIONA_LAND:
-                    if(pDragah)
-                        pDragah->GetAI()->DoAction(ACTION_DRAGAH_IS_ON_THE_GROUND);
-
-                    me->SetSpeed(MOVE_WALK, 1.0f);
-                    me->SetFlying(false);
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                    me->SetReactState(REACT_AGGRESSIVE);
-                    me->GetMotionMaster()->Clear();
-                    me->GetMotionMaster()->MoveChase(me->getVictim());
-
-                    events.ScheduleEvent(EVENT_VALIONAS_FLAME, urand(4000,7000));
-                    events.ScheduleEvent(EVENT_SHREDDING_SWIPE, urand(10000,13000));
-
-                    if(me->GetMap()->IsHeroic()) // To test it on non heroic difficulty
-                        events.ScheduleEvent(EVENT_DEVOURING_FLAMES, urand(15000,17000));
+                        me->GetMotionMaster()->MoveTargetedHome();
                     break;
                 case POINT_VALIONA_FLY_AWAY:
                     Summons.DespawnAll();
