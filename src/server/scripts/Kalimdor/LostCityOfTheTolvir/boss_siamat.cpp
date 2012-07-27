@@ -60,6 +60,12 @@ enum Yells
     SAY_STORM                   = -1812024,
 };
 
+enum Events
+{
+    EVENT_PHASE_STATIC          = 0,
+    EVENT_PHASE_MOVE            = 1,
+};
+
 class boss_siamat : public CreatureScript
 {
 public:
@@ -76,9 +82,7 @@ public:
         
         uint32 EventStep;
         uint32 NextEventTimer;
-        
         uint32 PhaseOneTimer;
-        
         uint32 DeflectingWindsTimer;
         uint32 StormBoltPhase1Timer;
         uint32 SummonServantTimer;
@@ -101,9 +105,7 @@ public:
             
             EventStep            = 0;
             NextEventTimer       = 0;
-            
             PhaseOneTimer        = 135000;
-            
             DeflectingWindsTimer = 1000;
             StormBoltPhase1Timer = 3000;
             SummonServantTimer   = 5000;
@@ -117,7 +119,6 @@ public:
         {
             me->SetSpeed(MOVE_RUN, 0.0f);
             me->SetSpeed(MOVE_WALK, 0.0f);
-            
             me->AddAura(SPELL_DEFLECTING_WINDS, me);
             
             DoScriptText(SAY_AGGRO, me);
@@ -131,10 +132,11 @@ public:
         void JustDied(Unit* /*Killer*/)
         {
             DoScriptText(SAY_DEATH, me);
-            
+
+            // Temp Fix In Wait for Correct Implementation on Database
             AchievementEntry const *AchievLcotTN = sAchievementStore.LookupEntry(ACHIEVEMENT_LCOTT_N);
             AchievementEntry const *AchievLcotTH = sAchievementStore.LookupEntry(ACHIEVEMENT_LCOTT_H);
-            
+
             Map::PlayerList const &PlayerList = me->GetMap()->GetPlayers();
             if (!PlayerList.isEmpty())
                 for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
@@ -155,7 +157,7 @@ public:
             {
                 switch (EventStep)
                 {
-                    case 0:
+                    case EVENT_PHASE_STATIC:
                     {
                         if (PhaseOneTimer <= diff)
                         {
@@ -207,8 +209,7 @@ public:
                         
                         break;
                     }
-                        
-                    case 1:
+                    case EVENT_PHASE_MOVE:
                     {
                         if (WailingWindsTimer <= diff)
                         {
@@ -235,7 +236,7 @@ public:
                         }
                         else
                             StormBoltPhase2Timer -= diff;
-                        
+
                         break;
                     }
                 }
@@ -268,21 +269,17 @@ public:
         InstanceScript* pInstance;
         
         bool Charge;
-        
         uint32 LightningNovaTimer;
         uint32 ThunderCrashTimer;
         
         void Reset()
         {            
             Charge                 = false;
-            
             LightningNovaTimer     = 5000;
             ThunderCrashTimer      = 10000;
         }
         
-        void EnterCombat(Unit* pWho)
-        {
-        }
+        void EnterCombat(Unit* pWho){}
         
         void JustReachedHome()
         {            
@@ -341,7 +338,6 @@ public:
         InstanceScript* pInstance;
         
         bool Charge;
-        
         uint32 ChainLightningTimer;
         uint32 TempestStormTimer;
         uint32 DepletionTimer;
@@ -349,15 +345,12 @@ public:
         void Reset()
         {            
             Charge                  = false;
-            
             ChainLightningTimer     = 5000;
             TempestStormTimer       = 10000;
             DepletionTimer          = 45000;
         }
         
-        void EnterCombat(Unit* pWho)
-        {
-        }
+        void EnterCombat(Unit* pWho){}
         
         void JustReachedHome()
         {            
