@@ -3,6 +3,7 @@
  * Copyright (C) 2011-2012 Project SkyFire <http://www.projectskyfire.org/>
  * Copyright (C) 2008-2012 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2012 MaNGOS <http://getmangos.com/>
+ *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
  * Free Software Foundation; either version 3 of the License, or (at your
@@ -16,7 +17,6 @@
  * You should have received a copy of the GNU General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
 
 #ifndef DEF_LOST_CITY_OF_THE_TOLVIR_H
 #define DEF_LOST_CITY_OF_THE_TOLVIR_H
@@ -40,6 +40,12 @@ enum Data64
     DATA_SIAMAT,
 };
 
+enum Achievements
+{
+    ACHIEVEMENT_LCOTT_N = 4848,
+    ACHIEVEMENT_LCOTT_H = 5066,
+};
+
 enum CreatureIds
 {
     // Dungeon Bosses
@@ -49,10 +55,14 @@ enum CreatureIds
     BOSS_LOCKMAW                 = 43614,
     BOSS_AUGH                    = 49045,
     BOSS_SIAMAT                  = 44819,
+    
+    // Siamat mobs
+    
+    NPC_SIAMAT_SERVANT           = 45269,
+    NPC_SIAMAT_MINION            = 44704,
 
     // Trash mobs
 
-    NPC_MINION_OF_SIAMAT         = 44704,
     NPC_NEFERSET_DARKCASTER      = 44982,
     NPC_NEFERSET_PLAGUEBRINGER   = 44976,
     NPC_NEFERSET_THEURGIST       = 44980,
@@ -68,7 +78,6 @@ enum CreatureIds
     NPC_PYGMY_BRUTE              = 44896,
     NPC_PYGMY_FIREBREATHER       = 44898,
     NPC_PYGMY_SCOUT              = 44897,
-    NPC_SERVANT_OF_SIAMAT        = 45269,
 
     // Various NPCs
 
@@ -79,6 +88,7 @@ enum CreatureIds
 enum GameObjectIds
 {
     GO_TOLVIR_GRAVE              = 207409,
+    GO_SIAMAT_PLATFORM           = 206667,
 };
 
 #endif
