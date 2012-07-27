@@ -70,6 +70,7 @@ set(scripts_STAT_SRCS
   Kalimdor/LostCityOfTheTolvir/instance_lost_city_of_the_tolvir.cpp
   Kalimdor/LostCityOfTheTolvir/lost_city_of_the_tolvir.cpp
   Kalimdor/LostCityOfTheTolvir/lost_city_of_the_tolvir.h
+  Kalimdor/LostCityOfTheTolvir/boss_siamat.cpp
   Kalimdor/LostCityOfTheTolvir/boss_lockmaw.cpp
   Kalimdor/LostCityOfTheTolvir/boss_high_prophet_barim.cpp  
   
