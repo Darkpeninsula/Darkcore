@@ -369,8 +369,8 @@ class spell_druid_wild_mushroom : public SpellScriptLoader
 
                     Position pos;
                     GetTargetDest()->GetPosition(&pos);
-					const SummonPropertiesEntry* properties = sSummonPropertiesStore.LookupEntry(spell->Effects[effIndex].MiscValueB);
-					TempSummon* summon = player->SummonCreature(spell->Effects[0].MiscValue, pos, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, spell->GetDuration());
+                    const SummonPropertiesEntry* properties = sSummonPropertiesStore.LookupEntry(spell->Effects[effIndex].MiscValueB);
+                    TempSummon* summon = player->SummonCreature(spell->Effects[0].MiscValue, pos, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, spell->GetDuration());
 
                     if (!summon)
                         return;
@@ -414,7 +414,7 @@ class spell_druid_wild_mushroom_detonate : public SpellScriptLoader
 
             bool Load()
             {
-				spellRange = GetSpellInfo()->GetMaxRange();
+                spellRange = GetSpellInfo()->GetMaxRange();
 
                 Player* player = GetCaster()->ToPlayer();
 
@@ -493,9 +493,9 @@ class spell_druid_wild_mushroom_detonate : public SpellScriptLoader
                         fungal = DRUID_SPELL_FUNGAL_GROWTH_2;
                         npcfungal = DRUID_NPC_FUNGAL_GROWTH_2;
                     }
-					else
+                    else
                     {
-						// Nothing do
+                        // Nothing do
                     }
 
                     for (std::list<TempSummon*>::const_iterator i = mushroomList.begin(); i != mushroomList.end(); ++i)
