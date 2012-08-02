@@ -440,20 +440,13 @@ class spell_pri_power_word_shield : public SpellScriptLoader
         }
 };
 
-// 87212 Shadowy Apparition
-enum ShadowyApparition
-{
-    SPELL_SHADOWY_APPARITION_SUMMON = 87426,
-    NPC_SHADOWY_APPARITION = 46954,
-    MAX_SHADOWY_APPARITIONS  = 5,
-};
 
+// Shadowy Apparition
+// Spell Id: 87212
 class spell_shadowy_apparition_proc: public SpellScriptLoader
 {
 public:
-    spell_shadowy_apparition_proc () : SpellScriptLoader("spell_shadowy_apparition_proc")
-    {
-    }
+    spell_shadowy_apparition_proc () : SpellScriptLoader("spell_shadowy_apparition_proc") {}
 
     // 87212 Summon Shadowy Apparition
     class spell_shadowy_apparition_proc_SpellScript: public SpellScript
@@ -461,14 +454,8 @@ public:
         PrepareSpellScript(spell_shadowy_apparition_proc_SpellScript)
         void HandleEffectScriptEffect (SpellEffIndex /*effIndex*/)
         {
-            std::list<Creature*> shadowy_apparitions;
-            GetCaster()->GetAllMinionsByEntry(shadowy_apparitions, NPC_SHADOWY_APPARITION);
-
-            if (shadowy_apparitions.size() >= MAX_SHADOWY_APPARITIONS)
-                return;
-
             if (Unit* caster = GetCaster())
-                caster->CastSpell(GetHitUnit(), SPELL_SHADOWY_APPARITION_SUMMON, true);
+                caster->CastSpell(caster->getVictim(), 87426, true);  // SPELL_SHADOWY_APPARITION_SUMMON
         }
 
         void Register ()

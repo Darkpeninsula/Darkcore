@@ -3133,29 +3133,120 @@ class npc_power_word_barrier : public CreatureScript
 class npc_shadowy_apparition: public CreatureScript
 {
 public:
-    npc_shadowy_apparition () : CreatureScript("npc_shadowy_apparition")
-    {
-    }
+    npc_shadowy_apparition () : CreatureScript("npc_shadowy_apparition") {}
 
     struct npc_shadowy_apparitionAI: public ScriptedAI
     {
         npc_shadowy_apparitionAI (Creature* c) : ScriptedAI(c) {}
 
-        uint64 targetGuid;
+        Unit* curVictim;
 
-        void Reset ()
+        void Reset()
         {
+            Unit* owner = me->GetOwner();
+            if (!owner)
+                return;
 
-        }
+            std::list<Creature*> apparitions;
+            owner->GetAllMinionsByEntry(apparitions, 46954);
 
-        void MoveInLineOfSight (Unit* who)
-        {
+            if (!apparitions.empty())
+                if (apparitions.size() > 4)
+                {
+                    me->DespawnOrUnsummon();
+                    return;
+                }
 
+            me->CastSpell(me, 87427, true, NULL, NULL, owner->GetGUID());
+            owner->CastSpell(me, 87213, true, NULL, NULL, owner->GetGUID());
         }
 
         void UpdateAI (const uint32 diff)
         {
+            Unit* owner = me->GetOwner();
+            if (me->getVictim() != curVictim)
+            {
+                // get all valid targets from its owner
+                std::list<Player*> ownerenemies = owner->GetNearestPlayersList(40.0f, true);
+                std::list<Unit*> ownerthreats;
+                {
+                    CellCoord p = Darkcore::ComputeCellCoord(owner->GetPositionX(), owner->GetPositionY());
+                    Cell cell(p);
+                    cell.SetNoCreate();
+     
+                    Darkcore::AnyUnfriendlyAttackableVisibleUnitInObjectRangeCheck check(owner, 40.0f);
+                    Darkcore::UnitListSearcher<Darkcore::AnyUnfriendlyAttackableVisibleUnitInObjectRangeCheck> searcher(owner, ownerthreats, check);
+     
+                    TypeContainerVisitor<Darkcore::UnitListSearcher<Darkcore::AnyUnfriendlyAttackableVisibleUnitInObjectRangeCheck>, GridTypeMapContainer> cSearcher(searcher);
+     
+                    cell.Visit(p, cSearcher, *(owner->GetMap()), *owner, 40.0f);
+                }
 
+                if (ownerthreats.empty() && ownerenemies.empty()) // no target available
+                {
+                    me->DespawnOrUnsummon();
+                    return;
+                }
+
+                std::list<Unit*> targets;
+
+                // populating with NPCs
+                if (!ownerthreats.empty())
+                {
+                    std::list<Unit*>::const_iterator itr= ownerthreats.begin();
+                    for (; itr!= ownerthreats.end(); ++itr)
+                    {
+                        Unit* unit = Unit::GetUnit(*me, (*itr)->GetGUID());
+                        if (unit && unit->HasAura(589, owner->GetGUID())) // add new possible target
+                            targets.push_back(unit);
+                    }
+                }
+                //populating with Players
+                if(!ownerenemies.empty())
+                {
+                    std::list<Player*>::const_iterator iter= ownerenemies.begin();
+                    for (; iter!= ownerenemies.end(); ++iter)
+                    {
+                        Unit* unit = Unit::GetUnit(*me, (*iter)->GetGUID());
+                        if (unit && unit->IsHostileTo(owner) && unit->HasAura(589, owner->GetGUID()))
+                        targets.push_back(unit);
+                    }
+                }
+
+                if (targets.empty())
+                {
+                    me->DespawnOrUnsummon();
+                    return;
+                }
+
+                targets.sort(Darkcore::ObjectDistanceOrderPred(me)); // not sure about this, need more offy datas
+                if (Unit* target = targets.front())
+                {
+                    me->SetTarget(target->GetGUID());
+                    me->SetInCombatWith(target);
+                    target->SetInCombatWith(me);
+                    me->GetMotionMaster()->MoveChase(target);
+                    curVictim = target;
+                }
+                
+            }
+            else if (Unit* victim = me->getVictim())
+                if (!victim->HasAura(589, owner->GetGUID())) // e.g. dispell or debuff ends while chasing target
+                {
+                    curVictim = NULL;
+                    return;
+                }
+        }
+
+        void MovementInform (uint32 type, uint32 /*id*/)
+        {
+            if (type != CHASE_MOTION_TYPE)
+                return;
+
+            me->GetMotionMaster()->Initialize();
+            me->CastCustomSpell(curVictim, 87532, NULL, NULL, NULL, true, 0, 0, me->GetOwnerGUID());
+            me->CastSpell(me, 87529, true);
+            me->DespawnOrUnsummon();
         }
     };
 
