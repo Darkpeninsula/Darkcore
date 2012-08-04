@@ -204,8 +204,11 @@ public:
 
         void JustSummoned(Creature* summon)
         {
-            summon->setActive(true);
-            Summons.Summon(summon);
+            if(summon)
+            {
+                summon->setActive(true);
+                Summons.Summon(summon);
+            }
         }
 
         void MovementInform(uint32 type, uint32 id)
@@ -215,7 +218,7 @@ public:
                 switch (id)
                 {
                     case POINT_ERUDAX_IS_AT_STALKER:
-                        DoCast(SPELL_SHADOW_GALE_VISUAL);
+                        me->CastSpell(me, SPELL_SHADOW_GALE_VISUAL, true);
                         ShouldSummonAdds = true;
                         break;
                     default:
@@ -430,8 +433,11 @@ public:
 
         void JustSummoned(Creature* summon)
         {
-            summon->setActive(true);
-            summon->AI()->DoZoneInCombat();
+            if(summon)
+            {
+                summon->setActive(true);
+                summon->AI()->DoZoneInCombat();
+            }
         }
         
         void UpdateAI(const uint32 diff)
