@@ -3748,6 +3748,11 @@ void SpellMgr::LoadSpellCustomAttr()
                 spellInfo->Effects[0].TriggerSpell = 86698;
                 spellInfo->Effects[0].TargetA = TARGET_UNIT_CASTER;
                 break;
+            case 83089: // Wailing Winds Trigger (Siamat)
+                spellInfo->Effects[0].RadiusEntry = sSpellRadiusStore.LookupEntry(8); // 5yd
+                spellInfo->Effects[1].RadiusEntry = sSpellRadiusStore.LookupEntry(8); // 5yd
+                spellInfo->Effects[2].RadiusEntry = sSpellRadiusStore.LookupEntry(8); // 5yd
+                break;
             default:
                 break;
         }
