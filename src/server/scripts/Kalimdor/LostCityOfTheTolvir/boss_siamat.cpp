@@ -20,14 +20,10 @@
 
 /* ScriptData
  SDName: boss_siamat
- SD%Complete: 90%
+ SD%Complete: 100%
  SDComment:
  SDCategory: Lost City of the Tol'vir
  EndScriptData */
-
-//
-// TODO: Spell "Wailing Winds" generate aggro to much mobs with hard radius, need fix.
-//
 
 #include "ScriptPCH.h"
 #include "lost_city_of_the_tolvir.h"
@@ -76,6 +72,7 @@ public:
         boss_siamatAI(Creature* pCreature) : ScriptedAI(pCreature)
         {
             pInstance = me->GetInstanceScript();
+            pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
         }
         
         InstanceScript* pInstance;
@@ -100,8 +97,6 @@ public:
         void Reset()
         {
             me->RemoveAllAuras();
-            me->SetSpeed(MOVE_RUN, 0.0f);
-            me->SetSpeed(MOVE_WALK, 0.0f);
             
             EventStep            = 0;
             NextEventTimer       = 0;
@@ -117,8 +112,6 @@ public:
         
         void EnterCombat(Unit* pWho)
         {
-            me->SetSpeed(MOVE_RUN, 0.0f);
-            me->SetSpeed(MOVE_WALK, 0.0f);
             me->AddAura(SPELL_DEFLECTING_WINDS, me);
             
             DoScriptText(SAY_AGGRO, me);
@@ -139,6 +132,7 @@ public:
 
             Map::PlayerList const &PlayerList = me->GetMap()->GetPlayers();
             if (!PlayerList.isEmpty())
+            {
                 for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
                 {
                     if (me->GetMap()->IsHeroic())
@@ -146,6 +140,7 @@ public:
                     else
                         i->getSource()->CompletedAchievement(AchievLcotTN);
                 }
+            }
         }
         
         void UpdateAI(const uint32 diff)
@@ -213,7 +208,7 @@ public:
                     {
                         if (WailingWindsTimer <= diff)
                         {
-                            //DoCast(me, SPELL_WAILING_WINDS);
+                            DoCast(me, SPELL_WAILING_WINDS);
                             WailingWindsTimer = 200000;
                         }
                         else
