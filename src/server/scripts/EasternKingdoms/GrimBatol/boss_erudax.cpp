@@ -20,6 +20,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+
+
+// UPDATE  `creature_template` SET  `ScriptName` =  '' WHERE  `creature_template`.`entry` = 39388 LIMIT 1;
+// UPDATE  `creature_template` SET  `ScriptName` =  '' WHERE  `creature_template`.`entry` = 40567 LIMIT 1;
+
 #include "ScriptPCH.h"
 #include "grim_batol.h"
 
@@ -97,9 +102,7 @@ public:
             ShouldSummonAdds = false;
 
             events.Reset();
-
             ResetMinions();
-            RemoveShadowGaleDebuffFromPlayers();
         }
 
         void EnterCombat(Unit* /*who*/)
@@ -127,7 +130,6 @@ public:
 
             if(ShouldSummonAdds)
             {
-                Summons.DespawnEntry(NPC_SHADOW_GALE_STALKER);
                 RemoveShadowGaleDebuffFromPlayers();
 
                 me->SetReactState(REACT_AGGRESSIVE);
@@ -197,7 +199,6 @@ public:
         void JustDied(Unit* /*killer*/)
         {
             ResetMinions();
-            RemoveShadowGaleDebuffFromPlayers();
             me->MonsterYell(SAY_DEATH, LANG_UNIVERSAL, NULL);
         }
 
@@ -210,6 +211,15 @@ public:
             }
         }
 
+        void SummonedCreatureDespawn(Creature* summon)
+        {
+            if (summon->GetCreatureTemplate()->Entry == NPC_SHADOW_GALE_STALKER)
+            {
+                ShouldSummonAdds = true;
+            }
+            Summons.Despawn(summon);
+        }
+
         void MovementInform(uint32 type, uint32 id)
         {
             if (type == POINT_MOTION_TYPE)
@@ -217,8 +227,11 @@ public:
                 switch (id)
                 {
                     case POINT_ERUDAX_IS_AT_STALKER:
-                        DoCastAOE(SPELL_SHADOW_GALE_VISUAL);
-                        ShouldSummonAdds = true;
+                        if (Creature* ShadowGaleTrigger = me->FindNearestCreature(NPC_SHADOW_GALE_STALKER, 2.0f, true))
+                        {
+                           ShadowGaleTrigger->Cast(ShadowGaleTrigger, SPELL_SHADOW_GALE_SPEED_TRIGGER);
+                           DoCastAOE(SPELL_SHADOW_GALE_VISUAL);
+                        }
                         break;
                     default:
                         break;
@@ -247,16 +260,6 @@ public:
 
                 (*iter)->SetHealth(77500);
                 (*iter)->SetMaxHealth(77500);
-            }
-        }
-
-        void RemoveShadowGaleDebuffFromPlayers()
-        {
-            Map::PlayerList const &PlayerList =  me->GetMap()->GetPlayers();
-            if (!PlayerList.isEmpty())
-            {
-                for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
-                        i->getSource()->RemoveAura(SPELL_SHADOW_GALE_DEBUFF);
             }
         }
     };
@@ -453,38 +456,9 @@ public:
     };
 };
 
-class mob_shadow_gale_stalker : public CreatureScript
-{
-public:
-    mob_shadow_gale_stalker() : CreatureScript("mob_shadow_gale_stalker") { }
-
-    CreatureAI* GetAI(Creature* creature) const
-    {
-        return new mob_shadow_gale_stalkerAI (creature);
-    }
-
-    struct mob_shadow_gale_stalkerAI : public ScriptedAI
-    {
-        mob_shadow_gale_stalkerAI(Creature* creature) : ScriptedAI(creature)
-        {
-        }
-
-        void IsSummonedBy(Unit* summoner)
-        {
-            me->SetFlag(UNIT_FIELD_FLAGS,UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_NOT_SELECTABLE);
-            DoCastAOE(SPELL_SHADOW_GALE_SPEED_TRIGGER);
-        }
-
-        void UpdateAI(const uint32 diff)
-        {
-        }
-    };
-};
-
 void AddSC_boss_erudax()
 {
     new boss_erudax();
     new mob_faceless();
     new mob_alexstraszas_eggs();
-    new mob_shadow_gale_stalker();
 }
