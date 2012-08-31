@@ -160,8 +160,8 @@ public:
                         events.ScheduleEvent(EVENT_ENFEEBLING_BLOW, urand(19000,24000));
                         break;
                     case EVENT_SHADOW_GALE:
-						DoCastAOE(SPELL_SUMMON_SHADOW_GALE,true);
-					    if (Creature* ShadowGaleTrigger = me->FindNearestCreature(NPC_SHADOW_GALE_STALKER, 50.0f, true))
+                        DoCastAOE(SPELL_SUMMON_SHADOW_GALE,true);
+                        if (Creature* ShadowGaleTrigger = me->FindNearestCreature(NPC_SHADOW_GALE_STALKER, 50.0f, true))
                         {
                            me->SetReactState(REACT_PASSIVE);
                            me->GetMotionMaster()->MovePoint(POINT_ERUDAX_IS_AT_STALKER,ShadowGaleTrigger->GetPositionX(),ShadowGaleTrigger->GetPositionY(),ShadowGaleTrigger->GetPositionZ());
@@ -217,7 +217,7 @@ public:
                 switch (id)
                 {
                     case POINT_ERUDAX_IS_AT_STALKER:
-						DoCastAOE(SPELL_SHADOW_GALE_VISUAL);
+                        DoCastAOE(SPELL_SHADOW_GALE_VISUAL);
                         ShouldSummonAdds = true;
                         break;
                     default:
@@ -438,7 +438,7 @@ public:
                 summon->AI()->DoZoneInCombat();
             }
         }
-        
+
         void UpdateAI(const uint32 diff)
         {
             if(me->HasAura(75569))
