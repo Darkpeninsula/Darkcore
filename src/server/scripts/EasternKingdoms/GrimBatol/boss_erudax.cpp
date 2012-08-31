@@ -130,8 +130,6 @@ public:
 
             if(ShouldSummonAdds)
             {
-                RemoveShadowGaleDebuffFromPlayers();
-
                 me->SetReactState(REACT_AGGRESSIVE);
                 me->GetMotionMaster()->Clear();
                 me->GetMotionMaster()->MoveChase(me->getVictim());
@@ -229,7 +227,7 @@ public:
                     case POINT_ERUDAX_IS_AT_STALKER:
                         if (Creature* ShadowGaleTrigger = me->FindNearestCreature(NPC_SHADOW_GALE_STALKER, 2.0f, true))
                         {
-                           ShadowGaleTrigger->Cast(ShadowGaleTrigger, SPELL_SHADOW_GALE_SPEED_TRIGGER);
+                           ShadowGaleTrigger->GetAI()->DoCast(ShadowGaleTrigger,SPELL_SHADOW_GALE_SPEED_TRIGGER,false);
                            DoCastAOE(SPELL_SHADOW_GALE_VISUAL);
                         }
                         break;
