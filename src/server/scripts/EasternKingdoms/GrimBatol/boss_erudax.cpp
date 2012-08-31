@@ -20,11 +20,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-
-// UPDATE  `creature_template` SET  `ScriptName` =  '' WHERE  `creature_template`.`entry` = 39388 LIMIT 1;
-// UPDATE  `creature_template` SET  `ScriptName` =  '' WHERE  `creature_template`.`entry` = 40567 LIMIT 1;
-
 #include "ScriptPCH.h"
 #include "grim_batol.h"
 
@@ -38,10 +33,10 @@ enum Spells
 {
     // Erudax
     SPELL_ENFEEBLING_BLOW               = 75789,
-    SPELL_SUMMON_SHADOW_GALE            = 75655,
+    SPELL_SHADOW_GALE_SUMMON            = 75655,
+    SPELL_SHADOW_GALE_DAMAGE            = 75692,
     SPELL_SHADOW_GALE_VISUAL            = 75664,
     SPELL_SHADOW_GALE_SPEED_TRIGGER     = 75675,
-    SPELL_SHADOW_GALE_DEBUFF            = 75694,
     SPELL_SPAWN_FACELESS                = 75704,
     SPELL_TWILIGHT_PORTAL_VISUAL        = 95716,
     SPELL_SHIELD_OF_NIGHTMARE           = 75809,
@@ -160,7 +155,7 @@ public:
                         events.ScheduleEvent(EVENT_ENFEEBLING_BLOW, urand(19000,24000));
                         break;
                     case EVENT_SHADOW_GALE:
-                        DoCastAOE(SPELL_SUMMON_SHADOW_GALE,true);
+                        DoCastAOE(SPELL_SHADOW_GALE_SUMMON,true);
                         if (Creature* ShadowGaleTrigger = me->FindNearestCreature(NPC_SHADOW_GALE_STALKER, 50.0f, true))
                         {
                            me->SetReactState(REACT_PASSIVE);
@@ -454,9 +449,60 @@ public:
     };
 };
 
+
+class ShadowGaleTargetSelector
+{
+public:
+    explicit ShadowGaleTargetSelector(Unit* _caster) : caster(_caster) { }
+
+    bool operator() (Unit* unit)
+    {
+        // Hostile only
+        if(!unit->IsHostileTo(caster))
+            return true;
+
+        // Area Bind? Not Sure About This
+        if(caster->GetAreaId() != unit->GetAreaId())
+            return true;
+
+        // Min Distance? How Much?
+        return unit->IsWithinDist(caster, 2.5f);
+    }
+
+private:
+    Unit* caster;
+};
+
+class spell_shadow_gale_visual : public SpellScriptLoader
+{
+    public:
+        spell_shadow_gale_visual() : SpellScriptLoader("spell_shadow_gale_visual") { }
+
+        class spell_shadow_gale_visual_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_shadow_gale_visual_SpellScript);
+
+            void FilterTargets(std::list<Unit*>& unitList)
+            {
+                unitList.remove_if(ShadowGaleTargetSelector(GetCaster()));
+            }
+
+            void Register()
+            {
+                OnUnitTargetSelect += SpellUnitTargetFn(spell_shadow_gale_visual_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENTRY);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_shadow_gale_visual_SpellScript();
+        }
+};
+
 void AddSC_boss_erudax()
 {
     new boss_erudax();
     new mob_faceless();
     new mob_alexstraszas_eggs();
+    new spell_shadow_gale_visual();
 }
