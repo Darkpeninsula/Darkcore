@@ -33,6 +33,7 @@ enum Spells
 {
     // Erudax
     SPELL_ENFEEBLING_BLOW               = 75789,
+    SPELL_SUMMON_SHADOW_GALE            = 75655,
     SPELL_SHADOW_GALE_VISUAL            = 75664,
     SPELL_SHADOW_GALE_SPEED_TRIGGER     = 75675,
     SPELL_SHADOW_GALE_DEBUFF            = 75694,
@@ -105,7 +106,6 @@ public:
         {
             ShouldSummonAdds = false;
 
-            // Se il boss è respownato fixa i comportamenti scorretti
             me->SetReactState(REACT_AGGRESSIVE);
             me->GetMotionMaster()->Clear();
             me->GetMotionMaster()->MoveChase(me->getVictim());
@@ -116,7 +116,6 @@ public:
 
             me->MonsterYell(SAY_AGGRO, LANG_UNIVERSAL, NULL);
 
-            //Posizone dei Portal Stalker
             if(FacelessPortalStalker = me->SummonCreature(NPC_FACELESS_PORTAL_STALKER,-641.515f,-827.8f,235.5f,3.069f,TEMPSUMMON_MANUAL_DESPAWN))
                 FacelessPortalStalker->SetFlag(UNIT_FIELD_FLAGS,UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_NOT_SELECTABLE);
         }
@@ -161,14 +160,14 @@ public:
                         events.ScheduleEvent(EVENT_ENFEEBLING_BLOW, urand(19000,24000));
                         break;
                     case EVENT_SHADOW_GALE:
-                        if(ShadowGaleTrigger = me->SummonCreature(NPC_SHADOW_GALE_STALKER,-739.665f/*+(urand(0,20)-10)*/,-827.024f/*+(urand(0,20)-10)*/,232.412f,3.1f,TEMPSUMMON_CORPSE_DESPAWN))
+						DoCastAOE(SPELL_SUMMON_SHADOW_GALE,true);
+					    if (Creature* ShadowGaleTrigger = me->FindNearestCreature(NPC_SHADOW_GALE_STALKER, 50.0f, true))
                         {
                            me->SetReactState(REACT_PASSIVE);
                            me->GetMotionMaster()->MovePoint(POINT_ERUDAX_IS_AT_STALKER,ShadowGaleTrigger->GetPositionX(),ShadowGaleTrigger->GetPositionY(),ShadowGaleTrigger->GetPositionZ());
                         }
                         break;
                     case EVENT_REMOVE_TWILIGHT_PORTAL:
-                        //Rimuove i Portal effect dagli Stalker
                         if(FacelessPortalStalker)
                            FacelessPortalStalker->RemoveAllAuras();
                         break;
@@ -218,7 +217,7 @@ public:
                 switch (id)
                 {
                     case POINT_ERUDAX_IS_AT_STALKER:
-                        me->CastSpell(me, SPELL_SHADOW_GALE_VISUAL, true);
+						DoCastAOE(SPELL_SHADOW_GALE_VISUAL);
                         ShouldSummonAdds = true;
                         break;
                     default:
@@ -468,11 +467,7 @@ public:
     {
         mob_shadow_gale_stalkerAI(Creature* creature) : ScriptedAI(creature)
         {
-            VisualEffectCasted = false;
         }
-
-        EventMap events;
-        bool VisualEffectCasted;
 
         void IsSummonedBy(Unit* summoner)
         {
@@ -482,47 +477,6 @@ public:
 
         void UpdateAI(const uint32 diff)
         {
-            if(VisualEffectCasted)
-            {
-                events.Update(diff);
-
-                while (uint32 eventId = events.ExecuteEvent())
-                {
-                    switch (eventId)
-                    {
-                        case EVENT_TRIGGER_GALE_CHECK_PLAYERS:
-                        {
-                            Map::PlayerList const &PlayerList = me->GetMap()->GetPlayers();
-                            if (!PlayerList.isEmpty())
-                            {
-                                for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
-                                    if(me->GetDistance(i->getSource()) >= 3)
-                                    {
-                                        if(!i->getSource()->HasAura(SPELL_SHADOW_GALE_DEBUFF))
-                                            me->CastSpell(i->getSource(), SPELL_SHADOW_GALE_DEBUFF, true);
-                                    }
-                                    else
-                                    {
-                                        i->getSource()->RemoveAura(SPELL_SHADOW_GALE_DEBUFF);
-                                    }
-                            }
-                            events.ScheduleEvent(EVENT_TRIGGER_GALE_CHECK_PLAYERS, 1000);
-                            break;
-                        }
-                        default:
-                            break;
-                    }
-                }
-            }
-
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            if(!VisualEffectCasted)
-            {
-                VisualEffectCasted = true;
-                events.ScheduleEvent(EVENT_TRIGGER_GALE_CHECK_PLAYERS, 1000);
-            }
         }
     };
 };
