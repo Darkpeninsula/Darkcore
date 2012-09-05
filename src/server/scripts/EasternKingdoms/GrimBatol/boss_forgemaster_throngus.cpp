@@ -287,6 +287,7 @@ public:
 
                     DoCast(me, SPELL_SHIELD_VISUAL, true);
                     DoCast(me, SPELL_PERSONAL_PHALANX, true);
+                    me->ModifyAuraState(AURA_STATE_UNKNOWN22, true);
 
                     events.ScheduleEvent(EVENT_PERSONAL_PHALANX, 1000);
                     break;
@@ -326,6 +327,7 @@ public:
             events.Reset();
             Summons.DespawnEntry(NPC_TWILIGHT_ARCHER);
 
+            me->ModifyAuraState(AURA_STATE_UNKNOWN22, true);
             me->InterruptNonMeleeSpells(false, SPELL_PARALAX_TARGET);
 
             me->RemoveAura(SPELL_SHIELD_VISUAL);
