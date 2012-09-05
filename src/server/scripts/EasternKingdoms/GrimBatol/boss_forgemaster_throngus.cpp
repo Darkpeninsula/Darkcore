@@ -214,7 +214,7 @@ public:
             {
                 if(!me->HasAura(SPELL_SHIELD_VISUAL))
                     DoCast(me, SPELL_SHIELD_VISUAL, true);
-                
+
                 if(!me->HasAura(SPELL_PERSONAL_PHALANX))
                     DoCast(me, SPELL_PERSONAL_PHALANX, true);
             }
@@ -281,7 +281,7 @@ public:
                 {
                     SetEquipmentSlots(false, 0, 0,0);
                     me->MonsterYell(SAY_SHIELD_STANCE, LANG_UNIVERSAL, NULL);
-                    
+
                     for(uint32 i = 0; i <= sizeof(TwilightArcherSummonPos); i++)
                         me->SummonCreature(NPC_TWILIGHT_ARCHER, TwilightArcherSummonPos[i], TEMPSUMMON_MANUAL_DESPAWN);
 
@@ -299,10 +299,10 @@ public:
 
                     DoCast(me, SPELL_DUAL_BLADES_BUFF, true);
                     DoCast(me, SPELL_TRASH_BUFF, true);
-                    
+
                     if(IsHeroic())
                         DoCast(me, SPELL_BURNING_FLAMES, true);
-                    
+
                     events.ScheduleEvent(EVENT_DISORIENTING_ROAR, 11000);
                     events.ScheduleEvent(EVENT_MIGHTY_STOMP, 15000);
                     break;
@@ -327,7 +327,7 @@ public:
             events.Reset();
             Summons.DespawnEntry(NPC_TWILIGHT_ARCHER);
 
-            me->ModifyAuraState(AURA_STATE_UNKNOWN22, true);
+            me->ModifyAuraState(AURA_STATE_UNKNOWN22, false);
             me->InterruptNonMeleeSpells(false, SPELL_PARALAX_TARGET);
 
             me->RemoveAura(SPELL_SHIELD_VISUAL);
