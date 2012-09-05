@@ -23,61 +23,67 @@
 #include "ScriptPCH.h"
 #include "grim_batol.h"
 
-#define SAY_AGGRO "You not get through defenses!"
-#define SAY_AGGRO1 "You not get through defenses!"
-#define SAY_AGGRO2 "Throngus use your corpse on body. Somewhere..."
-#define SAY_AGGRO3 "Oh, this gonna HURT!"
-#define SAY_DIED "Death... Good choice. Not best choice maybe, but better than fail and live."
+#define SAY_AGGRO                 "NO! Throngus get whipped again if he no finish!"
+#define SAY_MACE_STANCE           "Oh, this is gonna HURT!"
+#define SAY_SHIELD_STANCE         "You not get through defenses!"
+#define SAY_SWORDS_STANCE         "Throngus SLICE you up!"
+#define SAY_KILLED_PLAYER_0       "You break easy!"
+#define SAY_KILLED_PLAYER_1       "Throngus use your corpse on body. Somewhere..."
+#define SAY_DIED                  "Death... Good choice. Not best choice maybe, but better than fail and live."
 
 enum Spells
 {
-    SPELL_MIGHTY_STOMP = 74984,
-    SPELL_PICK_WEAPON = 75000,
-    SPELL_PERSONAL_PHALANX = 74908,
-    SPELL_FLAMING_SHIELD = 90819,
-    SPELL_FLAMING_ARROW = 45101,
-    SPELL_FLAMING_ARROW_VISUAL = 74944,
-    SPELL_DUAL_BLADES_BUFF = 74981,
-    SPELL_TRASH_BUFF = 47480,
-    SPELL_DISORIENTING_ROAR = 74976,
-    SPELL_BURNING_FLAMES = 90764,
-    SPELL_ENCUMBERED = 75007,
-    SPELL_IMPALING_SLAM = 75056,
-    SPELL_LAVA_PATCH = 90754,
-    SPELL_LAVA_PATCH_VISUAL = 90752,
+    SPELL_BURNING_FLAMES        = 90759,
+    SPELL_CAVE_IN_DAMAGE        = 74987,
+    SPELL_CAVE_IN_VISUAL        = 74990,
+    SPELL_DISORIENTING_ROAR     = 74976,
+    SPELL_DISORIENTING_ROAR_H   = 90737,
+    SPELL_DUAL_BLADES_BUFF      = 74981,
+    SPELL_ENCUMBERED            = 75007,
+    SPELL_FLAMING_ARROW         = 74944,
+    SPELL_FLAMING_SHIELD        = 90819,
+    SPELL_IMPALING_SLAM         = 75056,
+    SPELL_LAVA_PATCH            = 90752,
+    SPELL_MIGHTY_STOMP          = 74984,
+    SPELL_PARALAX_SUMMON        = 74914,
+    SPELL_PARALAX_TARGET        = 75071,
+    SPELL_PERSONAL_PHALANX      = 74908,
+    SPELL_PICK_WEAPON           = 75000,
+    SPELL_SHIELD_BUFF           = 74909,
+    SPELL_SHIELD_BUFF_H         = 76480,
+    SPELL_SHIELD_VISUAL         = 94588,
+    SPELL_TRASH_BUFF            = 74979,
 };
 
 enum Events
 {
-    EVENT_PICK_WEAPON = 1,
-    EVENT_STOMP = 2,
-
-    EVENT_PERSONAL_PHALANX = 3,
-
-    EVENT_DISORIENTING_ROAR = 4,
-
-    EVENT_IMPALING_SLAM = 5,
-
-    EVENT_ARCHER_SHOOT = 6,
-
+    EVENT_PICK_WEAPON           = 1,
+    EVENT_MIGHTY_STOMP          = 2,
+    EVENT_PERSONAL_PHALANX      = 3,
+    EVENT_DISORIENTING_ROAR     = 4,
+    EVENT_IMPALING_SLAM         = 5,
+    EVENT_ARCHER_SHOOT          = 6,
 };
 
-enum Weapon
+enum Weapons
 {
-    WEAPON_NON      = 0,
-    WEAPON_CHOOSING = 1,
-    WEAPON_SHIELD   = 2,
-    WEAPON_SWORDS   = 3,
-    WEAPON_MACE     = 4,
+    WEAPON_NONE                 = 0,
+    WEAPON_SHIELD               = 1,
+    WEAPON_SWORDS               = 2,
+    WEAPON_MACE                 = 3,
 };
 
-enum Equipment
+enum Equipments
 {
-    EQUIPMENT_ID_SHIELD = 40400,
-    EQUIPMENT_ID_SWORD  = 65094,
-    EQUIPMENT_ID_MACE   = 65090,
+    EQUIPMENT_ID_SWORD          = 65094,
+    EQUIPMENT_ID_MACE           = 65090,
 };
 
+enum Npcs
+{
+    NPC_CAVE_IN                 = 40228,
+    NPC_FIXATE_STALKER          = 40255,
+};
 
 Position const TwilightArcherSummonPos[13] =
 {{-542.994f, -605.236f, 300.201f, 1.68049f},
@@ -111,16 +117,14 @@ public:
         EventMap events;
         SummonList Summons;
 
-        uint32 currentWaepon;
-        uint8 phases [3];
+
+        uint8 currentWeapon;
+        uint8 phases[3];
 
         void EnterCombat(Unit* /*who*/)
         {
             me->MonsterYell(SAY_AGGRO, LANG_UNIVERSAL, NULL);
-
-            phases[0] = 0;
-            phases[1] = 0;
-            phases[2] = 0;
+            events.ScheduleEvent(EVENT_PICK_WEAPON, urand(5000,10000));
         }
 
         void JustDied(Unit* /*killer*/)
@@ -129,35 +133,94 @@ public:
             Summons.DespawnAll();
         }
 
+        void KilledUnit(Unit* victim)
+        {
+            if (victim->GetTypeId() != TYPEID_PLAYER)
+                return;
+
+            switch (urand(0, 1))
+            {
+                case 0:
+                    me->MonsterYell(SAY_KILLED_PLAYER_0, LANG_UNIVERSAL, 0);
+                    break;
+                case 1:
+                    me->MonsterYell(SAY_KILLED_PLAYER_1, LANG_UNIVERSAL, 0);
+                    break;
+            }
+        }
+
         void Reset()
         {
-            currentWaepon = WEAPON_NON;
+            currentWeapon = WEAPON_NONE;
+
+            phases[0] = 0;
+            phases[1] = 0;
+            phases[2] = 0;
+
+            events.Reset();
             Summons.DespawnAll();
             SetEquipmentSlots(false, 0, 0,0);
         }
 
-        void UpdateAI(const uint32 diff)
+        void SpellHit(Unit* target, const SpellInfo* spell)
         {
-            if (!UpdateVictim() || me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            if(currentWaepon == WEAPON_SHIELD && me->GetMap()->IsHeroic() && (!me->HasAura(SPELL_FLAMING_SHIELD)))
-                DoCast(me, SPELL_FLAMING_SHIELD, true);
-
-            if(currentWaepon == WEAPON_NON)
+            if (spell->Id == SPELL_PICK_WEAPON)
             {
                 ResetWeapon();
-                currentWaepon = WEAPON_CHOOSING;
-                DoCast(SPELL_PICK_WEAPON);
-                return;
+                EquipWeapon();
+                events.ScheduleEvent(EVENT_PICK_WEAPON, 30000);
+            }
+        }
+
+        void JustSummoned(Creature* summon)
+        {
+            summon->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_PACIFIED);
+            summon->SetDisplayId(11686);
+            summon->SetUInt32Value(UNIT_FIELD_LEVEL, me->getLevel()); // Hide Level Up Animation
+            summon->setFaction(me->getFaction());
+
+            switch(summon->GetEntry())
+            {
+                case NPC_CAVE_IN:
+                {
+                    summon->CastSpell(summon, SPELL_CAVE_IN_VISUAL, true);
+                    summon->CastSpell(summon, SPELL_CAVE_IN_DAMAGE, true);
+                    break;
+                }
+                case NPC_FIRE_PATCH:
+                {
+                    summon->CastSpell(summon, SPELL_LAVA_PATCH, true);
+                    break;
+                }
+                case NPC_TWILIGHT_ARCHER:
+                {
+                    summon->SetLevitate(true);
+                    summon->SetByteFlag(UNIT_FIELD_BYTES_1, 3, 0x01);
+                    summon->SetFlying(true);
+                    summon->SendMovementFlagUpdate();
+                    break;
+                }
             }
 
-            if(currentWaepon == WEAPON_CHOOSING)
-            {
-                IntializeWeapon();
-                events.ScheduleEvent(EVENT_PICK_WEAPON, 30000);
+            Summons.Summon(summon);
+        }
+
+        void UpdateAI(const uint32 diff)
+        {
+            if(!UpdateVictim())
                 return;
+
+            if(currentWeapon == WEAPON_SHIELD)
+            {
+                if(!me->HasAura(SPELL_SHIELD_VISUAL))
+                    DoCast(me, SPELL_SHIELD_VISUAL, true);
+                
+                if(!me->HasAura(SPELL_PERSONAL_PHALANX))
+                    DoCast(me, SPELL_PERSONAL_PHALANX, true);
             }
+
+            if(me->HasUnitState(UNIT_STATE_CASTING))
+                return;
 
             events.Update(diff);
 
@@ -165,81 +228,95 @@ public:
             {
                 switch(eventId)
                 {
-                case EVENT_PICK_WEAPON:
-                    currentWaepon = WEAPON_NON;
-                    break;
-                case EVENT_PERSONAL_PHALANX:
-                    if (Unit* tempTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 500.0f, true))
-                        DoCast(tempTarget, SPELL_PERSONAL_PHALANX);
-                    events.ScheduleEvent(EVENT_PERSONAL_PHALANX, 10000);
-                    break;
-                case EVENT_IMPALING_SLAM:
-                    if (Unit* tempTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 500.0f, true))
-                        DoCast(tempTarget, SPELL_IMPALING_SLAM);
-                    events.ScheduleEvent(EVENT_IMPALING_SLAM, 15000);
-                    break;
-                case EVENT_DISORIENTING_ROAR:
-                    DoCastAOE(SPELL_DISORIENTING_ROAR);
-                    events.ScheduleEvent(EVENT_DISORIENTING_ROAR, 11000);
-                default:
-                    break;
+                    case EVENT_PICK_WEAPON:
+                    {
+                        DoCast(SPELL_PICK_WEAPON);
+                        break;
+                    }
+                    case EVENT_MIGHTY_STOMP:
+                    {
+                        if (Unit* tempTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 100.0f, true))
+                            DoCast(tempTarget, SPELL_MIGHTY_STOMP);
+
+                        events.ScheduleEvent(EVENT_MIGHTY_STOMP, 15000);
+                        break;
+                    }
+                    case EVENT_PERSONAL_PHALANX:
+                    {
+                        if (Unit* tempTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 100.0f, true))
+                        {
+                            DoCast(tempTarget, SPELL_PARALAX_SUMMON, true);
+                            DoCast(me, SPELL_FLAMING_SHIELD, true);
+                            DoCast(tempTarget, SPELL_PARALAX_TARGET);
+                        }
+
+                        events.ScheduleEvent(EVENT_PERSONAL_PHALANX, 10000);
+                        break;
+                    }
+                    case EVENT_IMPALING_SLAM:
+                    {
+                        if (Unit* tempTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 100.0f, true))
+                            DoCast(tempTarget, SPELL_IMPALING_SLAM);
+
+                        events.ScheduleEvent(EVENT_IMPALING_SLAM, 7000);
+                        break;
+                    }
+                    case EVENT_DISORIENTING_ROAR:
+                    {
+                        DoCastAOE(SPELL_DISORIENTING_ROAR);
+                        events.ScheduleEvent(EVENT_DISORIENTING_ROAR, 11000);
+                        break;
+                    }
                 }
             }
 
             DoMeleeAttackIfReady();
         }
 
-        void JustSummoned(Creature* summon)
+        inline void EquipWeapon()
         {
-            //summon->setActive(true);
-            summon->SetFlag(UNIT_FIELD_FLAGS,UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_NOT_SELECTABLE);
-            if(summon->GetEntry() == NPC_FIRE_PATCH)
-                summon->CastSpell(summon, SPELL_LAVA_PATCH_VISUAL, true);
-            Summons.Summon(summon);
-        }
-
-        void DamageDealt(Unit* victim, uint32& damage, DamageEffectType /*damageType*/)
-        {
-            if(currentWaepon != WEAPON_SWORDS || !me->GetMap()->IsHeroic())
-                return;
-
-            if(me->GetMap()->IsHeroic() && damage > 0)
-                me->CastSpell(me->getVictim(), SPELL_BURNING_FLAMES, true);
-        }
-
-        inline void IntializeWeapon()
-        {
-            currentWaepon = GetNextPhase();
-
-            // If you want to test a single Phase you can overwrite the rand value here
-            // currentWaepon = WEAPON_MACE;
-
-            switch(currentWaepon)
+            switch(currentWeapon = GetNextWeapon())
             {
-            case WEAPON_SHIELD:
-                SetEquipmentSlots(false, 0, EQUIPMENT_ID_SHIELD,0);
+                case WEAPON_SHIELD:
+                {
+                    SetEquipmentSlots(false, 0, 0,0);
+                    me->MonsterYell(SAY_SHIELD_STANCE, LANG_UNIVERSAL, NULL);
+                    
+                    for(uint32 i = 0; i <= sizeof(TwilightArcherSummonPos); i++)
+                        me->SummonCreature(NPC_TWILIGHT_ARCHER, TwilightArcherSummonPos[i], TEMPSUMMON_MANUAL_DESPAWN);
 
-                if(me->GetMap()->IsHeroic())
-                    DoCast(me, SPELL_FLAMING_SHIELD, true);
+                    DoCast(me, SPELL_SHIELD_VISUAL, true);
+                    DoCast(me, SPELL_PERSONAL_PHALANX, true);
 
-                for(uint32 i = 0; i<=12; i++)
-                    me->SummonCreature(NPC_TWILIGHT_ARCHER,TwilightArcherSummonPos[i],TEMPSUMMON_MANUAL_DESPAWN);
+                    events.ScheduleEvent(EVENT_PERSONAL_PHALANX, 1000);
+                    break;
+                }
+                case WEAPON_SWORDS:
+                {
+                    SetEquipmentSlots(false, EQUIPMENT_ID_SWORD, EQUIPMENT_ID_SWORD,0);
+                    me->MonsterYell(SAY_SWORDS_STANCE, LANG_UNIVERSAL, NULL);
 
-                events.ScheduleEvent(EVENT_PERSONAL_PHALANX, 10000);
-                break;
-            case WEAPON_SWORDS:
-                DoCast(me, SPELL_DUAL_BLADES_BUFF, true);
-                DoCast(me, SPELL_TRASH_BUFF, true);
-                SetEquipmentSlots(false, EQUIPMENT_ID_SWORD, EQUIPMENT_ID_SWORD,0);
-                events.ScheduleEvent(EVENT_DISORIENTING_ROAR, 11000);
-                break;
-            case WEAPON_MACE:
-                if(me->GetMap()->IsHeroic())
-                    DoCast(me, SPELL_LAVA_PATCH, true);
-                DoCast(me, SPELL_ENCUMBERED, true);
-                SetEquipmentSlots(false, EQUIPMENT_ID_MACE, 0,0);
-                events.ScheduleEvent(EVENT_IMPALING_SLAM, 7000);
-                break;
+                    DoCast(me, SPELL_DUAL_BLADES_BUFF, true);
+                    DoCast(me, SPELL_TRASH_BUFF, true);
+                    
+                    if(IsHeroic())
+                        DoCast(me, SPELL_BURNING_FLAMES, true);
+                    
+                    events.ScheduleEvent(EVENT_DISORIENTING_ROAR, 11000);
+                    events.ScheduleEvent(EVENT_MIGHTY_STOMP, 15000);
+                    break;
+                }
+                case WEAPON_MACE:
+                {
+                    SetEquipmentSlots(false, EQUIPMENT_ID_MACE, 0,0);
+                    me->MonsterYell(SAY_MACE_STANCE, LANG_UNIVERSAL, NULL);
+
+                    DoCast(me, SPELL_ENCUMBERED, true);
+
+                    events.ScheduleEvent(EVENT_IMPALING_SLAM, 7000);
+                    events.ScheduleEvent(EVENT_MIGHTY_STOMP, 15000);
+                    break;
+                }
             }
 
         }
@@ -249,18 +326,20 @@ public:
             events.Reset();
             Summons.DespawnEntry(NPC_TWILIGHT_ARCHER);
 
+            me->InterruptNonMeleeSpells(false, SPELL_PARALAX_TARGET);
+
+            me->RemoveAura(SPELL_SHIELD_VISUAL);
             me->RemoveAura(SPELL_FLAMING_SHIELD);
             me->RemoveAura(SPELL_PERSONAL_PHALANX);
 
             me->RemoveAura(SPELL_DUAL_BLADES_BUFF);
             me->RemoveAura(SPELL_TRASH_BUFF);
+            me->RemoveAura(SPELL_BURNING_FLAMES);
 
-            me->RemoveAura(SPELL_LAVA_PATCH);
             me->RemoveAura(SPELL_ENCUMBERED);
-
         }
 
-        inline uint8 GetNextPhase()
+        inline uint8 GetNextWeapon()
         {
             uint8 base[3] = {WEAPON_SHIELD, WEAPON_SWORDS, WEAPON_MACE};
 
@@ -278,8 +357,8 @@ public:
 
                 uint8 v = phases[0];
                 phases[0] = 0;
-                return v;
 
+                return v;
             }
             else
             {
@@ -314,7 +393,6 @@ public:
     {
         mob_twilight_archerAI(Creature* creature) : ScriptedAI(creature)
         {
-            creature->SetReactState(REACT_PASSIVE);
         }
 
         EventMap events;
@@ -322,8 +400,7 @@ public:
         void IsSummonedBy(Unit* summoner)
         {
             DoZoneInCombat();
-
-            events.ScheduleEvent(EVENT_ARCHER_SHOOT, urand(1700,2500));
+            events.ScheduleEvent(EVENT_ARCHER_SHOOT, urand(2500,10000));
         }
 
         void UpdateAI(const uint32 diff)
@@ -334,23 +411,101 @@ public:
             {
                 switch(eventId)
                 {
-                case EVENT_ARCHER_SHOOT:
-                    if(Unit* nearPlayer = SelectTarget(SELECT_TARGET_NEAREST, 0, 2, true))
+                    case EVENT_ARCHER_SHOOT:
                     {
-                        me->CastSpell(nearPlayer,SPELL_FLAMING_ARROW_VISUAL,true);
-                        me->CastSpell(nearPlayer,SPELL_FLAMING_ARROW,true);
+                        if (Unit* nearPlayer = SelectTarget(SELECT_TARGET_RANDOM, 0, 500.0f, true))
+                            DoCast(nearPlayer,SPELL_FLAMING_ARROW,true);
+                        events.ScheduleEvent(EVENT_ARCHER_SHOOT, urand(2500,10000));
+                        break;
                     }
-
-                    events.ScheduleEvent(EVENT_ARCHER_SHOOT, urand(1700,2500));
-                    break;
                 }
             }
         }
     };
 };
 
+class spell_mighty_stomp_summon : public SpellScriptLoader
+{
+    public:
+        spell_mighty_stomp_summon() : SpellScriptLoader("spell_mighty_stomp_summon") { }
+
+        class spell_mighty_stomp_summon_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_mighty_stomp_summon_SpellScript);
+
+            bool Load()
+            {
+                if (!GetCaster()->GetInstanceScript())
+                    return false;
+                return true;
+            }
+
+            void HandleForceCast(SpellEffIndex effIndex)
+            {
+                PreventHitDefaultEffect(effIndex);
+                if (!GetHitUnit())
+                    return;
+
+                float x, y, z;
+                GetHitUnit()->GetPosition(x, y, z);
+                GetCaster()->SummonCreature(NPC_CAVE_IN, x, y, z, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 4 * MINUTE * IN_MILLISECONDS);
+            }
+
+            void Register()
+            {
+                OnEffectHitTarget += SpellEffectFn(spell_mighty_stomp_summon_SpellScript::HandleForceCast, EFFECT_0, SPELL_EFFECT_FORCE_CAST);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_mighty_stomp_summon_SpellScript();
+        }
+};
+
+class spell_personal_phalanx_summon : public SpellScriptLoader
+{
+    public:
+        spell_personal_phalanx_summon() : SpellScriptLoader("spell_personal_phalanx_summon") { }
+
+        class spell_personal_phalanx_summon_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_personal_phalanx_summon_SpellScript);
+
+            bool Load()
+            {
+                if (!GetCaster()->GetInstanceScript())
+                    return false;
+                return true;
+            }
+
+            void HandleForceCast(SpellEffIndex effIndex)
+            {
+                PreventHitDefaultEffect(effIndex);
+                if (!GetHitUnit())
+                    return;
+
+                float x, y, z;
+                GetHitUnit()->GetPosition(x, y, z);
+                GetCaster()->SummonCreature(NPC_FIXATE_STALKER, x, y, z, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 4 * IN_MILLISECONDS);
+            }
+
+            void Register()
+            {
+                OnEffectHitTarget += SpellEffectFn(spell_personal_phalanx_summon_SpellScript::HandleForceCast, EFFECT_0, SPELL_EFFECT_FORCE_CAST);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_personal_phalanx_summon_SpellScript();
+        }
+};
+
 void AddSC_boss_forgemaster_throngus()
 {
     new boss_forgemaster_throngus();
     new mob_twilight_archer();
+    new spell_mighty_stomp_summon();
+    new spell_personal_phalanx_summon();
 }
