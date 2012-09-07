@@ -108,7 +108,46 @@ class boss_argaloth: public CreatureScript
     }
 };
 
+class spell_meteor_slash : public SpellScriptLoader
+{
+    public:
+        spell_meteor_slash() : SpellScriptLoader("spell_meteor_slash") { }
+        
+        class spell_meteor_slash_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_meteor_slash_SpellScript);
+
+            std::list<Unit*>& targetList;
+
+            void FilterTargets(std::list<Unit*>& unitList)
+            {
+                targetList = unitList;
+            }
+
+            void DamageCaster(SpellEffIndex /*effIndex*/)
+            {
+                if(!targetList.empty())
+                {
+                    int32 damage = int32(GetHitDamage() / targetList.size());
+                    SetHitDamage(dmg);
+                }
+            }
+
+            void Register()
+            {
+                OnUnitTargetSelect += SpellUnitTargetFn(spell_meteor_slash_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_CONE_ENEMY_104);
+                OnEffectHitTarget += SpellEffectFn(spell_meteor_slash_SpellScript::DamageCaster, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_meteor_slash_SpellScript();
+        }
+};
+
 void AddSC_boss_argaloth()
 {
     new boss_argaloth();
+    new spell_meteor_slash();
 }
