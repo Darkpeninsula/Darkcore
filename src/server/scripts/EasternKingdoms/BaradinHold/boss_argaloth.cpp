@@ -119,7 +119,7 @@ class spell_meteor_slash : public SpellScriptLoader
         {
             PrepareSpellScript(spell_meteor_slash_SpellScript);
 
-            std::list<Unit*>& targetList;
+            std::list<Unit*> targetList;
 
             void FilterTargets(std::list<Unit*>& unitList)
             {
@@ -130,7 +130,7 @@ class spell_meteor_slash : public SpellScriptLoader
             {
                 if(!targetList.empty())
                 {
-                    int32 damage = int32(GetHitDamage() / targetList.size());
+                    int32 dmg = int32(GetHitDamage() / targetList.size());
                     SetHitDamage(dmg);
                 }
             }
