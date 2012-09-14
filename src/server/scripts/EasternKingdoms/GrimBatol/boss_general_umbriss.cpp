@@ -32,44 +32,41 @@
 enum CreatureIds
 {
     BOSS_UMBRISS    = 39625,
-    MOB_TROGG_MAL   = 39984,
+    MOB_TROGG_MALICE   = 39984,
     MOB_TROGG_DWE   = 45467,
 };
 
 enum Spells
 {
     //Umbriss
-    SPELL_BERSERK = 74853,
-    SPELL_SECOUSS = 74634,
-    SPELL_SECOUSS_H = 90249,
-    SPELL_ECLAIR = 74670,
-    SPELL_ECLAIR_H = 90250,
-    SPELL_PLAIE = 74846,
-    SPELL_PLAIE_H = 91937,
-    SPELL_APPARITION = 74859,
+    SPELL_FRENZY = 74853,
+    SPELL_GROUND_SIEGE = 74634,
+    SPELL_BLITZ = 74670,
+    SPELL_BLEENDING_WOUND = 74846,
+    SPELL_SUMMON_SKARDYN = 74859,
     //Trogg Malveillant and Dweller
-    SPELL_MAL = 90169,
+    SPELL_MALICE = 74699,
+    SPELL_MALICE_EFFECT = 90170,
     SPELL_MODGUD = 74837,
-    SPELL_GRIFFE = 90212,
+    SPELL_PUNCTURE = 76507,
 };
 
 enum Events
 {
     //Umbriss
-    EVENT_BERSERK  = 0,
-    EVENT_SECOUSS  = 1,
-    EVENT_ECLAIR   = 2,
-    EVENT_PLAIE    = 3,
-    EVENT_SUMMON   = 4,
+    EVENT_GROUND_SIEGE  = 0,
+    EVENT_BLITZ   = 1,
+    EVENT_BLEENDING_WOUND    = 2,
+    EVENT_SUMMON_SKARDYN   = 3,
     //Trogg
-    EVENT_GRIFFE   = 5,
-    EVENT_MAL      = 6,
-    EVENT_MOGUD    = 7,
+    EVENT_PUNCTURE   = 4,
+    EVENT_MALICE      = 5,
+    EVENT_MOGUD    = 6,
 };
 
 enum SummonIds
 {
-    NPC_TROGG_MAL = 39984,
+    NPC_TROGG_MALICE = 39984,
     NPC_TROGG_DWE = 45467,
 };
 
@@ -96,6 +93,8 @@ class boss_umbriss : public CreatureScript
             EventMap events;
             SummonList Summons;
 
+            bool isEnraged;
+
             void EnterCombat(Unit * /*who*/)
             {
                 EnterPhaseGround();
@@ -116,13 +115,19 @@ class boss_umbriss : public CreatureScript
                 Summons.Summon(pSummoned);
             }
 
+            void Reset()
+            {
+                events.Reset();
+                Summons.DespawnAll();
+                isEnraged = false;
+            }
+
             void EnterPhaseGround()
             {
-                events.ScheduleEvent(EVENT_SECOUSS, 6000);
-                events.ScheduleEvent(EVENT_ECLAIR, 13000);
-                events.ScheduleEvent(EVENT_PLAIE, 20000);
-                events.ScheduleEvent(EVENT_SUMMON, 60000);
-                events.ScheduleEvent(EVENT_BERSERK, 180000);
+                events.ScheduleEvent(EVENT_GROUND_SIEGE, 6000);
+                events.ScheduleEvent(EVENT_BLITZ, 13000);
+                events.ScheduleEvent(EVENT_BLEENDING_WOUND, 20000);
+                events.ScheduleEvent(EVENT_SUMMON_SKARDYN, 60000);
             }
 
             void UpdateAI(const uint32 diff)
@@ -130,35 +135,36 @@ class boss_umbriss : public CreatureScript
                 if (!UpdateVictim())
                     return;
 
+                if (HealthBelowPct(30) && !isEnraged)
+                {
+                    DoCast(me, SPELL_FRENZY);
+                    return;
+                }
                 events.Update(diff);
 
                 while (uint32 eventId = events.ExecuteEvent())
                 {
                     switch(eventId)
                     {
-                        case EVENT_SECOUSS:
+                        case EVENT_GROUND_SIEGE:
                             if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
-                                DoCast(target, IsHeroic() ? SPELL_SECOUSS_H : SPELL_SECOUSS);
-                            events.ScheduleEvent(EVENT_SECOUSS, 6000);
+                                DoCast(target, SPELL_GROUND_SIEGE);
+                            events.ScheduleEvent(EVENT_GROUND_SIEGE, 6000);
                             return;
-                        case EVENT_ECLAIR:
+                        case EVENT_BLITZ:
                             if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM,1,100,true))
-                                DoCast(target, IsHeroic() ? SPELL_ECLAIR_H : SPELL_ECLAIR);
-                            events.ScheduleEvent(EVENT_ECLAIR, 13000);
+                                DoCast(target, SPELL_BLITZ);
+                            events.ScheduleEvent(EVENT_BLITZ, 13000);
                             return;
-                        case EVENT_PLAIE:
+                        case EVENT_BLEENDING_WOUND:
                             if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
-                                DoCast(target, IsHeroic() ? SPELL_PLAIE_H : SPELL_PLAIE);
-                            events.ScheduleEvent(EVENT_PLAIE, 20000);
+                                DoCast(target, SPELL_BLEENDING_WOUND);
+                            events.ScheduleEvent(EVENT_BLEENDING_WOUND, 20000);
                             return;
-                        case EVENT_BERSERK:
-                            if(!HealthAbovePct(30))
-                                DoCast(me, SPELL_BERSERK);
-                            return;
-                        case EVENT_SUMMON:
-                            me->SummonCreature(NPC_TROGG_MAL, aSpawnLocations[0].GetPositionX(), aSpawnLocations[0].GetPositionY(), aSpawnLocations[0].GetPositionZ(), 0.0f, TEMPSUMMON_CORPSE_DESPAWN);
+                        case EVENT_SUMMON_SKARDYN:
+                            me->SummonCreature(NPC_TROGG_MALICE, aSpawnLocations[0].GetPositionX(), aSpawnLocations[0].GetPositionY(), aSpawnLocations[0].GetPositionZ(), 0.0f, TEMPSUMMON_CORPSE_DESPAWN);
                             me->SummonCreature(NPC_TROGG_DWE, aSpawnLocations[1].GetPositionX(), aSpawnLocations[1].GetPositionY(), aSpawnLocations[1].GetPositionZ(), 0.0f, TEMPSUMMON_CORPSE_DESPAWN);
-                            events.ScheduleEvent(EVENT_SUMMON, 60000);
+                            events.ScheduleEvent(EVENT_SUMMON_SKARDYN, 60000);
                             return;
                     }
                 }
@@ -190,8 +196,8 @@ public:
 
         void EnterPhaseGround()
         {
-            events.ScheduleEvent(EVENT_GRIFFE, 2000);
-            events.ScheduleEvent(EVENT_MAL, 6000);
+            events.ScheduleEvent(EVENT_PUNCTURE, 2000);
+            events.ScheduleEvent(EVENT_MALICE, 6000);
             events.ScheduleEvent(EVENT_MOGUD, 12000);
         }
 
@@ -206,13 +212,13 @@ public:
             {
                 switch(eventId)
                 {
-                    case EVENT_GRIFFE:
-                        DoCastVictim(SPELL_GRIFFE);
-                        events.ScheduleEvent(EVENT_GRIFFE, 2000);
+                    case EVENT_PUNCTURE:
+                        DoCastVictim(SPELL_PUNCTURE);
+                        events.ScheduleEvent(EVENT_PUNCTURE, 2000);
                         return;
-                    case EVENT_MAL:
-                        DoCastVictim(SPELL_MAL);
-                        events.ScheduleEvent(EVENT_MAL, 6000);
+                    case EVENT_MALICE:
+                        DoCastVictim(SPELL_MALICE);
+                        events.ScheduleEvent(EVENT_MALICE, 6000);
                         return;
                     case EVENT_MOGUD:
                         DoCastVictim(SPELL_MODGUD);
@@ -253,7 +259,7 @@ public:
 
         void EnterPhaseGround()
         {
-            events.ScheduleEvent(EVENT_GRIFFE, 5000);
+            events.ScheduleEvent(EVENT_PUNCTURE, 5000);
         }
 
         void UpdateAI(const uint32 diff)
@@ -267,9 +273,9 @@ public:
             {
                 switch(eventId)
                 {
-                    case EVENT_GRIFFE:
-                        DoCastVictim(SPELL_GRIFFE);
-                        events.ScheduleEvent(EVENT_GRIFFE, 5000);
+                    case EVENT_PUNCTURE:
+                        DoCastVictim(SPELL_PUNCTURE);
+                        events.ScheduleEvent(EVENT_PUNCTURE, 5000);
                         return;
                 }
             }
@@ -285,9 +291,118 @@ public:
 
 };
 
+class spell_modgud_malice : public SpellScriptLoader
+{
+    public:
+        spell_modgud_malice() :  SpellScriptLoader("spell_modgud_malice") { }
+
+        class spell_modgud_malice_AuraScript : public AuraScript
+        {
+            PrepareAuraScript(spell_modgud_malice_AuraScript);
+
+            bool Validate(SpellInfo const* /*spell*/)
+            {
+                if (!sSpellMgr->GetSpellInfo(SPELL_MALADY))
+                    return false;
+                return true;
+            }
+
+            void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+            {
+                if(GetTargetApplication()->GetRemoveMode() == AURA_REMOVE_BY_DEATH)
+                    GetCaster()->CastSpell(me, SPELL_MALADY, true);
+            }
+
+            void Register()
+            {
+                AfterEffectRemove += AuraEffectRemoveFn(spell_modgud_malice_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_MOD_SCALE, AURA_EFFECT_HANDLE_REAL);
+            }
+        };
+
+        AuraScript* GetAuraScript() const
+        {
+            return new spell_modgud_malice_AuraScript();
+        }
+};
+
+class ModgudMaladyTargetSelector
+{
+public:
+    explicit ModgudMaladyTargetSelector(Unit* _caster) : caster(_caster) { }
+
+    bool operator() (Unit* unit)
+    {
+        return !unit->IsWithinDist(caster, 8.0f);
+    }
+
+private:
+    Unit* caster;
+};
+
+class spell_modgud_malady : public SpellScriptLoader
+{
+    public:
+        spell_modgud_malady() : SpellScriptLoader("spell_modgud_malady") { }
+
+        class spell_modgud_malady_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_modgud_malady_SpellScript);
+
+            void FilterTargets(std::list<Unit*>& unitList)
+            {
+                unitList.remove_if(ModgudMaladyTargetSelector(GetCaster()));
+            }
+
+            void FilterTargetsExtended(std::list<Unit*>& unitList)
+            {
+                unitList.remove_if(ModgudMaladyTargetSelector(GetCaster()));
+
+                if(InstanceScript* instance = GetCaster()->GetInstanceScript())
+                {
+                    for (std::list<Unit*>::iterator itr = unitList.begin(); itr != unitList.end();)
+                    {
+                        if((*itr)->GetTypeId() == TYPEID_UNIT)
+                        {
+                            if(Creature* target = (*itr)->ToCreature())
+                            {
+                                if(Creature* GeneralUmbriss = Unit::GetCreature(GetCaster(), instance->GetData64(DATA_GENERAL_UMBRISS)))
+                                {
+                                    if (target->GetCreatureTemplate()->Entry == GeneralUmbriss->GetCreatureTemplate()->Entry)
+                                    {
+                                        GetCaster()->CastSpell(GeneralUmbriss, SPELL_MALICE_EFFECT, true);
+                                        unitList.erase(itr);
+                                    }
+                                }
+
+                                if (target->GetCreatureTemplate()->Entry == NPC_TROGG_DWE)
+                                {
+                                    target->UpdateEntry(NPC_TROGG_MAL);
+                                    unitList.erase(itr);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            void Register()
+            {
+                OnUnitTargetSelect += SpellUnitTargetFn(spell_modgud_malady_SpellScript::FilterTargetsExtended, EFFECT_0, TARGET_UNIT_SRC_AREA_ENTRY);
+                OnUnitTargetSelect += SpellUnitTargetFn(spell_modgud_malady_SpellScript::FilterTargets, EFFECT_1, TARGET_UNIT_SRC_AREA_ENTRY);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_modgud_malady_SpellScript();
+        }
+};
+
 void AddSC_boss_general_umbriss()
 {
     new boss_umbriss();
     new npc_dweller();
     new npc_malveillant();
+    new spell_modgud_malice();
+    new spell_modgud_malady();
 }
